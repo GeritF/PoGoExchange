@@ -2,10 +2,6 @@
   <Project Path="PoGoExchange.Android/PoGoExchange.Android.csproj">
     <Deploy />
   </Project>
-  <Project Path="PoGoExchange.Browser/PoGoExchange.Browser.csproj" />
   <Project Path="PoGoExchange.Desktop/PoGoExchange.Desktop.csproj" />
-  <Project Path="PoGoExchange.iOS/PoGoExchange.iOS.csproj">
-    <Deploy />
-  </Project>
   <Project Path="PoGoExchange/PoGoExchange.csproj" />
 </Solution>
