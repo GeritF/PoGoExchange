@@ -424,3 +424,10 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# Rider
+.idea/
+
+# Installationsdateien: Archive und entpackte Programme
+install/**/*.tar.gz
+install/**/jetbrains-toolbox-*/
