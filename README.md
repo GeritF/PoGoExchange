@@ -1,1 +1,799 @@
 # PoGoExchange
+
+Verwaltung von Tausch- und Sammellisten fuer Pokemon GO, mit besonderem
+Fokus auf Shiny-Tausche (Glueckstausch). Laeuft unter Linux, Windows und
+Android aus einer gemeinsamen Codebasis (C#, .NET, Avalonia UI).
+
+Hinweis zur Schreibweise: Dieses Dokument ist bewusst in reinem ASCII
+gehalten (ae, oe, ue, ss statt Umlauten), damit das Encoding
+editorunabhaengig bleibt. Das Programm selbst und seine Datendateien
+verwenden echte Umlaute (UTF-8).
+
+Die Einrichtung der Entwicklungsumgebung ist in
+`install/Entwicklungsumgebung_Linux.md` beschrieben.
+
+## Inhalt
+
+1. Funktionen fuer Anwender
+2. Datenstrukturen
+3. Technische Details und Begruendungen
+
+---
+
+# 1. Funktionen fuer Anwender
+
+## Grundidee
+
+Das Programm trennt zwei Arten von Daten:
+
+- **Nutzdaten**: Welche Pokemon und welche Formen gibt es im Spiel?
+  Diese Daten werden mit dem Programm ausgeliefert und per Update gepflegt.
+- **Persoenliche Listen**: Was habe ich, was suche ich, was kann ich
+  abgeben? Diese Daten gehoeren jedem Spieler selbst.
+
+## Formen und Merkmale
+
+Ein Pokemon kann in verschiedenen **Formen** vorkommen:
+
+- **Form**, z.B. "Rot" bei Flabebe, "Q" bei Icognito, "XL" bei Irrbiss
+- **Region** fuer Regionalformen, z.B. "Alola" bei Vulpix
+
+Fuer jedes Pokemon gibt es mindestens die Grundform.
+
+Daneben hat jedes einzelne Exemplar **Merkmale**:
+
+- **Geschlecht**: maennlich oder weiblich
+- **Shiny**
+- **Dynamax**: keins, Dynamax oder Gigadynamax
+- **Kostuem**: keins, oder ein Kostuem mit oder ohne Beschreibung
+- **Hintergrund**: keiner, oder ein Hintergrund mit oder ohne Beschreibung
+- **Glueck**
+- **100er** (Werte 15/15/15)
+
+Bei Eintraegen in "Habe ich" beschreiben die Merkmale das vorhandene
+Exemplar. Bei Eintraegen in "Suche ich" sind sie Anforderungen: Ein nicht
+gesetztes Merkmal bedeutet "egal". Wer z.B. "Pikachu" ohne Haken bei Shiny
+sucht, nimmt auch ein Shiny. Kostuem oder Hintergrund ohne Beschreibung
+bedeuten "beliebiges Kostuem" bzw. "beliebiger Hintergrund".
+
+Dynamax und Gigadynamax sind getrennte Ziele: Ein Gigadynamax-Exemplar
+erfuellt die Anforderung "Dynamax" nicht und umgekehrt.
+
+Eigene Formen (z.B. eine neue Form, die es in den Nutzdaten noch nicht gibt)
+kann jeder Spieler selbst anlegen. Eine Form, die es fuer dieses Pokemon
+schon gibt, wird dabei abgelehnt.
+
+## Persoenliche Listen
+
+Jeder Spieler fuehrt drei Listen:
+
+- **Habe ich**: Pokemon, die man besitzt, mit allen Merkmalen.
+- **Suche ich**: Pokemon, die man noch haben moechte. Eine Form mit denselben
+  Anforderungen kann mehrfach eingetragen werden (z.B. 3x Glumanda Shiny).
+  Zusaetzlich:
+  - "1:1 moeglich": Man wuerde dasselbe Pokemon im Tausch zurueckgeben.
+- **Habe ich ueber**: Pokemon, die man abgeben kann, mit ihren Merkmalen
+  (ohne Glueck und 100er).
+
+Regeln:
+
+- Gluecks-Pokemon wurden bereits getauscht und koennen nicht erneut
+  getauscht werden. Sie lassen sich daher nicht nach "Habe ich ueber"
+  verschieben.
+- Mit "Von 'Suche ich' nach 'Habe ich' verschieben" wird ein erfolgreicher
+  Tausch eingetragen. Der Sucheintrag wird dabei als erledigt markiert, in
+  "Habe ich" entsteht ein neues Exemplar. Die Merkmale des neuen Exemplars
+  koennen dabei angepasst werden (z.B. ist es ein 100er geworden).
+- Wird ein Exemplar entwickelt, geaendert oder geloescht, schlaegt das
+  Programm vor, welche erledigten Sucheintraege angepasst werden sollen. Es
+  aendert nichts selbststaendig (siehe "Pokemon entwickeln" und "Exemplare
+  aendern oder loeschen").
+
+## Pokemon zu "Suche ich" hinzufuegen
+
+Die Auswahl zeigt drei getrennte Listen:
+
+1. **Verfuegbar**: Formen, die es im Spiel gibt.
+2. **Hast du schon**: Formen, zu denen es bereits Exemplare in "Habe ich"
+   gibt.
+3. **Nicht verfuegbar**: Formen, deren Shiny es noch nicht gibt, wenn Shiny
+   gesucht wird (z.B. ein Shiny, das erst zum naechsten Community Day
+   erscheint).
+
+Alle drei Listen sind auswaehlbar.
+
+Gibt es in "Habe ich" bereits Exemplare, die die Anforderungen erfuellen,
+bietet das Programm an, entsprechend viele der neuen Sucheintraege sofort als
+erledigt zu markieren.
+
+## Sammel-Suche
+
+Mit einer Sammel-Suche wird fuer jedes Pokemon ein Sucheintrag mit
+denselben Anforderungen angelegt, z.B. "Von jedem ein 100er". Pokemon, fuer
+die es in "Habe ich" bereits ein passendes Exemplar gibt, werden sofort als
+erledigt markiert.
+
+## Pokemon entwickeln
+
+In "Habe ich" gibt es die Funktion "Entwickeln". Da das Programm keine
+Entwicklungsketten kennt, wird die Zielform von Hand ausgewaehlt. Dabei zaehlt
+die Form, nicht nur das Pokemon: Aus Alola-Vulpix wird Alola-Vulnona.
+
+Ablauf:
+
+1. In "Habe ich" das Exemplar auswaehlen und "Entwickeln" waehlen.
+2. Die Zielform auswaehlen, z.B. Glurak.
+3. Das Exemplar bekommt die neue Form. Alle Merkmale (Shiny, Glueck, 100er,
+   Hintergrund usw.) bleiben erhalten und koennen danach bei Bedarf angepasst
+   werden.
+4. Das Programm zeigt alle Zeilen aus "Suche ich" mit erledigten Eintraegen
+   derselben Form, deren Anforderungen das Exemplar erfuellt.
+5. Man hakt an, welche Zeilen "mit hochgezogen" werden sollen. Pro
+   angehakter Zeile wird genau ein erledigter Eintrag auf die neue Form
+   umgestellt und bleibt erledigt. Nicht angehakte Zeilen bleiben unveraendert.
+
+**Beispiel 1: Einfache Entwicklung**
+
+Vorher:
+
+- Habe ich: 3x Glumanda Shiny
+- Suche ich: 3x Glumanda Shiny, alle erledigt (3/3)
+
+Ein Glumanda wird zu Glurak entwickelt. Das Programm zeigt:
+
+- [ ] Glumanda - Shiny (3 erledigt)
+
+Mit Haken nachher:
+
+- Habe ich: 2x Glumanda Shiny, 1x Glurak Shiny
+- Suche ich: Glumanda - Shiny (2/2), Glurak - Shiny (1/1)
+
+Ohne Haken nachher:
+
+- Habe ich: 2x Glumanda Shiny, 1x Glurak Shiny
+- Suche ich: Glumanda - Shiny (3/3)
+
+Im zweiten Fall gibt es in "Habe ich" nur noch 2 passende Glumanda fuer 3
+erledigte Eintraege. Die Plausibilitaetspruefung weist darauf hin (siehe
+unten).
+
+**Beispiel 2: Mehrere Zeilen**
+
+Vorher:
+
+- Habe ich: 3x Glumanda Shiny, eines davon ist ein 100er
+- Suche ich: 3x Glumanda Shiny (3/3), 1x Glumanda Shiny [100er] (1/1)
+
+Das 100er-Glumanda wird zu Glurak entwickelt. Das Programm zeigt:
+
+- [ ] Glumanda - Shiny (3 erledigt)
+- [ ] Glumanda - Shiny [100er] (1 erledigt)
+
+Sind beide Zeilen angehakt, nachher:
+
+- Habe ich: 2x Glumanda Shiny, 1x Glurak Shiny 100er
+- Suche ich: Glumanda - Shiny (2/2), Glurak - Shiny (1/1),
+  Glurak - Shiny [100er] (1/1)
+
+Wird stattdessen ein Glumanda ohne 100er entwickelt, erscheint nur die erste
+Zeile, denn dieses Exemplar erfuellt die Anforderung "100er" nicht.
+
+**Beispiel 3: Keine passende Suche**
+
+Gibt es zu dem Exemplar keine erledigten Sucheintraege (z.B. weil es nie
+gesucht wurde), wird nur das Exemplar umgestellt. Es erscheint keine Auswahl.
+
+## Exemplare aendern oder loeschen
+
+Wird ein Exemplar in "Habe ich" geloescht oder so geaendert, dass es
+Anforderungen nicht mehr erfuellt, zeigt das Programm die betroffenen Zeilen
+aus "Suche ich" mit erledigten Eintraegen. Man hakt an, in welchen Zeilen ein
+Eintrag wieder geoeffnet werden soll. Pro angehakter Zeile wird genau ein
+Eintrag wieder offen. Das Programm aendert nichts selbststaendig.
+
+**Beispiel 4: Exemplar geloescht**
+
+Vorher:
+
+- Habe ich: 3x Glumanda Shiny
+- Suche ich: Glumanda - Shiny (3/3)
+
+Ein Glumanda wurde versehentlich eingetragen und wird geloescht. Das
+Programm zeigt:
+
+- [ ] Glumanda - Shiny (3 erledigt): einen Eintrag wieder oeffnen
+
+Mit Haken nachher:
+
+- Habe ich: 2x Glumanda Shiny
+- Suche ich: Glumanda - Shiny (2/3), erscheint wieder unter "fehlt"
+
+**Beispiel 5: Merkmal geaendert**
+
+Vorher:
+
+- Habe ich: 1x Glumanda Shiny mit Glueck
+- Suche ich: Glumanda - Shiny [Glueck] (1/1), Glumanda - Shiny (1/1)
+
+Der Glueck-Haken war ein Versehen und wird entfernt. Das Exemplar erfuellt
+"Shiny" weiterhin, "Shiny mit Glueck" aber nicht mehr. Das Programm zeigt
+daher nur:
+
+- [ ] Glumanda - Shiny [Glueck] (1 erledigt): einen Eintrag wieder oeffnen
+
+Mit Haken nachher:
+
+- Suche ich: Glumanda - Shiny [Glueck] (0/1), Glumanda - Shiny (1/1)
+
+## Plausibilitaetspruefung
+
+Das Programm vergleicht pro Zeile in "Suche ich" die Anzahl der erledigten
+Eintraege mit der Anzahl passender Exemplare in "Habe ich". Gibt es mehr
+erledigte Eintraege als passende Exemplare, erscheint ein Hinweis, z.B.
+"Glumanda - Shiny: 3 erledigt, aber nur 2 passende Exemplare vorhanden". Die
+Pruefung korrigiert nichts. Man kann den Hinweis bestaetigen oder einen
+Eintrag wieder oeffnen.
+
+## Tauschliste erstellen
+
+Das Programm erzeugt eine Tauschliste als Text, gruppiert nach Region und
+sortiert nach Dex-Nummer. Die Liste ist fuer Menschen lesbar und kann von
+anderen Spielern in ihr Programm eingelesen werden:
+
+```
+Kanto 1:1:
+- #4 Glumanda - Shiny (1/3)
+- #6 Glurak - Shiny
+
+Kanto fehlt:
+- #1 Bisasam - Shiny
+- #4 Glumanda - Shiny [100er] (0/1)
+- #150 Mewtu - Shiny
+
+Kanto abzugeben:
+- #2 Bisaknosp - Shiny
+```
+
+Die Angabe "(1/3)" bedeutet: 1 erledigt, 3 als Ziel. Bei einem einzelnen,
+noch offenen Sucheintrag entfaellt die Angabe. Angaben in eckigen Klammern
+wie "[Glueck]" oder "[100er]" zeigen, welche Anforderung nur der eigene
+Zaehler beruecksichtigt. Fuer den Tauschpartner sind sie ohne Bedeutung, da
+Glueck und Werte erst durch den Tausch entstehen.
+
+Vollstaendig erledigte Suchen erscheinen nicht in der Tauschliste.
+
+## Tauschlisten anderer Spieler abgleichen
+
+Eine fremde Tauschliste wird eingelesen und einmalig mit den eigenen Listen
+verglichen. Sie wird nicht gespeichert. Das Ergebnis zeigt:
+
+- Passende Treffer (er gibt ab, was ich suche, und umgekehrt).
+- Moegliche Treffer mit dem Hinweis "Pruefe ..., vielleicht passt das",
+  z.B. wenn ich "Quabbel weiblich" suche und er "Quabbel" ohne Angabe des
+  Geschlechts anbietet.
+- Zeilen, die keiner bekannten Form zugeordnet werden konnten.
+
+## Abgleich zwischen Geraeten (z.B. Handy und PC)
+
+Es gibt zwei Wege, die eigenen Daten zwischen Geraeten zu uebertragen:
+
+1. **Ueber das WLAN**: Auf beiden Geraeten das Abgleich-Fenster oeffnen. Die
+   Geraete finden sich selbst. Beide zeigen einen 6-stelligen Code an, der
+   auf beiden Seiten bestaetigt werden muss. Das Programm empfiehlt die
+   Richtung anhand der juengsten Aenderung. Beide Seiten muessen die Richtung
+   bestaetigen, sie kann auch geaendert werden.
+2. **Ueber eine Datei**: Export als ZIP-Datei, die auf das andere Geraet
+   kopiert und dort importiert wird.
+
+Wichtig:
+
+- Ein Abgleich ist immer vollstaendig. Die Daten des Zielgeraets werden
+  ueberschrieben. Mit dem Haken "Vorher Backup anlegen" (standardmaessig
+  aus) wird vorher eine Sicherung erstellt.
+- Wurde seit dem letzten Abgleich auf **beiden** Geraeten etwas geaendert,
+  warnt das Programm. Die Aenderungen auf der ueberschriebenen Seite gehen
+  verloren.
+- Geloeschte Eintraege werden 30 Tage aufbewahrt, bevor sie endgueltig
+  entfernt werden. Wer laenger als 30 Tage keinen Abgleich macht, sollte die
+  Richtung bewusst pruefen.
+- Waehrend des WLAN-Abgleichs bleibt der Bildschirm eingeschaltet. Das
+  Fenster sollte bis zum Ende geoeffnet bleiben.
+
+## Updates der Nutzdaten
+
+Mit neuen Versionen des Programms koennen neue Pokemon und Formen
+hinzukommen. Eigene Formen, die das Update ebenfalls enthaelt, werden
+automatisch durch die offizielle Form ersetzt. Formen, die das Update
+entfernt, aber noch in den eigenen Listen verwendet werden, bleiben erhalten
+und werden als "ungueltig" angezeigt, mit der Aufforderung, eine andere Form
+auszuwaehlen.
+
+## Sicherungen
+
+Sicherungen entstehen:
+
+- automatisch vor jedem Update der Nutzdaten,
+- manuell ueber die Funktion "Sicherung erstellen",
+- vor einem Abgleich, wenn der Haken "Vorher Backup anlegen" gesetzt ist.
+
+Damit die Datenmenge begrenzt bleibt, raeumt das Programm alte Sicherungen
+nach drei Regeln auf:
+
+1. Pro Tag bleibt nur die neueste Sicherung erhalten.
+2. Pro Monat bleiben nur die Sicherungen der neuesten 3 Tage erhalten.
+3. Insgesamt bleiben hoechstens die 10 neuesten Sicherungen erhalten.
+
+Beispiel: Wird ein Jahr lang jede Stunde zur halben Stunde eine Sicherung
+erstellt, sind am 31.12.2026 um 20:00 Uhr noch vorhanden:
+
+- 31.12.2026 19:30 Uhr, 30.12.2026 23:30 Uhr, 29.12.2026 23:30 Uhr
+- 30.11.2026, 29.11.2026, 28.11.2026, jeweils 23:30 Uhr
+- 31.10.2026, 30.10.2026, 29.10.2026, jeweils 23:30 Uhr
+- 30.09.2026 23:30 Uhr
+
+---
+
+# 2. Datenstrukturen
+
+Alle Daten liegen als CSV-Dateien vor und koennen z.B. mit Excel oder
+LibreOffice geoeffnet werden.
+
+## Allgemeine Festlegungen
+
+| Thema          | Festlegung                                                        |
+|----------------|-------------------------------------------------------------------|
+| Kodierung      | UTF-8 mit BOM                                                     |
+| Trennzeichen   | Semikolon `;`                                                     |
+| Erste Zeile    | Spaltenueberschriften                                             |
+| GUID           | 36 Zeichen, Kleinbuchstaben, mit Bindestrichen                    |
+| Wahrheitswerte | `1` = ja, `0` = nein                                              |
+| Zeitstempel    | ISO 8601 in UTC, z.B. `2026-11-23T18:30:00Z`                      |
+| Leere Felder   | Bedeuten "nicht gesetzt" bzw. "egal" (siehe jeweilige Spalte)     |
+
+## Nutzdaten
+
+### pokemon.csv
+
+Eine Zeile pro Pokemon-Art.
+
+| Spalte    | Inhalt                                                                    |
+|-----------|---------------------------------------------------------------------------|
+| Guid      | Eindeutige Kennung                                                        |
+| DexNr     | Nationale Pokedex-Nummer                                                  |
+| Name      | Deutscher Name                                                            |
+| Kategorie | Leer, `Legendaer`, `Mysterioes` oder `Ultrabestie` (wird nicht angezeigt) |
+
+### formen.csv
+
+Eine Zeile pro Form.
+
+| Spalte          | Inhalt                                                 |
+|-----------------|--------------------------------------------------------|
+| Guid            | Eindeutige Kennung                                     |
+| PokemonGuid     | Verweis auf `pokemon.csv`                              |
+| Form            | Freier Text, leer = Grundform                          |
+| Region          | Leer oder Regionsname (siehe `regionen.csv`)           |
+| ShinyVerfuegbar | `0` / `1` (gibt es das Shiny bereits im Spiel?)        |
+| ArchiviertAm    | Leer oder Zeitstempel der Archivierung                 |
+
+Einschraenkungen:
+
+- `Form` darf keine doppelten Anfuehrungszeichen, keine Zeilenumbrueche und
+  nicht die Zeichenfolge ` - ` enthalten.
+- Alle Textfelder werden beim Speichern getrimmt: Am Anfang und Ende werden
+  alle nicht druckbaren Zeichen entfernt.
+- Pro Pokemon darf es keine zwei Formen mit gleicher Kombination aus `Form`
+  und `Region` geben (Vergleich in Kleinbuchstaben, siehe Abschnitt 3).
+
+### regionen.csv
+
+Liste der Regionen. Dient der Gruppierung nach Dex-Nummer und als Auswahl
+fuer die Spalte `Region` in `formen.csv`.
+
+| Spalte | Inhalt                              |
+|--------|-------------------------------------|
+| Region | Name der Region, z.B. `Kanto`       |
+| DexVon | Erste Dex-Nummer (einschliesslich)  |
+| DexBis | Letzte Dex-Nummer (einschliesslich) |
+
+### nutzdaten_info.csv
+
+Schluessel-Wert-Paare zu den Nutzdaten.
+
+| Schluessel | Inhalt                              |
+|------------|-------------------------------------|
+| Version    | Fortlaufende Versionsnummer         |
+| Stand      | Zeitstempel der Erstellung          |
+
+## Eigene Daten des Spielers
+
+### eigene_formen.csv
+
+Aufbau wie `formen.csv`. Enthaelt vom Spieler angelegte Formen und Formen,
+die durch ein Update aus den Nutzdaten entfernt wurden, aber noch verwendet
+werden (dann ist `ArchiviertAm` gesetzt).
+
+### Gemeinsame Merkmal-Spalten
+
+Die drei persoenlichen Listen verwenden dieselben Spalten fuer die Merkmale.
+In "Habe ich" und "Habe ich ueber" beschreiben sie das Exemplar, in
+"Suche ich" die Anforderung.
+
+| Spalte           | Exemplar                              | Anforderung                         |
+|------------------|---------------------------------------|-------------------------------------|
+| Geschlecht       | `M`, `W` oder leer (nicht angegeben)  | `M`, `W` oder leer (egal)           |
+| Shiny            | `0` / `1`                             | `1` = muss Shiny sein, `0` = egal   |
+| Dynamax          | Leer, `Dynamax` oder `Gigadynamax`    | Leer = egal, sonst exakt dieser Wert |
+| KostuemAktiv     | `1` = traegt ein Kostuem              | `1` = muss Kostuem tragen, `0` = egal |
+| KostuemText      | Beschreibung, leer = nicht angegeben  | Beschreibung, leer = beliebig       |
+| HintergrundAktiv | `1` = hat einen Hintergrund           | `1` = muss Hintergrund haben, `0` = egal |
+| HintergrundText  | Beschreibung, leer = nicht angegeben  | Beschreibung, leer = beliebig       |
+
+`KostuemText` und `HintergrundText` duerfen keine doppelten
+Anfuehrungszeichen und keine Zeilenumbrueche enthalten und werden beim
+Speichern getrimmt.
+
+### habe_ich.csv
+
+| Spalte        | Inhalt                                       |
+|---------------|----------------------------------------------|
+| Guid          | Eindeutige Kennung des Eintrags              |
+| FormGuid      | Verweis auf eine Form                        |
+| (Merkmale)    | Gemeinsame Merkmal-Spalten (siehe oben)      |
+| Glueck        | `0` / `1`                                    |
+| Hundert       | `0` / `1` (100er, 15/15/15)                  |
+| GeaendertAm   | Zeitstempel der letzten Aenderung            |
+| GeloeschtAm   | Leer oder Zeitstempel der Loeschung          |
+
+### suche_ich.csv
+
+| Spalte        | Inhalt                                       |
+|---------------|----------------------------------------------|
+| Guid          | Eindeutige Kennung des Eintrags              |
+| FormGuid      | Verweis auf eine Form                        |
+| (Merkmale)    | Gemeinsame Merkmal-Spalten (siehe oben)      |
+| Glueck        | `1` = muss Glueck haben, `0` = egal          |
+| Hundert       | `1` = muss 100er sein, `0` = egal            |
+| EinsZuEins    | `0` / `1` (1:1-Tausch moeglich)              |
+| ErledigtAm    | Leer = offen, sonst Zeitstempel der Erledigung |
+| GeaendertAm   | Zeitstempel der letzten Aenderung            |
+| GeloeschtAm   | Leer oder Zeitstempel der Loeschung          |
+
+### habe_ich_ueber.csv
+
+| Spalte        | Inhalt                                       |
+|---------------|----------------------------------------------|
+| Guid          | Eindeutige Kennung des Eintrags              |
+| FormGuid      | Verweis auf eine Form                        |
+| (Merkmale)    | Gemeinsame Merkmal-Spalten (siehe oben)      |
+| GeaendertAm   | Zeitstempel der letzten Aenderung            |
+| GeloeschtAm   | Leer oder Zeitstempel der Loeschung          |
+
+### abgleich_info.csv
+
+Schluessel-Wert-Paare fuer den Abgleich zwischen Geraeten.
+
+| Schluessel      | Inhalt                                     |
+|-----------------|--------------------------------------------|
+| Geraetename     | Anzeigename dieses Geraets                 |
+| LetzterAbgleich | Zeitstempel des letzten Abgleichs          |
+
+## Exportpaket (ZIP)
+
+Fuer Abgleich und Datei-Export werden alle oben genannten Dateien
+(Nutzdaten und eigene Daten) in eine ZIP-Datei gepackt. Der WLAN-Abgleich
+uebertraegt dasselbe Paket. Sicherungen verwenden dasselbe Format.
+
+## Eintragstext
+
+Aus Form und Merkmalen eines Eintrags wird ein Text erzeugt, der in
+Tauschlisten und beim Abgleich verwendet wird:
+
+```
+Name Form - Geschlecht - Shiny - Region - Dynamax - Kostuem - Hintergrund
+```
+
+- Die Form folgt ohne Trennstrich direkt auf den Namen.
+- Alle weiteren Bestandteile werden mit ` - ` getrennt.
+- Nicht gesetzte Bestandteile entfallen vollstaendig.
+- Kostuem und Hintergrund mit Beschreibung erscheinen als
+  `Kostuem: "Partyhut"`, ohne Beschreibung als `Kostuem (beliebig)`.
+
+Beispiele (im Programm mit echten Umlauten):
+
+```
+Icognito Q - Shiny - Hintergrund (beliebig)
+Flabebe Rot - Maennlich - Shiny
+Vulpix - Shiny - Alola - Hintergrund: "New York 2026"
+Glumanda
+```
+
+## Tauschliste (Textformat)
+
+```
+<Region> 1:1:
+- #<DexNr> <Eintragstext> [<Zaehlbedingungen>] (<Erledigt>/<Ziel>)
+
+<Region> fehlt:
+- #<DexNr> <Eintragstext> [<Zaehlbedingungen>] (<Erledigt>/<Ziel>)
+
+<Region> abzugeben:
+- #<DexNr> <Eintragstext>
+```
+
+- "1:1" enthaelt gesuchte Pokemon, fuer die man dasselbe Pokemon im Tausch
+  zurueckgeben wuerde (`EinsZuEins` = `1`).
+- "fehlt" enthaelt die uebrigen gesuchten Pokemon.
+- "abzugeben" enthaelt die Eintraege aus "Habe ich ueber".
+- Sucheintraege mit gleicher Form, gleichen Merkmalen sowie gleichen Werten
+  fuer `Glueck`, `Hundert` und `EinsZuEins` bilden eine Zeile. Die Zeile
+  erscheint nur, wenn mindestens ein Eintrag offen ist.
+- `[<Zaehlbedingungen>]` enthaelt `Glueck` und/oder `100er`, durch Komma
+  getrennt, und entfaellt, wenn keine gesetzt ist.
+- `(Erledigt/Ziel)` entfaellt bei `(0/1)`.
+- Gleiche Eintraege aus "Habe ich ueber" erscheinen nur einmal.
+- Die Region der Ueberschrift richtet sich nach der Dex-Nummer
+  (`regionen.csv`), nicht nach der Spalte `Region` der Form.
+
+---
+
+# 3. Technische Details und Begruendungen
+
+## Warum Nutzdaten und eigene Daten getrennt sind
+
+Die Nutzdaten (alle Pokemon und Formen) werden zentral gepflegt. Die eigenen
+Listen enthalten nur Verweise per GUID. So bleiben die eigenen Listen klein,
+und ein Update der Nutzdaten ueberschreibt keine persoenlichen Daten.
+
+## Warum Formen und Merkmale getrennt sind
+
+Nur Form und Region machen ein Pokemon zu einem anderen Eintrag im Pokedex.
+Geschlecht, Shiny, Dynamax, Kostuem, Hintergrund, Glueck und Werte sind
+Eigenschaften eines einzelnen Exemplars.
+
+Wuerden diese Merkmale als eigene Variationen in den Nutzdaten gefuehrt,
+muessten alle Kombinationen vorab angelegt werden (z.B. 3 Geschlechter x
+Shiny ja/nein x 3 Dynamax-Stufen pro Form). Ausserdem bedeutet "nicht
+gesetzt" in einer Suche "egal", bei einem Exemplar aber "hat es nicht". Das
+laesst sich mit festen Variationen nicht abbilden. Deshalb stehen die
+Merkmale direkt an den Eintraegen der persoenlichen Listen.
+
+## Warum GUIDs statt Dex-Nummer oder Name
+
+Dex-Nummer und Name reichen nicht, um eine Form eindeutig zu bezeichnen, und
+Namen koennen sich (z.B. bei Uebersetzungen) aendern. Eine GUID bleibt
+dauerhaft gleich. Einmal vergebene GUIDs werden nie neu erzeugt.
+
+## Warum es keine Region-Spalte bei den Pokemon gibt
+
+Die Region ergibt sich aus der Dex-Nummer. Regionalformen wie Alola-Vulpix
+werden wie im Spiel als Form des Ursprungs-Pokemons gefuehrt (Vulpix,
+Dex-Nummer 37, Kanto). Die Spalte `Region` der Form beschreibt daher die
+Form, nicht die Gruppierung in der Liste. Die Bereiche stehen in
+`regionen.csv`, damit sie ohne Programmaenderung angepasst werden koennen.
+
+## Warum es keine Angabe zur Tauschbarkeit gibt
+
+Ob ein Pokemon tauschbar ist, haengt teils von der Art, teils von einzelnen
+Kostuemen oder Ereignissen ab. Das laesst sich weder auf Ebene der Art noch
+der Form zuverlaessig abbilden. Die Angabe entfaellt daher.
+
+## Warum die Kategorie gefuehrt wird
+
+Die Kategorie (legendaer, mysterioes usw.) wird fuer moegliche spaetere
+Funktionen mitgefuehrt. Sie wird noch nirgends angezeigt.
+
+## Glueck und 100er
+
+Glueck und Werte (IV) entstehen beim Tausch neu.
+
+- In "Habe ich" beschreiben sie das vorhandene Exemplar.
+- In "Suche ich" legen sie fest, welche Exemplare die Suche erfuellen. Fuer
+  den Tauschpartner sind sie ohne Bedeutung, da er sie nicht beeinflussen
+  kann. In der Tauschliste stehen sie deshalb nur in eckigen Klammern als
+  Hinweis zum Zaehler und werden beim Einlesen ignoriert.
+- In "Habe ich ueber" gibt es sie nicht: Gluecks-Pokemon sind nicht erneut
+  tauschbar, und die Werte aendern sich beim Tausch.
+
+## Erledigt statt Loeschen bei "Suche ich"
+
+Ein erfolgreich gesuchtes Pokemon wird nicht aus "Suche ich" entfernt,
+sondern mit `ErledigtAm` markiert. Nur so bleibt der Zaehler auch bei
+gemischten Anforderungen eindeutig.
+
+Beispiel: Gesucht werden 5x Glumanda Shiny, davon 1x mit `Hundert` = `1`.
+Kommt zuerst der 100er, wird dieser Eintrag erledigt. Wuerde er stattdessen
+geloescht, wuerde der 100er in "Habe ich" anschliessend auch fuer die vier
+Eintraege ohne Anforderung zaehlen, und der Zaehler zeigte (1/5) statt (0/4).
+
+Zaehler einer Zeile:
+
+- Ziel: Anzahl aller Sucheintraege der Zeile (offen und erledigt).
+- Erledigt: Anzahl der erledigten Sucheintraege der Zeile.
+
+Ein Exemplar darf mehrere Sucheintraege erfuellen, wenn diese zu
+verschiedenen Zeilen gehoeren. Beispiel: Ein Shiny-Gluecks-100er erfuellt
+"Shiny mit Glueck" und "100er". Innerhalb einer Zeile duerfen nicht mehr
+Eintraege automatisch als erledigt markiert werden, als es passende
+Exemplare in "Habe ich" gibt.
+
+## Warum es keine Verknuepfung zwischen Sucheintrag und Exemplar gibt
+
+Ein erledigter Sucheintrag speichert nicht, welches Exemplar ihn erledigt
+hat. Das ist nicht noetig: Alle Eintraege einer Zeile haben dieselbe Form
+und dieselben Anforderungen und sind damit untereinander austauschbar. Es ist
+also gleichgueltig, welcher von ihnen beim Entwickeln umgestellt oder beim
+Loeschen wieder geoeffnet wird.
+
+Welche Zeilen betroffen sein koennen, ergibt sich aus dem Exemplar selbst:
+Es sind die Zeilen mit derselben Form, deren Anforderungen das Exemplar vor
+der Aenderung erfuellt hat. Welche davon tatsaechlich angepasst werden,
+entscheidet der Anwender, weil nur er weiss, fuer welches Ziel ein Exemplar
+gedacht war. Deshalb schlaegt das Programm Anpassungen nur vor und fuehrt sie
+nie selbststaendig aus.
+
+Ohne Verknuepfung kann es vorkommen, dass eine Zeile mehr erledigte
+Eintraege hat als passende Exemplare, z.B. wenn beim Entwickeln eine Zeile
+nicht angehakt wurde. Die Plausibilitaetspruefung macht solche Faelle
+sichtbar, ohne sie automatisch zu korrigieren.
+
+Entwicklungsketten sind bewusst nicht enthalten, um den Pflegeaufwand der
+Nutzdaten gering zu halten. Die Zielform beim Entwickeln wird deshalb von
+Hand gewaehlt.
+
+## Warum "Habe ich ueber" keine Anzahl hat
+
+Die Tauschliste soll zeigen, was grundsaetzlich abgegeben werden kann. Die
+genaue Menge ist fuer den einzelnen Tausch irrelevant.
+
+## Eindeutigkeit von Formen
+
+Zwei Formen desselben Pokemons gelten als gleich, wenn `Form` und `Region`
+(in Kleinbuchstaben) gleich sind. Diese Regel wird an drei Stellen genutzt:
+
+1. Beim Anlegen wird eine bereits vorhandene Form abgelehnt.
+2. Beim Einlesen einer Tauschliste wird die Form ueber Dex-Nummer, Form und
+   Region gefunden.
+3. Beim Update der Nutzdaten werden eigene Formen erkannt, die nun
+   offiziell enthalten sind. Verweise werden auf die offizielle GUID
+   umgestellt, die eigene Form wird entfernt.
+
+Verglichen wird immer nur innerhalb derselben Dex-Nummer. Leerzeichen
+innerhalb des Textes bleiben erhalten, nur am Anfang und Ende wird getrimmt.
+
+## Einlesen von Tauschlisten
+
+1. Ueberschrift auswerten: Abschnitt "1:1", "fehlt" oder "abzugeben".
+2. Aufzaehlungszeichen `- ` und `#<DexNr>` abtrennen.
+3. Zaehler `(a/b)` und Zaehlbedingungen `[...]` am Ende abtrennen und
+   ignorieren.
+4. Den Rest an ` - ` ausserhalb von Anfuehrungszeichen zerlegen.
+5. Im ersten Teil den bekannten Namen zu dieser Dex-Nummer abtrennen, der
+   Rest ist die Form.
+6. Die uebrigen Teile als Merkmale erkennen: Geschlecht, `Shiny`,
+   Regionsname, `Dynamax`/`Gigadynamax`, Kostuem, Hintergrund.
+7. Die Form ueber Dex-Nummer, Form und Region suchen.
+
+Zeilen, die sich nicht zuordnen lassen, werden als "nicht zugeordnet"
+angezeigt. Freie Texte stehen in Anfuehrungszeichen, deshalb duerfen sie
+selbst keine enthalten. Trennstriche innerhalb von Anfuehrungszeichen
+stoeren nicht.
+
+## Abgleich der Merkmale mit fremden Listen
+
+Ein Exemplar erfuellt eine Anforderung, wenn alle gesetzten Anforderungen
+zutreffen. Nicht gesetzte Anforderungen gelten als "egal".
+
+- Ich suche "Zubat" (Geschlecht egal), angeboten wird "Zubat weiblich":
+  Treffer.
+- Ich suche "Quabbel weiblich", angeboten wird "Quabbel" ohne
+  Geschlechtsangabe: nur ein moeglicher Treffer mit Hinweis, weil unklar ist,
+  was der Partner wirklich hat.
+- Ich suche ein bestimmtes Kostuem, angeboten wird ein Kostuem ohne
+  Beschreibung: moeglicher Treffer mit Hinweis. Fuer Hintergruende gilt
+  dasselbe.
+
+## Archivieren statt Loeschen
+
+Formen in den Nutzdaten werden nie geloescht, sondern archiviert. Verweise
+aus den Listen der Spieler bleiben dadurch gueltig. Entfernt ein Update eine
+Form, die ein Spieler noch verwendet, wird sie mit gleicher GUID nach
+`eigene_formen.csv` uebernommen und archiviert. Archivierte Formen koennen
+nicht neu ausgewaehlt werden.
+
+Eigene Formen koennen nur geloescht werden, solange keine Liste sie
+verwendet.
+
+## Loeschen mit Aufbewahrungsfrist
+
+Eintraege in den eigenen Listen werden beim Loeschen nur mit `GeloeschtAm`
+markiert und nach 30 Tagen endgueltig entfernt. Dadurch hat auch eine
+Loeschung einen Zeitstempel, und die Empfehlung beim Abgleich ("juengste
+Aenderung") beruecksichtigt sie.
+
+## Sicherungen
+
+Sicherungen werden als Exportpaket (ZIP) mit Zeitstempel im Namen abgelegt.
+Die Aufraeumregeln werden nach jeder neuen Sicherung in dieser Reihenfolge
+angewendet:
+
+1. Pro Kalendertag nur die neueste Sicherung behalten.
+2. Pro Kalendermonat nur die Sicherungen der neuesten 3 Tage behalten.
+3. Insgesamt nur die 10 neuesten Sicherungen behalten.
+
+Vor einem Abgleich wird standardmaessig keine Sicherung erstellt, da
+haeufige Abgleiche sonst viele Sicherungen erzeugen wuerden.
+
+## Abgleich zwischen Geraeten
+
+Ein Abgleich uebertraegt immer das vollstaendige Exportpaket, einschliesslich
+der Nutzdaten. Ein teilweiser Abgleich wuerde bei unterschiedlichen
+Nutzdaten-Versionen zu Verweisen auf unbekannte GUIDs fuehren.
+
+Empfehlung der Richtung: Jede Seite ermittelt den juengsten Zeitstempel aus
+`GeaendertAm` und `GeloeschtAm` ihrer Listen. Die Seite mit dem juengeren
+Wert wird als Quelle empfohlen. Liegen auf beiden Seiten Aenderungen nach
+`LetzterAbgleich`, wird zusaetzlich gewarnt.
+
+### Ports
+
+| Port  | Protokoll | Zweck                               |
+|-------|-----------|-------------------------------------|
+| 28211 | UDP       | Suche nach Gegenstellen (Broadcast) |
+| 28212 | TCP       | Uebertragung                        |
+
+Feste Ports erlauben eine gezielte Firewall-Regel. Beide Ports liegen in
+einem bei der IANA nicht zugewiesenen Bereich und unterhalb der Bereiche, die
+Linux und Windows fuer ausgehende Verbindungen nutzen.
+
+### Ablauf
+
+1. Beide Geraete oeffnen das Abgleich-Fenster und lauschen auf Port 28211.
+2. Jedes Geraet wartet 2000 ms plus eine Zufallszeit von 100 bis 1000 ms
+   (Zufallszahl 1 bis 10, mal 100 ms) und sendet dann einen Broadcast.
+3. Empfaengt ein Geraet einen Broadcast, startet es den Server auf Port 28212,
+   antwortet "Kommunikation ueber Port 28212" und beendet seinen eigenen
+   Broadcast.
+4. Erhaelt ein Geraet eine Antwort auf seinen Broadcast, beendet es seinen
+   Lauscher und verbindet sich als Client.
+5. Brechen beide Seiten gleichzeitig ab, beginnt der Vorgang von vorn. Durch
+   die Zufallszeit hat spaetestens im zweiten Durchlauf ein Geraet den
+   Vorrang. Nach einer Gesamtzeit ohne Erfolg wird der Vorgang abgebrochen.
+6. Der Server erzeugt einen 6-stelligen Zahlencode. Beide Geraete zeigen ihn
+   an, beide Nutzer bestaetigen.
+7. Beide Seiten tauschen ihre Zeitstempel aus. Das Programm empfiehlt die
+   Richtung, beide Nutzer bestaetigen oder aendern sie.
+8. Ist "Vorher Backup anlegen" gesetzt, erstellt das Zielgeraet eine
+   Sicherung. Danach wird das Paket uebertragen.
+9. Beide Geraete setzen `LetzterAbgleich` und beenden die Verbindung.
+
+Der Code verhindert, dass sich versehentlich ein fremdes Geraet verbindet.
+Die Uebertragung selbst ist nicht verschluesselt. Fuer Tauschlisten im
+Heimnetz wird das als ausreichend angesehen.
+
+## Dateiformat
+
+- **UTF-8 mit BOM**: Pokemon-Namen enthalten Sonderzeichen (z.B. Flabebe mit
+  Akzent, Nidoran mit Geschlechtssymbol). Ohne BOM oeffnet Excel die Datei
+  nicht korrekt.
+- **Semikolon**: Standard-Trennzeichen eines deutschen Excel.
+- **Keine Anfuehrungszeichen in freien Texten**: Im Export begrenzen
+  Anfuehrungszeichen die freien Texte, deshalb duerfen diese selbst keine
+  enthalten.
+
+## Sprache
+
+Namen werden nur auf Deutsch gefuehrt. Weitere Sprachen koennen spaeter
+ueber eine Datei pro Sprache (GUID und Name) ergaenzt werden. Tauschlisten
+enthalten immer die Dex-Nummer, damit sie auch bei unterschiedlichen Namen
+zugeordnet werden koennen.
+
+## Plattformen
+
+- Desktop (Linux, Windows): Das Programm wird regulaer beendet.
+- Android: "Beenden" schliesst die App und entfernt sie aus der Liste der
+  zuletzt genutzten Apps. Den Prozess selbst darf Android noch eine Weile im
+  Speicher halten. Da Android eine App jederzeit beenden kann, werden alle
+  Aenderungen sofort gespeichert und nicht erst beim Beenden.
+- Android speichert die Daten in einem privaten Bereich. Der Zugriff von
+  aussen erfolgt ueber Export und Import (Exportpaket).
