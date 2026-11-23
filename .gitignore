@@ -431,3 +431,21 @@ FodyWeavers.xsd
 # Installationsdateien: Archive und entpackte Programme
 install/**/*.tar.gz
 install/**/jetbrains-toolbox-*/
+
+# Uebernommen aus der frueheren src/PoGoExchange/.gitignore (Avalonia-Vorlage)
+# JetBrains Rider
+*.sln.iml
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.stackdump
