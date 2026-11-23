@@ -93,3 +93,12 @@ public sealed class UeberEintragMap : ListenEintragMap<UeberEintrag>
         MapEnde();
     }
 }
+
+public sealed class SchluesselWertMap : ClassMap<SchluesselWert>
+{
+    public SchluesselWertMap()
+    {
+        Map(m => m.Schluessel).Name("Schluessel").TypeConverter<TextKonverter>();
+        Map(m => m.Wert).Name("Wert").TypeConverter<TextKonverter>();
+    }
+}

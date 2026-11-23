@@ -21,6 +21,11 @@ public static class CsvSpeicher
     public static List<T> Lesen<T, TMap>(string pfad) where TMap : ClassMap<T>
     {
         using var reader = new StreamReader(pfad, Utf8MitBom, detectEncodingFromByteOrderMarks: true);
+        return Lesen<T, TMap>(reader);
+    }
+
+    public static List<T> Lesen<T, TMap>(TextReader reader) where TMap : ClassMap<T>
+    {
         using var csv = new CsvReader(reader, Konfiguration());
         csv.Context.RegisterClassMap<TMap>();
         return csv.GetRecords<T>().ToList();

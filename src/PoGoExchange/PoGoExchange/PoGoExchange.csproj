@@ -20,4 +20,8 @@
         <PackageReference Include="CommunityToolkit.Mvvm"/>
         <PackageReference Include="CsvHelper" />
     </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Nutzdaten\*.csv" LogicalName="Nutzdaten.%(Filename)%(Extension)" />
+    </ItemGroup>
 </Project>
