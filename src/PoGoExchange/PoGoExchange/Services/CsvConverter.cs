@@ -114,3 +114,29 @@ public sealed class OptionalerZeitstempelKonverter : DefaultTypeConverter
     public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
         => value is DateTime d ? ZeitstempelKonverter.Schreiben(d) : "";
 }
+
+// Optionale ganze Zahl: leer = nicht gesetzt
+public sealed class OptionaleZahlKonverter : DefaultTypeConverter
+{
+  public override object? ConvertFromString(
+    string? text,
+    IReaderRow row,
+    MemberMapData memberMapData)
+  {
+    var t = TextBereinigung.Bereinigen(text);
+    if (t == "")
+    {
+      return null;
+    }
+
+    return int.Parse(t, NumberStyles.None, CultureInfo.InvariantCulture);
+  }
+
+  public override string? ConvertToString(
+    object? value,
+    IWriterRow row,
+    MemberMapData memberMapData)
+  {
+    return value is int zahl ? zahl.ToString(CultureInfo.InvariantCulture) : "";
+  }
+}
