@@ -3,5 +3,6 @@
     <Deploy />
   </Project>
   <Project Path="PoGoExchange.Desktop/PoGoExchange.Desktop.csproj" />
+  <Project Path="PoGoExchange.Tests/PoGoExchange.Tests.csproj" />
   <Project Path="PoGoExchange/PoGoExchange.csproj" />
 </Solution>
