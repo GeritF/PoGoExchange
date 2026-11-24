@@ -10,129 +10,172 @@ namespace PoGoExchange.Tests;
 
 public class CsvSpeicherTests : IDisposable
 {
-    private readonly string _pfad =
-        Path.Combine(Path.GetTempPath(), $"pogo_test_{Guid.NewGuid():N}.csv");
+  private readonly string _pfad =
+    Path.Combine(Path.GetTempPath(), $"pogo_test_{Guid.NewGuid():N}.csv");
 
-    public void Dispose()
+  public void Dispose()
+  {
+    if (File.Exists(_pfad))
+      File.Delete(_pfad);
+  }
+
+  [Fact]
+  public void Pokemon_HinUndZurueck_LiefertGleicheWerte()
+  {
+    var original = new List<Pokemon>
     {
-        if (File.Exists(_pfad))
-            File.Delete(_pfad);
-    }
+      new() { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" },
+      new() { Guid = Guid.NewGuid(), DexNr = 669, Name = "Flab\u00e9b\u00e9" }
+    };
 
-    [Fact]
-    public void Pokemon_HinUndZurueck_LiefertGleicheWerte()
+    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, original);
+    var gelesen = CsvSpeicher.Lesen<Pokemon, PokemonMap>(_pfad);
+
+    Assert.Equal(original.Count, gelesen.Count);
+    for (var i = 0; i < original.Count; i++)
     {
-        var original = new List<Pokemon>
-        {
-            new() { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" },
-            new() { Guid = Guid.NewGuid(), DexNr = 669, Name = "Flab\u00e9b\u00e9" }
-        };
-
-        CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, original);
-        var gelesen = CsvSpeicher.Lesen<Pokemon, PokemonMap>(_pfad);
-
-        Assert.Equal(original.Count, gelesen.Count);
-        for (var i = 0; i < original.Count; i++)
-        {
-            Assert.Equal(original[i].Guid, gelesen[i].Guid);
-            Assert.Equal(original[i].DexNr, gelesen[i].DexNr);
-            Assert.Equal(original[i].Name, gelesen[i].Name);
-            Assert.Equal(original[i].Kategorie, gelesen[i].Kategorie);
-        }
+      Assert.Equal(original[i].Guid, gelesen[i].Guid);
+      Assert.Equal(original[i].DexNr, gelesen[i].DexNr);
+      Assert.Equal(original[i].Name, gelesen[i].Name);
+      Assert.Equal(original[i].Kategorie, gelesen[i].Kategorie);
     }
+  }
 
-    [Fact]
-    public void Datei_BeginntMitBom_UndNutztSemikolon()
+  [Fact]
+  public void Datei_BeginntMitBom_UndNutztSemikolon()
+  {
+    var eintrag = new Pokemon { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" };
+    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, new[] { eintrag });
+
+    var bytes = File.ReadAllBytes(_pfad);
+    Assert.True(bytes.Length >= 3, $"Datei zu kurz: {bytes.Length} Bytes");
+    Assert.Equal(new byte[] { 0xEF, 0xBB, 0xBF }, bytes.Take(3).ToArray());
+
+    var kopf = File.ReadAllLines(_pfad, Encoding.UTF8)[0];
+    Assert.Equal("Guid;DexNr;Name;Kategorie", kopf);
+  }
+
+  [Fact]
+  public void SucheEintrag_WirdWieFestgelegtGeschrieben_UndGelesen()
+  {
+    var zeit = new DateTime(2026, 11, 23, 18, 30, 0, DateTimeKind.Utc);
+    var original = new SucheEintrag
     {
-        var eintrag = new Pokemon { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" };
-        CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, new[] { eintrag });
+      Guid = Guid.NewGuid(),
+      FormGuid = Guid.NewGuid(),
+      Geschlecht = Geschlecht.Weiblich,
+      Shiny = true,
+      Dynamax = DynamaxStufe.Gigadynamax,
+      HintergrundAktiv = true,
+      HintergrundText = "Paris; Eiffelturm",
+      Glueck = true,
+      EinsZuEins = true,
+      GeaendertAm = zeit
+    };
 
-        var bytes = File.ReadAllBytes(_pfad);
-        Assert.True(bytes.Length >= 3, $"Datei zu kurz: {bytes.Length} Bytes");
-        Assert.Equal(new byte[] { 0xEF, 0xBB, 0xBF }, bytes.Take(3).ToArray());
+    CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, new[] { original });
 
-        var kopf = File.ReadAllLines(_pfad, Encoding.UTF8)[0];
-        Assert.Equal("Guid;DexNr;Name;Kategorie", kopf);
-    }
+    // Gemessen: Rohtext der Datei
+    var zeilen = File.ReadAllLines(_pfad, Encoding.UTF8);
+    Assert.Equal(
+      "Guid;PokemonGuid;FormGuid;Geschlecht;Shiny;Dynamax;KostuemAktiv;KostuemText;" +
+      "HintergrundAktiv;HintergrundText;Glueck;Hundert;EinsZuEins;ErledigtAm;GeaendertAm;" +
+      "GeloeschtAm",
+      zeilen[0]);
+    Assert.Contains(
+      ";W;1;Gigadynamax;0;;1;\"Paris; Eiffelturm\";1;0;1;;2026-11-23T18:30:00Z;",
+      zeilen[1]);
 
-    [Fact]
-    public void SucheEintrag_WirdWieFestgelegtGeschrieben_UndGelesen()
+    // Gemessen: zurueckgelesene Werte
+    var gelesen = CsvSpeicher.Lesen<SucheEintrag, SucheEintragMap>(_pfad).Single();
+    Assert.Equal(original.Guid, gelesen.Guid);
+    Assert.Equal(Geschlecht.Weiblich, gelesen.Geschlecht);
+    Assert.True(gelesen.Shiny);
+    Assert.Equal(DynamaxStufe.Gigadynamax, gelesen.Dynamax);
+    Assert.False(gelesen.KostuemAktiv);
+    Assert.Equal("Paris; Eiffelturm", gelesen.HintergrundText);
+    Assert.True(gelesen.Glueck);
+    Assert.False(gelesen.Hundert);
+    Assert.True(gelesen.EinsZuEins);
+    Assert.Null(gelesen.ErledigtAm);
+    Assert.Equal(zeit, gelesen.GeaendertAm);
+    Assert.Equal(DateTimeKind.Utc, gelesen.GeaendertAm.Kind);
+    Assert.Null(gelesen.GeloeschtAm);
+  }
+
+  [Fact]
+  public void FormBeliebig_WirdAlsLeeresFeldGeschrieben_UndGelesen()
+  {
+    var pokemonGuid = Guid.NewGuid();
+    var original = new SucheEintrag
     {
-        var zeit = new DateTime(2026, 11, 23, 18, 30, 0, DateTimeKind.Utc);
-        var original = new SucheEintrag
-        {
-            Guid = Guid.NewGuid(),
-            FormGuid = Guid.NewGuid(),
-            Geschlecht = Geschlecht.Weiblich,
-            Shiny = true,
-            Dynamax = DynamaxStufe.Gigadynamax,
-            HintergrundAktiv = true,
-            HintergrundText = "Paris; Eiffelturm",
-            Glueck = true,
-            EinsZuEins = true,
-            GeaendertAm = zeit
-        };
+      Guid = Guid.NewGuid(),
+      PokemonGuid = pokemonGuid,
+      FormGuid = Guid.Empty
+    };
 
-        CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, new[] { original });
+    CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, new[] { original });
 
-        // Gemessen: Rohtext der Datei
-        var zeilen = File.ReadAllLines(_pfad, Encoding.UTF8);
-        Assert.Equal(
-          "Guid;PokemonGuid;FormGuid;Geschlecht;Shiny;Dynamax;KostuemAktiv;KostuemText;" +
-          "HintergrundAktiv;HintergrundText;Glueck;Hundert;EinsZuEins;ErledigtAm;GeaendertAm;" +
-          "GeloeschtAm",
-          zeilen[0]);
-        Assert.Contains(
-            ";W;1;Gigadynamax;0;;1;\"Paris; Eiffelturm\";1;0;1;;2026-11-23T18:30:00Z;",
-            zeilen[1]);
+    // Gemessen: drittes Feld (FormGuid) ist leer
+    var felder = File.ReadAllLines(_pfad, Encoding.UTF8)[1].Split(';');
+    Assert.Equal(pokemonGuid.ToString(), felder[1]);
+    Assert.Equal("", felder[2]);
 
-        // Gemessen: zurueckgelesene Werte
-        var gelesen = CsvSpeicher.Lesen<SucheEintrag, SucheEintragMap>(_pfad).Single();
-        Assert.Equal(original.Guid, gelesen.Guid);
-        Assert.Equal(Geschlecht.Weiblich, gelesen.Geschlecht);
-        Assert.True(gelesen.Shiny);
-        Assert.Equal(DynamaxStufe.Gigadynamax, gelesen.Dynamax);
-        Assert.False(gelesen.KostuemAktiv);
-        Assert.Equal("Paris; Eiffelturm", gelesen.HintergrundText);
-        Assert.True(gelesen.Glueck);
-        Assert.False(gelesen.Hundert);
-        Assert.True(gelesen.EinsZuEins);
-        Assert.Null(gelesen.ErledigtAm);
-        Assert.Equal(zeit, gelesen.GeaendertAm);
-        Assert.Equal(DateTimeKind.Utc, gelesen.GeaendertAm.Kind);
-        Assert.Null(gelesen.GeloeschtAm);
-    }
+    var gelesen = CsvSpeicher.Lesen<SucheEintrag, SucheEintragMap>(_pfad).Single();
+    Assert.Equal(pokemonGuid, gelesen.PokemonGuid);
+    Assert.True(gelesen.FormBeliebig);
+  }
 
-    [Fact]
-    public void FormBeliebig_WirdAlsLeeresFeldGeschrieben_UndGelesen()
-    {
-      var pokemonGuid = Guid.NewGuid();
-      var original = new SucheEintrag
-      {
-        Guid = Guid.NewGuid(),
-        PokemonGuid = pokemonGuid,
-        FormGuid = Guid.Empty
-      };
+  [Theory]
+  [InlineData("  Glumanda  ", "Glumanda")]
+  [InlineData("\u200BGlumanda\u200B", "Glumanda")]
+  [InlineData("\t\r\nBla Rot\u00A0", "Bla Rot")]
+  [InlineData("", "")]
+  public void Bereinigen_EntferntNurZeichenAmRand(string eingabe, string erwartet)
+  {
+    Assert.Equal(erwartet, TextBereinigung.Bereinigen(eingabe));
+  }
 
-      CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, new[] { original });
+  [Fact]
+  public void Schreiben_NutztWindowsZeilenumbruch()
+  {
+    var eintrag = new Pokemon { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" };
+    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, new[] { eintrag });
 
-      // Gemessen: drittes Feld (FormGuid) ist leer
-      var felder = File.ReadAllLines(_pfad, Encoding.UTF8)[1].Split(';');
-      Assert.Equal(pokemonGuid.ToString(), felder[1]);
-      Assert.Equal("", felder[2]);
+    // Gemessen: jeder Zeilenvorschub gehoert zu einem CRLF
+    var text = File.ReadAllText(_pfad, Encoding.UTF8);
+    var crlf = text.Split("\r\n").Length - 1;
+    var lf = text.Count(c => c == '\n');
+    Assert.Equal(2, crlf);
+    Assert.Equal(crlf, lf);
+  }
 
-      var gelesen = CsvSpeicher.Lesen<SucheEintrag, SucheEintragMap>(_pfad).Single();
-      Assert.Equal(pokemonGuid, gelesen.PokemonGuid);
-      Assert.True(gelesen.FormBeliebig);
-    }
+  [Fact]
+  public void LeereListe_SchreibtNurKopfzeile()
+  {
+    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, Array.Empty<Pokemon>());
 
-    [Theory]
-    [InlineData("  Glumanda  ", "Glumanda")]
-    [InlineData("\u200BGlumanda\u200B", "Glumanda")]
-    [InlineData("\t\r\nBla Rot\u00A0", "Bla Rot")]
-    [InlineData("", "")]
-    public void Bereinigen_EntferntNurZeichenAmRand(string eingabe, string erwartet)
-    {
-        Assert.Equal(erwartet, TextBereinigung.Bereinigen(eingabe));
-    }
+    var zeilen = File.ReadAllLines(_pfad, Encoding.UTF8);
+    Assert.Equal(new[] { "Guid;DexNr;Name;Kategorie" }, zeilen);
+  }
+
+  [Fact]
+  public void LesenMitPruefung_SpaltenInAndererReihenfolge()
+  {
+    var guid = Guid.NewGuid();
+    File.WriteAllText(
+      _pfad,
+      $"Name;Kategorie;DexNr;Guid\r\nGlumanda;;4;{guid}\r\n",
+      new UTF8Encoding(true));
+
+    var ergebnis = CsvSpeicher.LesenMitPruefung<Pokemon, PokemonMap>(_pfad);
+
+    Assert.Empty(ergebnis.FehlendeSpalten);
+    Assert.Empty(ergebnis.UnbekannteSpalten);
+    Assert.Empty(ergebnis.Fehler);
+    var pokemon = Assert.Single(ergebnis.Eintraege);
+    Assert.Equal(guid, pokemon.Guid);
+    Assert.Equal(4, pokemon.DexNr);
+    Assert.Equal("Glumanda", pokemon.Name);
+  }
 }

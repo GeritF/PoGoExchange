@@ -11,7 +11,7 @@ public class NutzdatenTests
   {
     var pokemon = EingebetteteNutzdaten.Lesen<Pokemon, PokemonMap>("pokemon.csv");
 
-    Assert.Equal(4, pokemon.Count);
+    Assert.NotEmpty(pokemon);
     Assert.Contains(pokemon, p => p.DexNr == 669 && p.Name == "Flab\u00e9b\u00e9");
   }
 

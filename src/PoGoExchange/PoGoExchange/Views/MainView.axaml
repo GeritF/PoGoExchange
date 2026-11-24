@@ -12,11 +12,11 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
-        <TextBox Text="{Binding Greeting}"
-                 HorizontalAlignment="Center"
-                 VerticalAlignment="Center" />
-        <Button Content="Beenden" HorizontalAlignment="Center" Command="{Binding CloseCommand}" />
-    </StackPanel>
-    
+    <ScrollViewer>
+        <StackPanel Margin="16" Spacing="12">
+            <SelectableTextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+            <Button Content="Beenden" Command="{Binding CloseCommand}" />
+        </StackPanel>
+    </ScrollViewer>
+
 </UserControl>

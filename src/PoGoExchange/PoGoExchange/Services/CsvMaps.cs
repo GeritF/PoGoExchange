@@ -43,8 +43,8 @@ public abstract class ListenEintragMap<T> : ClassMap<T> where T : ListenEintrag
 {
   protected void MapAnfang()
   {
-    Map(m => m.Guid).Name("Guid");
-    Map(m => m.PokemonGuid).Name("PokemonGuid");
+    Map(m => m.Guid).Name("Guid").TypeConverter<OptionaleGuidKonverter>();
+    Map(m => m.PokemonGuid).Name("PokemonGuid").TypeConverter<OptionaleGuidKonverter>();
     Map(m => m.FormGuid).Name("FormGuid").TypeConverter<OptionaleGuidKonverter>();
     Map(m => m.Geschlecht).Name("Geschlecht").TypeConverter<GeschlechtKonverter>();
     Map(m => m.Shiny).Name("Shiny").TypeConverter<WahrheitswertKonverter>();
