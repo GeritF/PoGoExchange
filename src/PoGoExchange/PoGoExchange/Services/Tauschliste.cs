@@ -22,8 +22,6 @@ public static class Tauschliste
   internal const string AbschnittAbzugeben = "abzugeben";
   internal const string TextGlueck = "Gl\u00fcck";
   internal const string TextHundert = "100er";
-  internal const string ListeSuche = "Suche ich";
-  internal const string ListeUeber = "Habe ich \u00fcber";
 
   private static readonly string[] Abschnitte =
   {
@@ -33,16 +31,16 @@ public static class Tauschliste
   };
 
   // Gliederung: Region (siehe Katalog), dann Abschnitt, dann Dex-Nummer und Text.
-  // Leere Abschnitte und Regionen entfallen. Eintraege mit unbekannter Form
-  // erscheinen nicht im Text, sondern in der Fehlerliste.
+  // Leere Abschnitte und Regionen entfallen. Ungueltige Eintraege (siehe
+  // Konsistenz) erscheinen nicht im Text, sondern in der Fehlerliste.
   public static TauschlistenErgebnis Erzeugen(
     Katalog katalog,
     IEnumerable<SucheEintrag> suche,
     IEnumerable<UeberEintrag> ueber)
   {
     var fehler = new List<ExportFehler>();
-    var gueltigeSuche = NurBekannteFormen(katalog, suche, ListeSuche, fehler);
-    var gueltigeUeber = NurBekannteFormen(katalog, ueber, ListeUeber, fehler);
+    var gueltigeSuche = NurGueltige(katalog, suche, ListenNamen.Suche, false, fehler);
+    var gueltigeUeber = NurGueltige(katalog, ueber, ListenNamen.Ueber, true, fehler);
 
     var zeilen = new List<ExportZeile>();
     zeilen.AddRange(SuchZeilenFuerExport(katalog, gueltigeSuche));
@@ -55,12 +53,13 @@ public static class Tauschliste
     };
   }
 
-  // Liefert nur nicht geloeschte Eintraege mit bekannter Form,
-  // alle anderen nicht geloeschten Eintraege landen in der Fehlerliste
-  private static List<T> NurBekannteFormen<T>(
+  // Liefert nur nicht geloeschte, gueltige Eintraege;
+  // ungueltige nicht geloeschte Eintraege landen in der Fehlerliste
+  private static List<T> NurGueltige<T>(
     Katalog katalog,
     IEnumerable<T> eintraege,
     string liste,
+    bool formPflicht,
     List<ExportFehler> fehler)
     where T : ListenEintrag
   {
@@ -72,13 +71,10 @@ public static class Tauschliste
         continue;
       }
 
-      if (katalog.Aufloesen(eintrag.FormGuid) == null)
+      var grund = Konsistenz.EintragPruefen(katalog, eintrag, formPflicht);
+      if (grund != null)
       {
-        fehler.Add(new ExportFehler(
-          liste,
-          eintrag.Guid,
-          eintrag.FormGuid,
-          $"Form {eintrag.FormGuid} oder zugeh\u00f6riges Pokemon nicht gefunden"));
+        fehler.Add(new ExportFehler(liste, eintrag.Guid, eintrag.FormGuid, grund));
         continue;
       }
 
@@ -86,6 +82,17 @@ public static class Tauschliste
     }
 
     return gueltig;
+  }
+
+  // Nur fuer bereits gepruefte Eintraege; Form ist null bei "Form beliebig"
+  private static (Pokemon Pokemon, PokemonForm? Form) Aufloesen(
+    Katalog katalog,
+    ListenEintrag eintrag)
+  {
+    var pokemon = katalog.PokemonZuGuid(eintrag.PokemonGuid)
+      ?? throw new InvalidOperationException("Eintrag wurde vor dem Aufloesen nicht geprueft");
+    var form = eintrag.FormBeliebig ? null : katalog.FormZuGuid(eintrag.FormGuid);
+    return (pokemon, form);
   }
 
   // Nur Zeilen mit mindestens einem offenen Eintrag
@@ -100,13 +107,7 @@ public static class Tauschliste
         continue;
       }
 
-      var aufgeloest = katalog.Aufloesen(zeile.Muster.FormGuid);
-      if (aufgeloest == null)
-      {
-        continue;
-      }
-
-      var (pokemon, form) = aufgeloest.Value;
+      var (pokemon, form) = Aufloesen(katalog, zeile.Muster);
       yield return new ExportZeile(
         katalog.RegionZuDex(pokemon.DexNr),
         zeile.Muster.EinsZuEins ? AbschnittEinsZuEins : AbschnittFehlt,
@@ -124,13 +125,7 @@ public static class Tauschliste
     var gesehen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     foreach (var eintrag in ueber)
     {
-      var aufgeloest = katalog.Aufloesen(eintrag.FormGuid);
-      if (aufgeloest == null)
-      {
-        continue;
-      }
-
-      var (pokemon, form) = aufgeloest.Value;
+      var (pokemon, form) = Aufloesen(katalog, eintrag);
       var text = EintragText.Erzeugen(pokemon, form, eintrag);
       if (!gesehen.Add(pokemon.DexNr + " " + text))
       {

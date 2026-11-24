@@ -62,6 +62,12 @@ bedeuten "beliebiges Kostuem" bzw. "beliebiger Hintergrund".
 Dynamax und Gigadynamax sind getrennte Ziele: Ein Gigadynamax-Exemplar
 erfuellt die Anforderung "Dynamax" nicht und umgekehrt.
 
+Auch die Form kann in "Suche ich" offen bleiben: **Form beliebig**. Wer
+"Vulpix 100er, Form beliebig" sucht, ist mit einem Kanto-Vulpix ebenso
+zufrieden wie mit einem Alola-Vulpix. "Form beliebig" gibt es nur in
+"Suche ich". In "Habe ich" und "Habe ich ueber" hat jedes Exemplar eine
+konkrete Form.
+
 Eigene Formen (z.B. eine neue Form, die es in den Nutzdaten noch nicht gibt)
 kann jeder Spieler selbst anlegen. Eine Form, die es fuer dieses Pokemon
 schon gibt, wird dabei abgelehnt.
@@ -86,7 +92,9 @@ Regeln:
 - Mit "Von 'Suche ich' nach 'Habe ich' verschieben" wird ein erfolgreicher
   Tausch eingetragen. Der Sucheintrag wird dabei als erledigt markiert, in
   "Habe ich" entsteht ein neues Exemplar. Die Merkmale des neuen Exemplars
-  koennen dabei angepasst werden (z.B. ist es ein 100er geworden).
+  koennen dabei angepasst werden (z.B. ist es ein 100er geworden). War die
+  Suche "Form beliebig", muss fuer das neue Exemplar die tatsaechliche Form
+  angegeben werden. Der Sucheintrag selbst bleibt unveraendert.
 - Wird ein Exemplar entwickelt, geaendert oder geloescht, schlaegt das
   Programm vor, welche erledigten Sucheintraege angepasst werden sollen. Es
   aendert nichts selbststaendig (siehe "Pokemon entwickeln" und "Exemplare
@@ -101,7 +109,8 @@ Die Auswahl zeigt drei getrennte Listen:
    gibt.
 3. **Nicht verfuegbar**: Formen, deren Shiny es noch nicht gibt, wenn Shiny
    gesucht wird (z.B. ein Shiny, das erst zum naechsten Community Day
-   erscheint).
+   erscheint). Bei "Form beliebig" gilt das Shiny als verfuegbar, sobald es
+   fuer mindestens eine Form des Pokemon verfuegbar ist.
 
 Alle drei Listen sind auswaehlbar.
 
@@ -111,10 +120,18 @@ erledigt zu markieren.
 
 ## Sammel-Suche
 
-Mit einer Sammel-Suche wird fuer jedes Pokemon ein Sucheintrag mit
-denselben Anforderungen angelegt, z.B. "Von jedem ein 100er". Pokemon, fuer
-die es in "Habe ich" bereits ein passendes Exemplar gibt, werden sofort als
-erledigt markiert.
+Mit einer Sammel-Suche werden viele Sucheintraege mit denselben
+Anforderungen auf einmal angelegt, z.B. "Von jedem ein 100er". Ein Schalter
+legt fest, wie:
+
+- **Einer pro Form** (voreingestellt): Vulpix bekommt zwei Eintraege (Kanto
+  und Alola), Flabebe einen pro Farbe.
+- **Einer pro Pokemon**: jeweils ein Eintrag mit "Form beliebig".
+
+Eintraege, fuer die es in "Habe ich" bereits ein passendes Exemplar gibt,
+werden sofort als erledigt markiert. Da eine Sammel-Suche sehr viele
+Eintraege erzeugt, schlaegt das Programm vorher vor, eine Sicherung
+anzulegen.
 
 ## Pokemon entwickeln
 
@@ -268,8 +285,9 @@ Vollstaendig erledigte Suchen erscheinen nicht in der Tauschliste.
 Pokemon, deren Dex-Nummer in keiner Region liegt (z.B. Meltan und Melmetal),
 stehen in einer eigenen Gruppe "Unbekannt" am Ende der Liste.
 
-Eintraege, die wegen beschaedigter Daten keiner Form zugeordnet werden
-koennen, erscheinen nicht in der Liste, sondern werden als Fehler gemeldet.
+Eintraege, die die Konsistenzpruefung nicht bestehen (z.B. wegen
+beschaedigter Daten), erscheinen nicht in der Liste, sondern werden als
+Fehler gemeldet.
 
 ## Tauschlisten anderer Spieler abgleichen
 
@@ -350,7 +368,8 @@ auszuwaehlen.
 Sicherungen entstehen:
 
 - automatisch vor jedem Update der Nutzdaten,
-- manuell ueber die Funktion "Sicherung erstellen",
+- manuell ueber die Funktion "Sicherung erstellen" (das Programm schlaegt
+  dies auch vor Massenaenderungen wie einer Sammel-Suche vor),
 - vor einem Abgleich, wenn der Haken "Vorher Backup anlegen" gesetzt ist.
 
 Damit die Datenmenge begrenzt bleibt, raeumt das Programm alte Sicherungen
@@ -461,6 +480,23 @@ Aufbau wie `formen.csv`. Enthaelt vom Spieler angelegte Formen und Formen,
 die durch ein Update aus den Nutzdaten entfernt wurden, aber noch verwendet
 werden (dann ist `ArchiviertAm` gesetzt).
 
+### Gemeinsame Verweis-Spalten
+
+Jeder Eintrag der drei persoenlichen Listen verweist auf ein Pokemon und
+eine Form:
+
+| Spalte      | Inhalt                                                          |
+|-------------|-----------------------------------------------------------------|
+| PokemonGuid | Verweis auf `pokemon.csv`, immer gesetzt                        |
+| FormGuid    | Verweis auf eine Form; leer = "Form beliebig" (nur in "Suche ich") |
+
+Regeln (Konsistenzpruefung):
+
+- `PokemonGuid` muss auf ein bekanntes Pokemon verweisen.
+- In "Habe ich" und "Habe ich ueber" muss `FormGuid` gesetzt sein.
+- Ist `FormGuid` gesetzt, muss die Form bekannt sein und zum Pokemon aus
+  `PokemonGuid` gehoeren.
+
 ### Gemeinsame Merkmal-Spalten
 
 Die drei persoenlichen Listen verwenden dieselben Spalten fuer die Merkmale.
@@ -486,7 +522,8 @@ Speichern getrimmt.
 | Spalte        | Inhalt                                       |
 |---------------|----------------------------------------------|
 | Guid          | Eindeutige Kennung des Eintrags              |
-| FormGuid      | Verweis auf eine Form                        |
+| PokemonGuid   | Verweis auf ein Pokemon (siehe oben)         |
+| FormGuid      | Verweis auf eine Form (siehe oben)           |
 | (Merkmale)    | Gemeinsame Merkmal-Spalten (siehe oben)      |
 | Glueck        | `0` / `1`                                    |
 | Hundert       | `0` / `1` (100er, 15/15/15)                  |
@@ -498,7 +535,8 @@ Speichern getrimmt.
 | Spalte        | Inhalt                                       |
 |---------------|----------------------------------------------|
 | Guid          | Eindeutige Kennung des Eintrags              |
-| FormGuid      | Verweis auf eine Form                        |
+| PokemonGuid   | Verweis auf ein Pokemon (siehe oben)         |
+| FormGuid      | Verweis auf eine Form (siehe oben)           |
 | (Merkmale)    | Gemeinsame Merkmal-Spalten (siehe oben)      |
 | Glueck        | `1` = muss Glueck haben, `0` = egal          |
 | Hundert       | `1` = muss 100er sein, `0` = egal            |
@@ -512,7 +550,8 @@ Speichern getrimmt.
 | Spalte        | Inhalt                                       |
 |---------------|----------------------------------------------|
 | Guid          | Eindeutige Kennung des Eintrags              |
-| FormGuid      | Verweis auf eine Form                        |
+| PokemonGuid   | Verweis auf ein Pokemon (siehe oben)         |
+| FormGuid      | Verweis auf eine Form (siehe oben)           |
 | (Merkmale)    | Gemeinsame Merkmal-Spalten (siehe oben)      |
 | GeaendertAm   | Zeitstempel der letzten Aenderung            |
 | GeloeschtAm   | Leer oder Zeitstempel der Loeschung          |
@@ -542,6 +581,8 @@ Name Form - Geschlecht - Shiny - Region - Dynamax - Kostuem - Hintergrund
 ```
 
 - Die Form folgt ohne Trennstrich direkt auf den Namen.
+- Bei "Form beliebig" folgt auf den Namen der Bestandteil `Form (beliebig)`,
+  eine Region entfaellt dann.
 - Alle weiteren Bestandteile werden mit ` - ` getrennt.
 - Nicht gesetzte Bestandteile entfallen vollstaendig.
 - Kostuem und Hintergrund mit Beschreibung erscheinen als
@@ -553,6 +594,7 @@ Beispiele (im Programm mit echten Umlauten):
 Icognito Q - Shiny - Hintergrund (beliebig)
 Flabebe Rot - Maennlich - Shiny
 Vulpix - Shiny - Alola - Hintergrund: "New York 2026"
+Vulpix - Form (beliebig) - Shiny
 Glumanda
 ```
 
@@ -611,6 +653,28 @@ Shiny ja/nein x 3 Dynamax-Stufen pro Form). Ausserdem bedeutet "nicht
 gesetzt" in einer Suche "egal", bei einem Exemplar aber "hat es nicht". Das
 laesst sich mit festen Variationen nicht abbilden. Deshalb stehen die
 Merkmale direkt an den Eintraegen der persoenlichen Listen.
+
+## Warum "Form beliebig" kein Eintrag in den Nutzdaten ist
+
+Ein leerer Form-Text bedeutet in `formen.csv` bereits "Grundform" (z.B. das
+Kanto-Vulpix). Er kann deshalb nicht zusaetzlich "egal" bedeuten. Eine
+eigene Form "beliebig" in den Nutzdaten waere eine Form, die es im Spiel
+nicht gibt, und Exemplare koennten ihr faelschlich zugeordnet werden.
+
+"Form beliebig" ist daher wie "Geschlecht egal" eine Anforderung des
+Sucheintrags: `FormGuid` bleibt leer, `PokemonGuid` gibt das Pokemon an.
+Damit jeder Eintrag sein Pokemon auch ohne Form kennt, fuehren alle drei
+Listen `PokemonGuid`. Bei Eintraegen mit Form steht das Pokemon damit doppelt
+in den Daten; die Konsistenzpruefung stellt sicher, dass beide
+Angaben zusammenpassen.
+
+Ein Exemplar erfuellt eine Suche mit "Form beliebig", wenn es dasselbe
+Pokemon ist, gleich welche Form. Ueberschneidungen wie "Vulpix 100er (Form
+beliebig)" neben "Vulpix Alola 100er" sind erlaubt: Ein Alola-100er erfuellt
+beide Zeilen, so wie ein Exemplar auch sonst mehrere Zeilen erfuellen darf.
+
+Beim Entwickeln wird eine Zeile mit "Form beliebig" auf das neue Pokemon
+hochgezogen und bleibt "Form beliebig".
 
 ## Warum GUIDs statt Dex-Nummer oder Name
 
@@ -745,9 +809,11 @@ Ablauf pro Eintrag:
 4. Den Rest an ` - ` ausserhalb von Anfuehrungszeichen zerlegen.
 5. Im ersten Teil den bekannten Namen zu dieser Dex-Nummer abtrennen, der
    Rest ist die Form.
-6. Die uebrigen Teile als Merkmale erkennen: Geschlecht, `Shiny`,
-   Regionsname, `Dynamax`/`Gigadynamax`, Kostuem, Hintergrund.
-7. Die Form ueber Dex-Nummer, Form und Region suchen.
+6. Die uebrigen Teile als Merkmale erkennen: `Form (beliebig)`, Geschlecht,
+   `Shiny`, Regionsname, `Dynamax`/`Gigadynamax`, Kostuem, Hintergrund.
+7. Bei `Form (beliebig)` bleibt die Form leer. Steht zusaetzlich eine Form
+   oder Region dabei, ist das ein Fehler.
+8. Sonst die Form ueber Dex-Nummer, Form und Region suchen.
 
 Eintraege, die sich nicht zuordnen lassen, landen mit Zeilennummer und Grund
 in einer Fehlerliste, z.B. "Dex-Nummer 999 unbekannt", "Name passt nicht zu
@@ -773,7 +839,8 @@ Jedes Merkmal liefert eines von drei Ergebnissen:
 
 | Merkmal            | passt                                         | pruefen                                             | passt nicht                         |
 |--------------------|-----------------------------------------------|-----------------------------------------------------|-------------------------------------|
-| Form               | gleich                                        | -                                                   | anders                              |
+| Pokemon            | gleich                                        | -                                                   | anders                              |
+| Form               | gleich, oder Anforderung "Form beliebig"      | Angebot "Form beliebig", Anforderung bestimmte Form | anders                              |
 | Geschlecht         | Anforderung egal oder gleich                  | Anforderung M/W, Angebot ohne Angabe                | anderes Geschlecht                  |
 | Shiny              | nicht gefordert, oder Angebot ist Shiny       | -                                                   | gefordert, Angebot nicht Shiny      |
 | Dynamax            | egal oder exakt gleich                        | -                                                   | anders                              |
@@ -831,7 +898,9 @@ angewendet:
 3. Insgesamt nur die 10 neuesten Sicherungen behalten.
 
 Vor einem Abgleich wird standardmaessig keine Sicherung erstellt, da
-haeufige Abgleiche sonst viele Sicherungen erzeugen wuerden.
+haeufige Abgleiche sonst viele Sicherungen erzeugen wuerden. Vor
+Massenaenderungen (z.B. Sammel-Suche) schlaegt das Programm eine manuelle
+Sicherung vor.
 
 ## Abgleich zwischen Geraeten
 
@@ -927,6 +996,9 @@ zugeordnet werden koennen.
 - Der Code-Stil ist in `src/PoGoExchange/.editorconfig` festgelegt:
   Einrueckung mit 2 Leerzeichen, geschweifte Klammern auch bei einzeiligen
   `if`-Bloecken, Zeilen bis etwa 100 Zeichen.
+- Die Konsistenz der persoenlichen Listen (Verweise auf Pokemon und Formen)
+  prueft `Services/Konsistenz.cs`; die Namen der Listen fuer Meldungen
+  stehen in `ListenNamen`.
 - Klassennamen weichen an zwei Stellen von den Dateinamen ab, weil eine
   C#-Klasse keine Eigenschaft mit ihrem eigenen Namen haben darf:
   `PokemonForm` (Datei `formen.csv`, Spalte `Form`) und `RegionBereich`

@@ -140,3 +140,23 @@ public sealed class OptionaleZahlKonverter : DefaultTypeConverter
     return value is int zahl ? zahl.ToString(CultureInfo.InvariantCulture) : "";
   }
 }
+// Optionale GUID: leer = Guid.Empty
+public sealed class OptionaleGuidKonverter : DefaultTypeConverter
+{
+  public override object? ConvertFromString(
+    string? text,
+    IReaderRow row,
+    MemberMapData memberMapData)
+  {
+    var t = TextBereinigung.Bereinigen(text);
+    return t == "" ? Guid.Empty : Guid.Parse(t);
+  }
+
+  public override string? ConvertToString(
+    object? value,
+    IWriterRow row,
+    MemberMapData memberMapData)
+  {
+    return value is Guid guid && guid != Guid.Empty ? guid.ToString() : "";
+  }
+}

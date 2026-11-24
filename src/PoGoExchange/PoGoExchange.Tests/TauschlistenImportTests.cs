@@ -57,12 +57,13 @@ public class TauschlistenImportTests
     };
   }
 
-  // Vergleichbare Beschreibung eines Eintrags: Abschnitt, Form und alle Merkmale
+  // Vergleichbare Beschreibung eines Eintrags: Abschnitt, Pokemon, Form und alle Merkmale
   private static string Beschreibung(string abschnitt, ListenEintrag e)
   {
     return string.Join(
       "|",
       abschnitt,
+      e.PokemonGuid,
       e.FormGuid,
       e.Geschlecht,
       e.Shiny,
@@ -78,30 +79,39 @@ public class TauschlistenImportTests
   {
     var glumandaEinsZuEins = new SucheEintrag
     {
-      FormGuid = _glumandaForm.Guid, Shiny = true, EinsZuEins = true
+      PokemonGuid = _glumanda.Guid, FormGuid = _glumandaForm.Guid, Shiny = true, EinsZuEins = true
     };
     var glumanda100er = new SucheEintrag
     {
-      FormGuid = _glumandaForm.Guid, Shiny = true, Hundert = true
+      PokemonGuid = _glumanda.Guid, FormGuid = _glumandaForm.Guid, Shiny = true, Hundert = true
     };
     var vulpixAlola = new SucheEintrag
     {
+      PokemonGuid = _vulpix.Guid,
       FormGuid = _vulpixAlola.Guid,
       Shiny = true,
       HintergrundAktiv = true,
       HintergrundText = "New York - 2026"
     };
+    var vulpixBeliebig = new SucheEintrag
+    {
+      PokemonGuid = _vulpix.Guid, FormGuid = Guid.Empty, Geschlecht = Geschlecht.Maennlich
+    };
     var flabebeWeiblich = new SucheEintrag
     {
-      FormGuid = _flabebeRot.Guid, Geschlecht = Geschlecht.Weiblich
+      PokemonGuid = _flabebe.Guid, FormGuid = _flabebeRot.Guid, Geschlecht = Geschlecht.Weiblich
     };
     var glurakGiga = new SucheEintrag
     {
-      FormGuid = _glurakForm.Guid, Dynamax = DynamaxStufe.Gigadynamax, KostuemAktiv = true
+      PokemonGuid = _glurak.Guid,
+      FormGuid = _glurakForm.Guid,
+      Dynamax = DynamaxStufe.Gigadynamax,
+      KostuemAktiv = true
     };
-    var vulpixUeber = new UeberEintrag { FormGuid = _vulpixForm.Guid };
+    var vulpixUeber = new UeberEintrag { PokemonGuid = _vulpix.Guid, FormGuid = _vulpixForm.Guid };
     var glurakUeber = new UeberEintrag
     {
+      PokemonGuid = _glurak.Guid,
       FormGuid = _glurakForm.Guid,
       Geschlecht = Geschlecht.Maennlich,
       Dynamax = DynamaxStufe.Dynamax,
@@ -110,7 +120,10 @@ public class TauschlistenImportTests
 
     var export = Tauschliste.Erzeugen(
       _katalog,
-      new[] { glumandaEinsZuEins, glumanda100er, vulpixAlola, flabebeWeiblich, glurakGiga },
+      new[]
+      {
+        glumandaEinsZuEins, glumanda100er, vulpixAlola, vulpixBeliebig, flabebeWeiblich, glurakGiga
+      },
       new[] { vulpixUeber, glurakUeber });
     var import = TauschlistenImport.Einlesen(_katalog, export.Text);
 
@@ -119,6 +132,7 @@ public class TauschlistenImportTests
       Beschreibung("1:1", glumandaEinsZuEins),
       Beschreibung("fehlt", glumanda100er),
       Beschreibung("fehlt", vulpixAlola),
+      Beschreibung("fehlt", vulpixBeliebig),
       Beschreibung("fehlt", flabebeWeiblich),
       Beschreibung("fehlt", glurakGiga),
       Beschreibung("abzugeben", vulpixUeber),
@@ -141,8 +155,35 @@ public class TauschlistenImportTests
     Assert.Empty(import.Fehler);
     var eintrag = Assert.Single(import.Eintraege);
     Assert.Equal("fehlt", eintrag.Abschnitt);
+    Assert.Equal(_glumanda.Guid, eintrag.PokemonGuid);
     Assert.Equal(_glumandaForm.Guid, eintrag.FormGuid);
     Assert.True(eintrag.Shiny);
+  }
+
+  [Fact]
+  public void FormBeliebig_WirdErkannt()
+  {
+    var text = "Kanto fehlt:\n- #37 Vulpix - Form (beliebig) - Shiny\n";
+
+    var import = TauschlistenImport.Einlesen(_katalog, text);
+
+    Assert.Empty(import.Fehler);
+    var eintrag = Assert.Single(import.Eintraege);
+    Assert.Equal(_vulpix.Guid, eintrag.PokemonGuid);
+    Assert.True(eintrag.FormBeliebig);
+    Assert.True(eintrag.Shiny);
+  }
+
+  [Fact]
+  public void FormBeliebig_ZusammenMitRegion_IstFehler()
+  {
+    var text = "Kanto fehlt:\n- #37 Vulpix - Form (beliebig) - Alola\n";
+
+    var import = TauschlistenImport.Einlesen(_katalog, text);
+
+    Assert.Empty(import.Eintraege);
+    var fehler = Assert.Single(import.Fehler);
+    Assert.Contains("Form (beliebig) zusammen mit", fehler.Grund);
   }
 
   [Theory]

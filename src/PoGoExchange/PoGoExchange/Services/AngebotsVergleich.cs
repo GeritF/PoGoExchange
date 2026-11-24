@@ -23,6 +23,7 @@ public sealed class Vergleichsergebnis
 // Glueck und 100er werden nicht verglichen, sie entstehen erst durch den Tausch.
 public static class AngebotsVergleich
 {
+  internal const string HinweisForm = "Form beim Angebot nicht angegeben";
   internal const string HinweisGeschlecht = "Geschlecht beim Angebot nicht angegeben";
   internal const string HinweisKostuem = "Kost\u00fcm beim Angebot nicht beschrieben";
   internal const string HinweisHintergrund = "Hintergrund beim Angebot nicht beschrieben";
@@ -52,9 +53,23 @@ public static class AngebotsVergleich
     ListenEintrag anforderung,
     List<string> hinweise)
   {
-    if (angebot.FormGuid != anforderung.FormGuid)
+    if (angebot.PokemonGuid != anforderung.PokemonGuid)
     {
       return false;
+    }
+
+    // "Form beliebig" in der Anforderung: jede Form passt.
+    // "Form beliebig" im Angebot: unklar, welche Form er hat -> pruefen.
+    if (!anforderung.FormBeliebig)
+    {
+      if (angebot.FormBeliebig)
+      {
+        hinweise.Add(HinweisForm);
+      }
+      else if (angebot.FormGuid != anforderung.FormGuid)
+      {
+        return false;
+      }
     }
 
     if (

@@ -120,7 +120,7 @@ public static class TauschlistenImport
       a => string.Equals(a, letztesWort, StringComparison.OrdinalIgnoreCase));
   }
 
-  // Wertet den Text nach "#DexNr" aus.
+    // Wertet den Text nach "#DexNr" aus.
   // Liefert null bei Erfolg, sonst den Grund fuer die Fehlerliste.
   private static string? Auswerten(Katalog katalog, ImportEintrag eintrag, string rest)
   {
@@ -151,12 +151,26 @@ public static class TauschlistenImport
     }
 
     var region = "";
+    var formBeliebig = false;
     foreach (var teil in teile.Skip(1))
     {
-      if (!MerkmalUebernehmen(katalog, eintrag, teil, ref region))
+      if (!MerkmalUebernehmen(katalog, eintrag, teil, ref region, ref formBeliebig))
       {
         return $"Unbekannter Bestandteil: {teil}";
       }
+    }
+
+    eintrag.PokemonGuid = pokemon.Guid;
+
+    if (formBeliebig)
+    {
+      if (formText != "" || region != "")
+      {
+        return "Form (beliebig) zusammen mit Form oder Region angegeben";
+      }
+
+      eintrag.FormGuid = Guid.Empty;
+      return null;
     }
 
     var form = katalog.FormSuchen(pokemon.Guid, formText, region);
@@ -169,13 +183,21 @@ public static class TauschlistenImport
     return null;
   }
 
-  // Erkennt einen Bestandteil und setzt das passende Merkmal bzw. die Region
+  // Erkennt einen Bestandteil und setzt das passende Merkmal, die Region
+  // oder "Form beliebig"
   private static bool MerkmalUebernehmen(
     Katalog katalog,
     ImportEintrag eintrag,
     string teil,
-    ref string region)
+    ref string region,
+    ref bool formBeliebig)
   {
+    if (Gleich(teil, EintragText.TextForm + " " + EintragText.TextBeliebig))
+    {
+      formBeliebig = true;
+      return true;
+    }
+
     if (Gleich(teil, EintragText.TextMaennlich))
     {
       eintrag.Geschlecht = Geschlecht.Maennlich;

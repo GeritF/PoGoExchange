@@ -6,6 +6,7 @@ namespace PoGoExchange.Services;
 public static class EintragText
 {
   // Anzeigetexte (im Programm mit echten Umlauten)
+  internal const string TextForm = "Form";
   internal const string TextMaennlich = "M\u00e4nnlich";
   internal const string TextWeiblich = "Weiblich";
   internal const string TextShiny = "Shiny";
@@ -17,11 +18,20 @@ public static class EintragText
   internal const string Trenner = " - ";
 
   // Aufbau: Name Form - Geschlecht - Shiny - Region - Dynamax - Kostuem - Hintergrund
+  // Bei "Form beliebig" (form == null): Name - Form (beliebig) - Geschlecht - ...
   // Nicht gesetzte Bestandteile entfallen vollstaendig.
-  public static string Erzeugen(Pokemon pokemon, PokemonForm form, ListenEintrag eintrag)
+  public static string Erzeugen(Pokemon pokemon, PokemonForm? form, ListenEintrag eintrag)
   {
-    var kopf = form.Form == "" ? pokemon.Name : pokemon.Name + " " + form.Form;
-    var teile = new List<string> { kopf };
+    var teile = new List<string>();
+    if (form == null)
+    {
+      teile.Add(pokemon.Name);
+      teile.Add(TextForm + " " + TextBeliebig);
+    }
+    else
+    {
+      teile.Add(form.Form == "" ? pokemon.Name : pokemon.Name + " " + form.Form);
+    }
 
     if (eintrag.Geschlecht == Geschlecht.Maennlich)
     {
@@ -37,7 +47,7 @@ public static class EintragText
       teile.Add(TextShiny);
     }
 
-    if (form.Region != "")
+    if (form != null && form.Region != "")
     {
       teile.Add(form.Region);
     }

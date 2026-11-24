@@ -112,4 +112,19 @@ public sealed class Katalog
       string.Equals(f.Form, form, StringComparison.OrdinalIgnoreCase) &&
       string.Equals(f.Region, region, StringComparison.OrdinalIgnoreCase));
   }
+
+  public Pokemon? PokemonZuGuid(Guid pokemonGuid)
+  {
+    return _pokemon.TryGetValue(pokemonGuid, out var pokemon) ? pokemon : null;
+  }
+
+  public PokemonForm? FormZuGuid(Guid formGuid)
+  {
+    return _formen.TryGetValue(formGuid, out var form) ? form : null;
+  }
+
+  public IEnumerable<PokemonForm> FormenZuPokemon(Guid pokemonGuid)
+  {
+    return _formenNachPokemon[pokemonGuid];
+  }
 }

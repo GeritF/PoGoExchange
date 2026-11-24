@@ -148,6 +148,7 @@ public static class Abgleich
     return ueber
       .Where(e => e.GeloeschtAm == null)
       .GroupBy(e => (
+        e.PokemonGuid,
         e.FormGuid,
         e.Geschlecht,
         e.Shiny,

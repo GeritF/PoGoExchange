@@ -62,6 +62,7 @@ public class AbgleichTests
     return new SucheEintrag
     {
       Guid = Guid.NewGuid(),
+      PokemonGuid = form.PokemonGuid,
       FormGuid = form.Guid,
       Shiny = shiny,
       EinsZuEins = einsZuEins,
@@ -72,7 +73,13 @@ public class AbgleichTests
 
   private static UeberEintrag Ueber(PokemonForm form, bool shiny = false)
   {
-    return new UeberEintrag { Guid = Guid.NewGuid(), FormGuid = form.Guid, Shiny = shiny };
+    return new UeberEintrag
+    {
+      Guid = Guid.NewGuid(),
+      PokemonGuid = form.PokemonGuid,
+      FormGuid = form.Guid,
+      Shiny = shiny
+    };
   }
 
   private AbgleichErgebnis Abgleichen(
@@ -225,5 +232,37 @@ public class AbgleichTests
 
     var fehler = Assert.Single(ergebnis.Fehler);
     Assert.Contains("999", fehler.Grund);
+  }
+
+  [Fact]
+  public void MeineSucheMitFormBeliebig_PasstZuJederForm()
+  {
+    var beliebig = new SucheEintrag
+    {
+      Guid = Guid.NewGuid(),
+      PokemonGuid = _vulpix.Guid,
+      Shiny = true
+    };
+
+    var ergebnis = Abgleichen(
+      "Kanto abzugeben:\n- #37 Vulpix - Shiny - Alola\n",
+      new[] { beliebig },
+      Array.Empty<UeberEintrag>());
+
+    var treffer = Assert.Single(ergebnis.ErHat);
+    Assert.Equal(Passung.Passt, treffer.Passung);
+  }
+
+  [Fact]
+  public void SeinAngebotMitFormBeliebig_ErgibtPruefen()
+  {
+    var ergebnis = Abgleichen(
+      "Kanto abzugeben:\n- #37 Vulpix - Form (beliebig) - Shiny\n",
+      new[] { Suche(_vulpixAlola, shiny: true) },
+      Array.Empty<UeberEintrag>());
+
+    var treffer = Assert.Single(ergebnis.ErHat);
+    Assert.Equal(Passung.Pruefen, treffer.Passung);
+    Assert.Contains(treffer.Hinweise, h => h.Contains("Form"));
   }
 }

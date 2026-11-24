@@ -70,6 +70,7 @@ public class TauschlisteTests
     return new SucheEintrag
     {
       Guid = Guid.NewGuid(),
+      PokemonGuid = form.PokemonGuid,
       FormGuid = form.Guid,
       Shiny = shiny,
       EinsZuEins = einsZuEins,
@@ -81,7 +82,13 @@ public class TauschlisteTests
 
   private static UeberEintrag Ueber(PokemonForm form, bool shiny = true)
   {
-    return new UeberEintrag { Guid = Guid.NewGuid(), FormGuid = form.Guid, Shiny = shiny };
+    return new UeberEintrag
+    {
+      Guid = Guid.NewGuid(),
+      PokemonGuid = form.PokemonGuid,
+      FormGuid = form.Guid,
+      Shiny = shiny
+    };
   }
 
   [Fact]
@@ -201,5 +208,32 @@ public class TauschlisteTests
 
     Assert.Equal("", ergebnis.Text);
     Assert.Empty(ergebnis.Fehler);
+  }
+
+  [Fact]
+  public void FormBeliebig_WirdGekennzeichnetExportiert()
+  {
+    var suche = new[]
+    {
+      new SucheEintrag { Guid = Guid.NewGuid(), PokemonGuid = _vulpix.Guid, Shiny = true }
+    };
+
+    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, Array.Empty<UeberEintrag>());
+
+    Assert.Equal("Kanto fehlt:\n- #37 Vulpix - Form (beliebig) - Shiny\n", ergebnis.Text);
+    Assert.Empty(ergebnis.Fehler);
+  }
+
+  [Fact]
+  public void UeberEintragOhneForm_LandetInFehlerliste()
+  {
+    var ohneForm = new UeberEintrag { Guid = Guid.NewGuid(), PokemonGuid = _glumanda.Guid };
+
+    var ergebnis = Tauschliste.Erzeugen(_katalog, Array.Empty<SucheEintrag>(), new[] { ohneForm });
+
+    Assert.Equal("", ergebnis.Text);
+    var fehler = Assert.Single(ergebnis.Fehler);
+    Assert.Equal("Habe ich \u00fcber", fehler.Liste);
+    Assert.Contains("Form fehlt", fehler.Meldung);
   }
 }

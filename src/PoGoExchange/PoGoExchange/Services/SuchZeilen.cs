@@ -37,6 +37,7 @@ public static class SuchZeilen
 
   // Freie Texte zaehlen nur bei gesetztem Haken, Vergleich in Kleinbuchstaben
   internal static ZeilenSchluessel Schluessel(SucheEintrag e) => new(
+    e.PokemonGuid,
     e.FormGuid,
     e.Geschlecht,
     e.Shiny,
@@ -52,6 +53,7 @@ public static class SuchZeilen
 }
 
 internal readonly record struct ZeilenSchluessel(
+  Guid PokemonGuid,
   Guid FormGuid,
   Geschlecht Geschlecht,
   bool Shiny,

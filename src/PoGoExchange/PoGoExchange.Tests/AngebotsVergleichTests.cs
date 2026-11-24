@@ -114,4 +114,36 @@ public class AngebotsVergleichTests
     Assert.Contains(ergebnis.Hinweise, h => h.Contains("Geschlecht"));
     Assert.Contains(ergebnis.Hinweise, h => h.Contains("Hintergrund"));
   }
+
+  [Fact]
+  public void AnforderungFormBeliebig_PasstZuJederFormDesPokemon()
+  {
+    var pokemon = Guid.NewGuid();
+    var angebot = new UeberEintrag { PokemonGuid = pokemon, FormGuid = FormA };
+    var anforderung = new SucheEintrag { PokemonGuid = pokemon, FormGuid = Guid.Empty };
+
+    Assert.Equal(Passung.Passt, Ergebnis(angebot, anforderung));
+  }
+
+  [Fact]
+  public void AngebotOhneForm_ErgibtPruefen()
+  {
+    var pokemon = Guid.NewGuid();
+    var angebot = new ImportEintrag { PokemonGuid = pokemon, FormGuid = Guid.Empty };
+    var anforderung = new SucheEintrag { PokemonGuid = pokemon, FormGuid = FormA };
+
+    var ergebnis = AngebotsVergleich.Vergleichen(angebot, anforderung);
+
+    Assert.Equal(Passung.Pruefen, ergebnis.Passung);
+    Assert.Contains(ergebnis.Hinweise, h => h.Contains("Form"));
+  }
+
+  [Fact]
+  public void AnderesPokemon_PasstNicht_AuchBeiFormBeliebig()
+  {
+    var angebot = new UeberEintrag { PokemonGuid = Guid.NewGuid(), FormGuid = FormA };
+    var anforderung = new SucheEintrag { PokemonGuid = Guid.NewGuid(), FormGuid = Guid.Empty };
+
+    Assert.Equal(Passung.PasstNicht, Ergebnis(angebot, anforderung));
+  }
 }

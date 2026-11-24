@@ -14,7 +14,13 @@ public static class Anforderung
       return false;
     }
 
-    if (exemplar.FormGuid != suche.FormGuid)
+    if (exemplar.PokemonGuid != suche.PokemonGuid)
+    {
+      return false;
+    }
+
+    // "Form beliebig" in der Suche: jede Form des Pokemon erfuellt
+    if (!suche.FormBeliebig && exemplar.FormGuid != suche.FormGuid)
     {
       return false;
     }

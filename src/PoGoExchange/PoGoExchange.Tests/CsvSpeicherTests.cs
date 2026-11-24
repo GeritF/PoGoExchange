@@ -78,9 +78,10 @@ public class CsvSpeicherTests : IDisposable
         // Gemessen: Rohtext der Datei
         var zeilen = File.ReadAllLines(_pfad, Encoding.UTF8);
         Assert.Equal(
-            "Guid;FormGuid;Geschlecht;Shiny;Dynamax;KostuemAktiv;KostuemText;HintergrundAktiv;" +
-            "HintergrundText;Glueck;Hundert;EinsZuEins;ErledigtAm;GeaendertAm;GeloeschtAm",
-            zeilen[0]);
+          "Guid;PokemonGuid;FormGuid;Geschlecht;Shiny;Dynamax;KostuemAktiv;KostuemText;" +
+          "HintergrundAktiv;HintergrundText;Glueck;Hundert;EinsZuEins;ErledigtAm;GeaendertAm;" +
+          "GeloeschtAm",
+          zeilen[0]);
         Assert.Contains(
             ";W;1;Gigadynamax;0;;1;\"Paris; Eiffelturm\";1;0;1;;2026-11-23T18:30:00Z;",
             zeilen[1]);
@@ -100,6 +101,29 @@ public class CsvSpeicherTests : IDisposable
         Assert.Equal(zeit, gelesen.GeaendertAm);
         Assert.Equal(DateTimeKind.Utc, gelesen.GeaendertAm.Kind);
         Assert.Null(gelesen.GeloeschtAm);
+    }
+
+    [Fact]
+    public void FormBeliebig_WirdAlsLeeresFeldGeschrieben_UndGelesen()
+    {
+      var pokemonGuid = Guid.NewGuid();
+      var original = new SucheEintrag
+      {
+        Guid = Guid.NewGuid(),
+        PokemonGuid = pokemonGuid,
+        FormGuid = Guid.Empty
+      };
+
+      CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, new[] { original });
+
+      // Gemessen: drittes Feld (FormGuid) ist leer
+      var felder = File.ReadAllLines(_pfad, Encoding.UTF8)[1].Split(';');
+      Assert.Equal(pokemonGuid.ToString(), felder[1]);
+      Assert.Equal("", felder[2]);
+
+      var gelesen = CsvSpeicher.Lesen<SucheEintrag, SucheEintragMap>(_pfad).Single();
+      Assert.Equal(pokemonGuid, gelesen.PokemonGuid);
+      Assert.True(gelesen.FormBeliebig);
     }
 
     [Theory]
