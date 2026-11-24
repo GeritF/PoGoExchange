@@ -85,7 +85,7 @@ public static class Tauschliste
   }
 
   // Nur fuer bereits gepruefte Eintraege; Form ist null bei "Form beliebig"
-  private static (Pokemon Pokemon, PokemonForm? Form) Aufloesen(
+  internal static (Pokemon Pokemon, PokemonForm? Form) Aufloesen(
     Katalog katalog,
     ListenEintrag eintrag)
   {

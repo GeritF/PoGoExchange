@@ -3,20 +3,45 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:PoGoExchange.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:views="using:PoGoExchange.Views"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="700"
              x:Class="PoGoExchange.Views.MainView"
              x:DataType="vm:MainViewModel">
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <ScrollViewer>
-        <StackPanel Margin="16" Spacing="12">
-            <SelectableTextBlock Text="{Binding Status}" TextWrapping="Wrap" />
-            <Button Content="Beenden" Command="{Binding CloseCommand}" />
-        </StackPanel>
-    </ScrollViewer>
+    <DockPanel>
+        <Border DockPanel.Dock="Top" Padding="8" BorderThickness="0,0,0,1" BorderBrush="Gray">
+            <Grid ColumnDefinitions="Auto,*">
+                <Button Grid.Column="0"
+                        Content="&lt; Zur&#xFC;ck"
+                        Command="{Binding ZurueckCommand}"
+                        IsVisible="{Binding Navigation.KannZurueck}"
+                        Margin="0,0,8,0" />
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Navigation.AktuelleSeite.Titel}"
+                           FontSize="20"
+                           VerticalAlignment="Center" />
+            </Grid>
+        </Border>
 
+        <!-- Seiten ausdruecklich zuordnen statt ueber den ViewLocator (keine Reflexion) -->
+        <ContentControl Content="{Binding Navigation.AktuelleSeite}">
+            <ContentControl.DataTemplates>
+                <DataTemplate DataType="vm:HauptseiteViewModel">
+                    <views:HauptseiteView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:TauschlistenViewModel">
+                    <views:TauschlistenView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:VerwaltungViewModel">
+                    <views:VerwaltungView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:PlatzhalterViewModel">
+                    <views:PlatzhalterView />
+                </DataTemplate>
+            </ContentControl.DataTemplates>
+        </ContentControl>
+    </DockPanel>
 </UserControl>

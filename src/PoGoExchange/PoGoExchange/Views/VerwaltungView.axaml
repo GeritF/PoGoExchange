@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             x:Class="PoGoExchange.Views.VerwaltungView"
+             x:DataType="vm:VerwaltungViewModel">
+    <ScrollViewer>
+        <StackPanel Margin="16" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Kopieren" Command="{Binding KopierenCommand}" />
+                <TextBlock Text="{Binding Rueckmeldung}" VerticalAlignment="Center" />
+            </StackPanel>
+            <SelectableTextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             xmlns:svc="using:PoGoExchange.Services"
+             x:Class="PoGoExchange.Views.ListenTabView"
+             x:DataType="vm:ListenTabViewModel">
+  <UserControl.Styles>
+    <Style Selector="TextBlock.erledigt">
+      <Setter Property="Opacity" Value="0.5" />
+      <Setter Property="TextDecorations" Value="Strikethrough" />
+    </Style>
+    <Style Selector="TextBlock.fehlerhaft">
+      <Setter Property="Foreground" Value="Red" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel Margin="8">
+    <StackPanel DockPanel.Dock="Top" Spacing="4">
+      <TextBlock Text="Suche (Name oder Dex-Nummer):" />
+      <TextBox Text="{Binding Suchtext}" />
+    </StackPanel>
+
+    <StackPanel DockPanel.Dock="Top"
+                IsVisible="{Binding HatErledigtUmschalter}"
+                Spacing="4" Margin="0,8,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="{Binding ErledigtButtonText}"
+                Command="{Binding ErledigtUmschaltenCommand}" />
+        <TextBlock Text="{Binding ErledigtStatus}" VerticalAlignment="Center" />
+      </StackPanel>
+      <StackPanel IsVisible="{Binding RueckfrageSichtbar}" Spacing="4">
+        <TextBlock Text="Sollen jetzt auch die erledigten Eintr&#xE4;ge angezeigt werden?"
+                   TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Ja" Command="{Binding RueckfrageJaCommand}" />
+          <Button Content="Nein" Command="{Binding RueckfrageNeinCommand}" />
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock DockPanel.Dock="Top"
+               Text="Keine Eintr&#xE4;ge"
+               IsVisible="{Binding IstLeer}"
+               Margin="0,8,0,0" />
+
+    <ListBox ItemsSource="{Binding Zeilen}" Margin="0,8,0,0">
+      <ListBox.DataTemplates>
+        <DataTemplate DataType="vm:RegionKopf">
+          <TextBlock Text="{Binding Region}" FontWeight="Bold" Margin="0,8,0,0" />
+        </DataTemplate>
+        <DataTemplate DataType="svc:AnzeigeZeile">
+          <TextBlock Text="{Binding Anzeige}"
+                     Classes.erledigt="{Binding Erledigt}"
+                     Classes.fehlerhaft="{Binding Fehlerhaft}"
+                     TextWrapping="Wrap" />
+        </DataTemplate>
+      </ListBox.DataTemplates>
+    </ListBox>
+  </DockPanel>
+</UserControl>
