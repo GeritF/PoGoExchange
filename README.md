@@ -17,6 +17,7 @@ Die Einrichtung der Entwicklungsumgebung ist in
 1. Funktionen fuer Anwender
 2. Datenstrukturen
 3. Technische Details und Begruendungen
+4. Hinweise zur Entwicklung
 
 ---
 
@@ -38,7 +39,9 @@ Ein Pokemon kann in verschiedenen **Formen** vorkommen:
 - **Form**, z.B. "Rot" bei Flabebe, "Q" bei Icognito, "XL" bei Irrbiss
 - **Region** fuer Regionalformen, z.B. "Alola" bei Vulpix
 
-Fuer jedes Pokemon gibt es mindestens die Grundform.
+Fuer jedes Pokemon gibt es mindestens eine Form. Meist ist das die Grundform
+(ohne Form-Text). Manche Pokemon haben nur benannte Formen, z.B. Flabebe in
+verschiedenen Farben.
 
 Daneben hat jedes einzelne Exemplar **Merkmale**:
 
@@ -247,7 +250,7 @@ Kanto 1:1:
 
 Kanto fehlt:
 - #1 Bisasam - Shiny
-- #4 Glumanda - Shiny [100er] (0/1)
+- #4 Glumanda - Shiny [100er]
 - #150 Mewtu - Shiny
 
 Kanto abzugeben:
@@ -262,16 +265,50 @@ Glueck und Werte erst durch den Tausch entstehen.
 
 Vollstaendig erledigte Suchen erscheinen nicht in der Tauschliste.
 
+Pokemon, deren Dex-Nummer in keiner Region liegt (z.B. Meltan und Melmetal),
+stehen in einer eigenen Gruppe "Unbekannt" am Ende der Liste.
+
+Eintraege, die wegen beschaedigter Daten keiner Form zugeordnet werden
+koennen, erscheinen nicht in der Liste, sondern werden als Fehler gemeldet.
+
 ## Tauschlisten anderer Spieler abgleichen
 
-Eine fremde Tauschliste wird eingelesen und einmalig mit den eigenen Listen
-verglichen. Sie wird nicht gespeichert. Das Ergebnis zeigt:
+Eine fremde Tauschliste wird eingefuegt und einmalig mit den eigenen Listen
+verglichen. Sie wird nicht gespeichert. Es darf die ganze Nachricht
+eingefuegt werden: Text ausserhalb der Liste (z.B. eine Begruessung) wird
+ignoriert.
 
-- Passende Treffer (er gibt ab, was ich suche, und umgekehrt).
-- Moegliche Treffer mit dem Hinweis "Pruefe ..., vielleicht passt das",
-  z.B. wenn ich "Quabbel weiblich" suche und er "Quabbel" ohne Angabe des
-  Geschlechts anbietet.
-- Zeilen, die keiner bekannten Form zugeordnet werden konnten.
+Das Ergebnis besteht aus drei Listen:
+
+1. **1:1 passt exakt**: Wir suchen beide dasselbe Pokemon 1:1 und koennen es
+   uns gegenseitig geben.
+2. **Er hat, was ich suche**: Seine Eintraege unter "abzugeben" und "1:1"
+   gegen meine offenen Sucheintraege. Wer etwas 1:1 sucht, hat es auch und
+   kann es abgeben.
+3. **Er sucht, was ich uebrig habe**: Seine Eintraege unter "fehlt" und "1:1"
+   gegen mein "Habe ich ueber" und meine eigenen 1:1-Eintraege.
+
+Ist an einem Treffer in Liste 2 oder 3 ein 1:1-Eintrag beteiligt, wird er mit
+"1:1 gewuenscht" gekennzeichnet. Ob das streng gemeint ist ("gebe ich nur
+gegen dasselbe ab") oder nur ein Angebot ("kann ich auch zurueckgeben"),
+klaeren die Spieler untereinander.
+
+Ein Pokemon, das bereits in Liste 1 einen Treffer hat, erscheint nicht
+zusaetzlich in Liste 2 oder 3. Der 1:1-Tausch ist der Idealfall.
+
+Jeder Treffer ist entweder **sicher** oder mit **pruefen** markiert, z.B.
+"Pruefe Quabbel: Geschlecht beim Angebot nicht angegeben", wenn ich
+"Quabbel weiblich" suche und er "Quabbel" ohne Angabe des Geschlechts
+anbietet.
+
+Sortierung innerhalb jeder Liste:
+
+1. Treffer mit "1:1 gewuenscht" zuerst,
+2. dann sichere Treffer vor denen mit "pruefen",
+3. dann nach Dex-Nummer.
+
+Zusaetzlich werden Zeilen der fremden Liste angezeigt, die keiner bekannten
+Form zugeordnet werden konnten, jeweils mit Zeilennummer und Grund.
 
 ## Abgleich zwischen Geraeten (z.B. Handy und PC)
 
@@ -390,11 +427,22 @@ Einschraenkungen:
 Liste der Regionen. Dient der Gruppierung nach Dex-Nummer und als Auswahl
 fuer die Spalte `Region` in `formen.csv`.
 
-| Spalte | Inhalt                              |
-|--------|-------------------------------------|
-| Region | Name der Region, z.B. `Kanto`       |
-| DexVon | Erste Dex-Nummer (einschliesslich)  |
-| DexBis | Letzte Dex-Nummer (einschliesslich) |
+| Spalte | Inhalt                                          |
+|--------|-------------------------------------------------|
+| Region | Name der Region, z.B. `Kanto`                   |
+| DexVon | Erste Dex-Nummer (einschliesslich), oder leer   |
+| DexBis | Letzte Dex-Nummer (einschliesslich), oder leer  |
+
+Eine Region ohne `DexVon` und `DexBis` ist die **Auffang-Region**. Sie nimmt
+alle Dex-Nummern auf, die in keinem Bereich liegen, z.B. `Unbekannt` fuer
+Meltan (808) und Melmetal (809), wenn Alola bei 807 endet.
+
+Einschraenkungen:
+
+- `DexVon` und `DexBis` sind entweder beide gesetzt oder beide leer.
+- Bereiche ueberschneiden sich nicht. Luecken sind erlaubt.
+- Es gibt hoechstens eine Auffang-Region. Fehlt sie, gilt der Name
+  `Unbekannt`.
 
 ### nutzdaten_info.csv
 
@@ -534,6 +582,12 @@ Glumanda
 - Gleiche Eintraege aus "Habe ich ueber" erscheinen nur einmal.
 - Die Region der Ueberschrift richtet sich nach der Dex-Nummer
   (`regionen.csv`), nicht nach der Spalte `Region` der Form.
+- Reihenfolge der Regionen: Regionen mit Bereich nach Dex-Nummer, die
+  Auffang-Region zuletzt. Leere Abschnitte und Regionen entfallen.
+- Innerhalb eines Abschnitts wird nach Dex-Nummer und dann nach
+  Eintragstext sortiert.
+- Zeilenende ist immer ein einfacher Zeilenvorschub, unabhaengig vom
+  Betriebssystem.
 
 ---
 
@@ -571,6 +625,11 @@ werden wie im Spiel als Form des Ursprungs-Pokemons gefuehrt (Vulpix,
 Dex-Nummer 37, Kanto). Die Spalte `Region` der Form beschreibt daher die
 Form, nicht die Gruppierung in der Liste. Die Bereiche stehen in
 `regionen.csv`, damit sie ohne Programmaenderung angepasst werden koennen.
+
+Die Auffang-Region ohne Bereich gibt es, weil Pokemon GO einzelne Pokemon
+keiner Region zuordnet (z.B. Meltan und Melmetal). Statt Ausnahmen im
+Programm zu pflegen, laesst man im Bereich der Regionen eine Luecke. Ebenso
+landen neue Pokemon dort, bevor `regionen.csv` erweitert wurde.
 
 ## Warum es keine Angabe zur Tauschbarkeit gibt
 
@@ -663,8 +722,24 @@ innerhalb des Textes bleiben erhalten, nur am Anfang und Ende wird getrimmt.
 
 ## Einlesen von Tauschlisten
 
-1. Ueberschrift auswerten: Abschnitt "1:1", "fehlt" oder "abzugeben".
-2. Aufzaehlungszeichen `- ` und `#<DexNr>` abtrennen.
+Grundregeln:
+
+- Als Eintrag gilt jede Zeile der Form `#<DexNr> ...`, optional mit
+  Aufzaehlungszeichen `-` oder `*` davor. Alle anderen Zeilen (z.B. eine
+  Begruessung) werden ignoriert.
+- Eine Zeile, die mit `:` endet, ist eine Ueberschrift. Das letzte Wort davor
+  bestimmt den Abschnitt (`1:1`, `fehlt` oder `abzugeben`). Eine
+  Ueberschrift mit unbekanntem Abschnitt beendet den aktuellen Abschnitt,
+  damit nachfolgende Eintraege nicht falsch zugeordnet werden.
+- Die Region in der Ueberschrift wird nicht ausgewertet, massgeblich ist die
+  Dex-Nummer.
+- Gross- und Kleinschreibung spielt keine Rolle, Windows-Zeilenenden sind
+  erlaubt.
+
+Ablauf pro Eintrag:
+
+1. Abschnitt aus der letzten Ueberschrift uebernehmen.
+2. Aufzaehlungszeichen und `#<DexNr>` abtrennen.
 3. Zaehler `(a/b)` und Zaehlbedingungen `[...]` am Ende abtrennen und
    ignorieren.
 4. Den Rest an ` - ` ausserhalb von Anfuehrungszeichen zerlegen.
@@ -674,24 +749,58 @@ innerhalb des Textes bleiben erhalten, nur am Anfang und Ende wird getrimmt.
    Regionsname, `Dynamax`/`Gigadynamax`, Kostuem, Hintergrund.
 7. Die Form ueber Dex-Nummer, Form und Region suchen.
 
-Zeilen, die sich nicht zuordnen lassen, werden als "nicht zugeordnet"
-angezeigt. Freie Texte stehen in Anfuehrungszeichen, deshalb duerfen sie
+Eintraege, die sich nicht zuordnen lassen, landen mit Zeilennummer und Grund
+in einer Fehlerliste, z.B. "Dex-Nummer 999 unbekannt", "Name passt nicht zu
+#4 (Glumanda)", "Unbekannter Bestandteil: Glitzer" oder "Form nicht
+gefunden". Eintraege vor der ersten gueltigen Ueberschrift werden ebenfalls
+gemeldet. Freie Texte stehen in Anfuehrungszeichen, deshalb duerfen sie
 selbst keine enthalten. Trennstriche innerhalb von Anfuehrungszeichen
 stoeren nicht.
 
 ## Abgleich der Merkmale mit fremden Listen
 
-Ein Exemplar erfuellt eine Anforderung, wenn alle gesetzten Anforderungen
-zutreffen. Nicht gesetzte Anforderungen gelten als "egal".
+Beim Abgleich steht immer ein **Angebot** einer **Anforderung** gegenueber.
+Angebote sind Eintraege unter "abzugeben", Eintraege aus "Habe ich ueber"
+sowie 1:1-Eintraege (wer 1:1 sucht, hat das Pokemon auch). Anforderungen
+sind Eintraege unter "fehlt" und "1:1" bzw. die eigenen offenen
+Sucheintraege.
+
+Ein Angebot beschreibt ein Exemplar: Ein nicht gesetztes Merkmal bedeutet
+"hat es nicht" (z.B. kein Shiny), beim Geschlecht "nicht angegeben". Eine
+Anforderung behandelt nicht gesetzte Merkmale als "egal".
+
+Jedes Merkmal liefert eines von drei Ergebnissen:
+
+| Merkmal            | passt                                         | pruefen                                             | passt nicht                         |
+|--------------------|-----------------------------------------------|-----------------------------------------------------|-------------------------------------|
+| Form               | gleich                                        | -                                                   | anders                              |
+| Geschlecht         | Anforderung egal oder gleich                  | Anforderung M/W, Angebot ohne Angabe                | anderes Geschlecht                  |
+| Shiny              | nicht gefordert, oder Angebot ist Shiny       | -                                                   | gefordert, Angebot nicht Shiny      |
+| Dynamax            | egal oder exakt gleich                        | -                                                   | anders                              |
+| Kostuem/Hintergrund | nicht gefordert, beliebig, oder gleicher Text | bestimmter Text gefordert, Angebot ohne Beschreibung | gefordert, aber keins; anderer Text |
+
+Ist ein Merkmal "passt nicht", passt der Eintrag nicht. Ist mindestens eines
+"pruefen", ist es ein Treffer mit Hinweis, sonst ein sicherer Treffer.
+Glueck und 100er werden nicht verglichen, da sie erst durch den Tausch
+entstehen.
+
+Beispiele:
 
 - Ich suche "Zubat" (Geschlecht egal), angeboten wird "Zubat weiblich":
-  Treffer.
+  sicherer Treffer.
 - Ich suche "Quabbel weiblich", angeboten wird "Quabbel" ohne
-  Geschlechtsangabe: nur ein moeglicher Treffer mit Hinweis, weil unklar ist,
-  was der Partner wirklich hat.
+  Geschlechtsangabe: Treffer mit Hinweis, weil unklar ist, was der Partner
+  wirklich hat.
 - Ich suche ein bestimmtes Kostuem, angeboten wird ein Kostuem ohne
-  Beschreibung: moeglicher Treffer mit Hinweis. Fuer Hintergruende gilt
-  dasselbe.
+  Beschreibung: Treffer mit Hinweis. Fuer Hintergruende gilt dasselbe.
+
+Ein **1:1-Treffer** (Liste 1) liegt vor, wenn sein 1:1-Eintrag als Angebot
+meine 1:1-Anforderung erfuellt und mein 1:1-Eintrag als Angebot seine. Gilt
+das, erscheint das Paar nur in Liste 1.
+
+Die Regel fuer die eigenen Listen ("erfuellt ein Exemplar aus 'Habe ich'
+einen Sucheintrag?") kennt dagegen nur ja oder nein: Dort sind alle Angaben
+bekannt, ein "pruefen" ist nicht noetig.
 
 ## Archivieren statt Loeschen
 
@@ -797,3 +906,28 @@ zugeordnet werden koennen.
   Aenderungen sofort gespeichert und nicht erst beim Beenden.
 - Android speichert die Daten in einem privaten Bereich. Der Zugriff von
   aussen erfolgt ueber Export und Import (Exportpaket).
+
+---
+
+# 4. Hinweise zur Entwicklung
+
+- Die Einrichtung der Entwicklungsumgebung steht in
+  `install/Entwicklungsumgebung_Linux.md`.
+- Die Fachlogik (Ordner `Models` und `Services`) ist unabhaengig von der
+  Oberflaeche und wird im Projekt `PoGoExchange.Tests` mit xUnit getestet.
+- `test/Test_XUnit.sh` fuehrt alle Tests aus und zeigt eine Auswertung pro
+  Testklasse. Mit `ALLE_TESTS=1` im Skript wird jeder einzelne Test mit
+  seinen Testdaten aufgelistet.
+- Die mitgelieferten Nutzdaten liegen in `src/PoGoExchange/PoGoExchange/Nutzdaten`
+  und werden als eingebettete Ressource in das Programm uebernommen. Die
+  Tests in `NutzdatenTests` pruefen ihre innere Stimmigkeit (Verweise,
+  Eindeutigkeit, Regionsbereiche).
+- Quelltext wird in reinem ASCII geschrieben. Sonderzeichen in Anzeigetexten
+  stehen als `\u`-Escapes im Quelltext (z.B. `"Kost\u00fcm"`).
+- Der Code-Stil ist in `src/PoGoExchange/.editorconfig` festgelegt:
+  Einrueckung mit 2 Leerzeichen, geschweifte Klammern auch bei einzeiligen
+  `if`-Bloecken, Zeilen bis etwa 100 Zeichen.
+- Klassennamen weichen an zwei Stellen von den Dateinamen ab, weil eine
+  C#-Klasse keine Eigenschaft mit ihrem eigenen Namen haben darf:
+  `PokemonForm` (Datei `formen.csv`, Spalte `Form`) und `RegionBereich`
+  (Datei `regionen.csv`, Spalte `Region`).

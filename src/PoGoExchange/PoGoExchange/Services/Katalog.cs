@@ -20,6 +20,8 @@ public sealed class Katalog
 
   private readonly Dictionary<Guid, Pokemon> _pokemon;
   private readonly Dictionary<Guid, PokemonForm> _formen;
+  private readonly Dictionary<int, Pokemon> _pokemonNachDex;
+  private readonly ILookup<Guid, PokemonForm> _formenNachPokemon;
 
   // Regionen fuer die Gruppierung der Tauschliste (siehe Hinweis oben)
   private readonly List<RegionBereich> _regionenMitBereich;
@@ -33,6 +35,10 @@ public sealed class Katalog
   {
     _pokemon = pokemon.ToDictionary(p => p.Guid);
     _formen = formen.ToDictionary(f => f.Guid);
+    _pokemonNachDex = _pokemon.Values
+      .GroupBy(p => p.DexNr)
+      .ToDictionary(g => g.Key, g => g.First());
+    _formenNachPokemon = _formen.Values.ToLookup(f => f.PokemonGuid);
 
     var alle = regionen.ToList();
     _regionenMitBereich = alle
@@ -70,6 +76,14 @@ public sealed class Katalog
     return bereich?.Region ?? _auffangRegion;
   }
 
+  // Liefert den Regionsnamen in der Schreibweise aus regionen.csv, oder null.
+  // Wird beim Einlesen gebraucht, um Regionalformen (z.B. "Alola") zu erkennen.
+  public string? RegionsnameFinden(string text)
+  {
+    return _regionenReihenfolge.FirstOrDefault(
+      r => string.Equals(r, text, StringComparison.OrdinalIgnoreCase));
+  }
+
   // Liefert Pokemon und Form zu einer FormGuid, oder null wenn unbekannt
   public (Pokemon Pokemon, PokemonForm Form)? Aufloesen(Guid formGuid)
   {
@@ -84,5 +98,18 @@ public sealed class Katalog
     }
 
     return (pokemon, form);
+  }
+
+  public Pokemon? PokemonZuDex(int dexNr)
+  {
+    return _pokemonNachDex.TryGetValue(dexNr, out var pokemon) ? pokemon : null;
+  }
+
+  // Sucht eine Form ueber Form-Text und Region, ohne Gross-/Kleinschreibung
+  public PokemonForm? FormSuchen(Guid pokemonGuid, string form, string region)
+  {
+    return _formenNachPokemon[pokemonGuid].FirstOrDefault(f =>
+      string.Equals(f.Form, form, StringComparison.OrdinalIgnoreCase) &&
+      string.Equals(f.Region, region, StringComparison.OrdinalIgnoreCase));
   }
 }

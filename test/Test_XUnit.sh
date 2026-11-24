@@ -3,7 +3,7 @@
 # ALLE_TESTS=1 listet zusaetzlich jeden einzelnen Test mit seinen Testdaten
 ALLE_TESTS=0
 
-cd ~/DEV/3_PoGoExchange/src/PoGoExchange || exit 1
+cd "$(dirname "$0")/../src/PoGoExchange" || exit 1
 log=/tmp/pogo_test.log
 
 # Nicht-ASCII-Zeichen als \uXXXX ausgeben, damit die Ausgabe reines ASCII bleibt
