@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PoGoExchange.Services;
 using PoGoExchange.ViewModels;
+using PoGoExchange.Models;
 
 namespace PoGoExchange.Tests;
 
@@ -51,5 +52,21 @@ public class ListenTabViewModelTests
     Assert.False(tab.IstLeer);
     Assert.IsType<RegionKopf>(tab.Zeilen[0]);
     Assert.IsType<AnzeigeZeile>(tab.Zeilen[1]);
+  }
+
+  [Fact]
+  public void AntippenEinerZeile_OeffnetSie_UndHebtAuswahlAuf()
+  {
+    AnzeigeZeile? geoeffnet = null;
+    var zeile = new AnzeigeZeile("Kanto", 4, "Glumanda", "", false, false, new SucheEintrag());
+    var tab = new ListenTabViewModel(
+      false,
+      (_, _) => new List<AnzeigeGruppe> { new("Kanto", new[] { zeile }) },
+      oeffnen: z => geoeffnet = z);
+
+    tab.Ausgewaehlt = zeile;
+
+    Assert.Same(zeile, geoeffnet);
+    Assert.Null(tab.Ausgewaehlt);
   }
 }

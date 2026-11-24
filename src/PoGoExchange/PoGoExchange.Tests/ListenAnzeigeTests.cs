@@ -169,18 +169,4 @@ public class ListenAnzeigeTests
     Assert.True(zeile.Fehlerhaft);
     Assert.Contains("Form fehlt", zeile.Anzeige);
   }
-
-  [Fact]
-  public void GeloeschteEintraege_WerdenNichtAngezeigt()
-  {
-    var geloescht = new UeberEintrag
-    {
-      Guid = Guid.NewGuid(),
-      PokemonGuid = _glumanda.Guid,
-      FormGuid = _glumandaForm.Guid,
-      GeloeschtAm = DateTime.UtcNow
-    };
-
-    Assert.Empty(ListenAnzeige.Ueber(_katalog, new[] { geloescht }, ""));
-  }
 }

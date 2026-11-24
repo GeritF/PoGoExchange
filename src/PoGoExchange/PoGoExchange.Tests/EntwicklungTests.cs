@@ -135,8 +135,8 @@ public class EntwicklungTests
     var zeile = Assert.Single(Entwicklung.BetroffeneZeilen(vorher, habe[0], suche, habe));
     Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
 
-    Assert.Equal(Jetzt, alt.GeloeschtAm);
-    var aktiv = Assert.Single(suche, e => e.GeloeschtAm == null);
+    Assert.DoesNotContain(alt, suche);
+    var aktiv = Assert.Single(suche);
     Assert.Equal(Glurak.Guid, aktiv.FormGuid);
     Assert.Equal(1, aktiv.Anzahl);
   }
@@ -177,7 +177,6 @@ public class EntwicklungTests
 
     Assert.Equal(Glurak.PokemonGuid, exemplar.PokemonGuid);
     Assert.Equal(Glurak.Guid, exemplar.FormGuid);
-    Assert.Equal(Jetzt, exemplar.GeaendertAm);
     Assert.Equal(Glumanda.Guid, vorher.FormGuid);
   }
 }

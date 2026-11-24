@@ -16,6 +16,13 @@
 
   <DockPanel Margin="8">
     <StackPanel DockPanel.Dock="Top" Spacing="4">
+      <Button Content="+ Neu"
+              Command="{Binding NeuCommand}"
+              IsVisible="{Binding HatNeu}" />
+      <TextBlock Text="{Binding Rueckmeldung}"
+                 IsVisible="{Binding HatRueckmeldung}"
+                 Foreground="Green"
+                 TextWrapping="Wrap" />
       <TextBlock Text="Suche (Name oder Dex-Nummer):" />
       <TextBox Text="{Binding Suchtext}" />
     </StackPanel>
@@ -43,7 +50,9 @@
                IsVisible="{Binding IstLeer}"
                Margin="0,8,0,0" />
 
-    <ListBox ItemsSource="{Binding Zeilen}" Margin="0,8,0,0">
+    <ListBox ItemsSource="{Binding Zeilen}"
+             SelectedItem="{Binding Ausgewaehlt}"
+             Margin="0,8,0,0">
       <ListBox.DataTemplates>
         <DataTemplate DataType="vm:RegionKopf">
           <TextBlock Text="{Binding Region}" FontWeight="Bold" Margin="0,8,0,0" />

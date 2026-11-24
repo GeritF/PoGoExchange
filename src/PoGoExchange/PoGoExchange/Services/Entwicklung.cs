@@ -16,7 +16,6 @@ public static class Entwicklung
     var vorher = exemplar.Kopie();
     exemplar.PokemonGuid = neueForm.PokemonGuid;
     exemplar.FormGuid = neueForm.Guid;
-    exemplar.GeaendertAm = jetzt;
     return vorher;
   }
 
@@ -54,7 +53,6 @@ public static class Entwicklung
     if (vorhanden != null)
     {
       vorhanden.Anzahl += 1;
-      vorhanden.GeaendertAm = jetzt;
       return vorhanden;
     }
 

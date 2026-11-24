@@ -64,9 +64,9 @@ public sealed partial class VerwaltungViewModel : SeiteViewModel
 
     text.AppendLine($"Pokemon in den Nutzdaten: {bestand.Katalog.AllePokemon().Count()}");
     text.AppendLine($"Eigene Formen: {bestand.EigeneFormen.Count}");
-    text.AppendLine($"Habe ich: {bestand.Habe.Count(e => e.GeloeschtAm == null)}");
-    text.AppendLine($"Suche ich: {bestand.Suche.Count(e => e.GeloeschtAm == null)} Zeilen");
-    text.AppendLine($"Habe ich \u00fcber: {bestand.Ueber.Count(e => e.GeloeschtAm == null)}");
+    text.AppendLine($"Habe ich: {bestand.Habe.Count}");
+    text.AppendLine($"Suche ich: {bestand.Suche.Count} Zeilen");
+    text.AppendLine($"Habe ich \u00fcber: {bestand.Ueber.Count}");
 
     if (bestand.Meldungen.Count == 0)
     {

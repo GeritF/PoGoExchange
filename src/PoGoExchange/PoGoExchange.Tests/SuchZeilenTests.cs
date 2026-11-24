@@ -64,26 +64,6 @@ public class SuchZeilenTests
   }
 
   [Fact]
-  public void GeloeschteHabeEintraege_ZaehlenNicht()
-  {
-    var geloescht = Habe();
-    geloescht.GeloeschtAm = DateTime.UtcNow;
-
-    var zeile = SuchZeilen.Bilden(new[] { Suche(2) }, new[] { geloescht, Habe() }).Single();
-
-    Assert.Equal(1, zeile.Erledigt);
-  }
-
-  [Fact]
-  public void GeloeschteSucheintraege_WerdenIgnoriert()
-  {
-    var geloescht = Suche();
-    geloescht.GeloeschtAm = DateTime.UtcNow;
-
-    Assert.Empty(SuchZeilen.Bilden(new[] { geloescht }, Array.Empty<HabeEintrag>()));
-  }
-
-  [Fact]
   public void DoppelteDatensaetze_WerdenZuEinerZeileAddiert()
   {
     var zeile = SuchZeilen.Bilden(

@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             xmlns:views="using:PoGoExchange.Views"
+             x:Class="PoGoExchange.Views.SuchZeileView"
+             x:DataType="vm:SuchZeileViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+      <TextBlock Text="{Binding Kopf}" FontSize="18" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding Fortschritt}" />
+      <TextBlock Text="{Binding Meldung}"
+                 IsVisible="{Binding HatMeldung}"
+                 Foreground="Green"
+                 TextWrapping="Wrap" />
+
+      <TextBlock Text="Anforderungen" FontWeight="Bold" Margin="0,12,0,0" />
+      <views:AnforderungenView DataContext="{Binding Anforderungen}" />
+      <Button Content="Anforderungen &#xFC;bernehmen"
+              Command="{Binding AnforderungenUebernehmenCommand}" />
+
+      <StackPanel IsVisible="{Binding KonfliktSichtbar}" Spacing="4">
+        <TextBlock Text="{Binding KonfliktText}" TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Ja" Command="{Binding KonfliktJaCommand}" />
+          <Button Content="Nein" Command="{Binding KonfliktNeinCommand}" />
+        </StackPanel>
+      </StackPanel>
+
+      <TextBlock Text="Anzahl" FontWeight="Bold" Margin="0,12,0,0" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <NumericUpDown Value="{Binding Anzahl}"
+                       Minimum="0" Increment="1" FormatString="0"
+                       MinWidth="150" />
+        <Button Content="Anzahl &#xFC;bernehmen"
+                Command="{Binding AnzahlUebernehmenCommand}" />
+      </StackPanel>
+
+      <Button Content="L&#xF6;schen"
+              Command="{Binding LoeschenCommand}"
+              Margin="0,12,0,0" />
+      <TextBlock Text="Setze die Anzahl auf 0, um die Zeile zu l&#xF6;schen."
+                 IsVisible="{Binding LoeschHinweisSichtbar}"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

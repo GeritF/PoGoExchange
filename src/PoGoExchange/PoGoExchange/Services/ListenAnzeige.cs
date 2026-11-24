@@ -6,14 +6,16 @@ using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
-// Eine Zeile fuer die Anzeige einer persoenlichen Liste
+// Eine Zeile fuer die Anzeige einer persoenlichen Liste.
+// Eintrag ist bei "Suche ich" der Datensatz der Zeile, sonst null.
 public sealed record AnzeigeZeile(
   string Region,
   int DexNr,
   string Text,
   string Zusatz,
   bool Erledigt,
-  bool Fehlerhaft)
+  bool Fehlerhaft,
+  SucheEintrag? Eintrag = null)
 {
   public string Anzeige => Fehlerhaft ? Text : $"#{DexNr} {Text}{Zusatz}";
 }
@@ -58,7 +60,8 @@ public static class ListenAnzeige
         EintragText.Erzeugen(pokemon, form, zeile.Muster),
         SuchZusatz(zeile),
         erledigt,
-        false));
+        false,
+        zeile.Muster));
     }
 
     return Gruppieren(katalog, zeilen);
@@ -144,11 +147,6 @@ public static class ListenAnzeige
     var gueltig = new List<T>();
     foreach (var eintrag in eintraege)
     {
-      if (eintrag.GeloeschtAm != null)
-      {
-        continue;
-      }
-
       var grund = Konsistenz.EintragPruefen(katalog, eintrag, formPflicht);
       if (grund != null)
       {

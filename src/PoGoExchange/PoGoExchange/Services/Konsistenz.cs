@@ -68,11 +68,6 @@ public static class Konsistenz
   {
     foreach (var eintrag in eintraege)
     {
-      if (eintrag.GeloeschtAm != null)
-      {
-        continue;
-      }
-
       var grund = EintragPruefen(katalog, eintrag, formPflicht);
       if (grund != null)
       {

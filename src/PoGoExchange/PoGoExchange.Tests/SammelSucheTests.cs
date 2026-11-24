@@ -180,7 +180,6 @@ public class SammelSucheTests
       Assert.True(e.Glueck);
       Assert.True(e.Hundert);
       Assert.True(e.EinsZuEins);
-      Assert.Equal(Jetzt, e.GeaendertAm);
       Assert.Equal(1, e.Anzahl);
     });
     Assert.Equal(

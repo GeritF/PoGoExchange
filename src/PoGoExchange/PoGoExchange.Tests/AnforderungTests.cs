@@ -24,13 +24,6 @@ public class AnforderungTests
       new SucheEintrag { FormGuid = FormB }));
   }
 
-  [Fact]
-  public void Geloeschtes_Exemplar_ErfuelltNicht()
-  {
-    var exemplar = new HabeEintrag { FormGuid = FormA, GeloeschtAm = DateTime.UtcNow };
-    Assert.False(Anforderung.Erfuellt(exemplar, new SucheEintrag { FormGuid = FormA }));
-  }
-
   [Theory]
   [InlineData(false, false, true)] // Shiny egal, Exemplar normal
   [InlineData(true, false, false)] // Shiny gefordert, Exemplar normal

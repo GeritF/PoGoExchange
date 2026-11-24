@@ -2,7 +2,8 @@ using System;
 
 namespace PoGoExchange.Models;
 
-// Gemeinsame Spalten aller drei persoenlichen Listen
+// Gemeinsame Spalten aller drei persoenlichen Listen.
+// Geloeschte Eintraege werden aus der Datei entfernt.
 public abstract class ListenEintrag
 {
   public Guid Guid { get; set; }
@@ -22,9 +23,6 @@ public abstract class ListenEintrag
   public string KostuemText { get; set; } = "";
   public bool HintergrundAktiv { get; set; }
   public string HintergrundText { get; set; } = "";
-
-  public DateTime GeaendertAm { get; set; }
-  public DateTime? GeloeschtAm { get; set; }
 }
 
 // Eintrag in "Habe ich" (habe_ich.csv)
@@ -40,7 +38,7 @@ public sealed class HabeEintrag : ListenEintrag
   }
 }
 
-// Eintrag in "Suche ich" (suche_ich.csv): eine Zeile mit Anzahl.
+// Zeile in "Suche ich" (suche_ich.csv): eine Zeile mit Anzahl.
 // Der Fortschritt wird aus "Habe ich" berechnet und nicht gespeichert.
 public sealed class SucheEintrag : ListenEintrag
 {

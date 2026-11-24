@@ -68,11 +68,6 @@ public static class Tauschliste
     var gueltig = new List<T>();
     foreach (var eintrag in eintraege)
     {
-      if (eintrag.GeloeschtAm != null)
-      {
-        continue;
-      }
-
       var grund = Konsistenz.EintragPruefen(katalog, eintrag, formPflicht);
       if (grund != null)
       {

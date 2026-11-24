@@ -27,9 +27,9 @@ public static class SuchZeilen
     IEnumerable<SucheEintrag> suche,
     IEnumerable<HabeEintrag> habe)
   {
-    var exemplare = habe.Where(h => h.GeloeschtAm == null).ToList();
+    var exemplare = habe.ToList();
     return suche
-      .Where(e => e.GeloeschtAm == null && e.Anzahl > 0)
+      .Where(e => e.Anzahl > 0)
       .GroupBy(Schluessel)
       .Select(g =>
       {

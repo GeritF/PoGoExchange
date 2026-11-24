@@ -216,7 +216,6 @@ public class SuchBearbeitungTests
     Assert.Equal(_glumanda.Guid, ergebnis.PokemonGuid);
     Assert.Equal(_glumandaForm.Guid, ergebnis.FormGuid);
     Assert.Equal(2, ergebnis.Anzahl);
-    Assert.Equal(Jetzt, ergebnis.GeaendertAm);
   }
 
   [Fact]
@@ -232,7 +231,6 @@ public class SuchBearbeitungTests
 
     Assert.Same(mitGlueck, ergebnis);
     Assert.Equal(5, ergebnis.Anzahl);
-    Assert.Equal(Jetzt, ohneGlueck.GeloeschtAm);
     Assert.Single(SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()));
   }
 
@@ -245,7 +243,6 @@ public class SuchBearbeitungTests
     SuchBearbeitung.AnzahlSetzen(suche, zeile, 4, Jetzt);
 
     Assert.Equal(4, suche.Single().Anzahl);
-    Assert.Null(suche.Single().GeloeschtAm);
   }
 
   [Fact]
@@ -256,7 +253,6 @@ public class SuchBearbeitungTests
 
     SuchBearbeitung.AnzahlSetzen(suche, zeile, 0, Jetzt);
 
-    Assert.Equal(Jetzt, suche.Single().GeloeschtAm);
     Assert.Empty(SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()));
   }
 }

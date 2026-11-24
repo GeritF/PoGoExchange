@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             x:Class="PoGoExchange.Views.AnforderungenView"
+             x:DataType="vm:AnforderungenViewModel">
+    <StackPanel Spacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Geschlecht:" VerticalAlignment="Center" Width="100" />
+            <ComboBox ItemsSource="{Binding GeschlechtAuswahl}"
+                      SelectedIndex="{Binding GeschlechtIndex}"
+                      MinWidth="150" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Dynamax:" VerticalAlignment="Center" Width="100" />
+            <ComboBox ItemsSource="{Binding DynamaxAuswahl}"
+                      SelectedIndex="{Binding DynamaxIndex}"
+                      MinWidth="150" />
+        </StackPanel>
+
+        <CheckBox Content="Shiny" IsChecked="{Binding Shiny}" />
+
+        <CheckBox Content="Kost&#xFC;m" IsChecked="{Binding KostuemAktiv}" />
+        <TextBox Text="{Binding KostuemText}"
+                 IsEnabled="{Binding KostuemAktiv}"
+                 Margin="24,0,0,0" />
+        <TextBlock Text="leer = beliebiges Kost&#xFC;m"
+                   Opacity="0.6" Margin="24,0,0,0" />
+
+        <CheckBox Content="Hintergrund" IsChecked="{Binding HintergrundAktiv}" />
+        <TextBox Text="{Binding HintergrundText}"
+                 IsEnabled="{Binding HintergrundAktiv}"
+                 Margin="24,0,0,0" />
+        <TextBlock Text="leer = beliebiger Hintergrund"
+                   Opacity="0.6" Margin="24,0,0,0" />
+
+        <CheckBox Content="Gl&#xFC;ck" IsChecked="{Binding Glueck}" />
+        <CheckBox Content="100er" IsChecked="{Binding Hundert}" />
+        <CheckBox Content="1:1 m&#xF6;glich" IsChecked="{Binding EinsZuEins}" />
+
+        <TextBlock Text="{Binding Fehler}"
+                   IsVisible="{Binding HatFehler}"
+                   Foreground="Red"
+                   TextWrapping="Wrap" />
+    </StackPanel>
+</UserControl>

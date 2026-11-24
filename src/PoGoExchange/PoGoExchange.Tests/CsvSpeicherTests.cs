@@ -58,7 +58,6 @@ public class CsvSpeicherTests : IDisposable
   [Fact]
   public void SucheEintrag_WirdWieFestgelegtGeschrieben_UndGelesen()
   {
-    var zeit = new DateTime(2026, 11, 23, 18, 30, 0, DateTimeKind.Utc);
     var original = new SucheEintrag
     {
       Guid = Guid.NewGuid(),
@@ -70,7 +69,7 @@ public class CsvSpeicherTests : IDisposable
       HintergrundText = "Paris; Eiffelturm",
       Glueck = true,
       EinsZuEins = true,
-      GeaendertAm = zeit
+      Anzahl = 3
     };
 
     CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, new[] { original });
@@ -79,12 +78,9 @@ public class CsvSpeicherTests : IDisposable
     var zeilen = File.ReadAllLines(_pfad, Encoding.UTF8);
     Assert.Equal(
       "Guid;PokemonGuid;FormGuid;Geschlecht;Shiny;Dynamax;KostuemAktiv;KostuemText;" +
-      "HintergrundAktiv;HintergrundText;Glueck;Hundert;EinsZuEins;Anzahl;GeaendertAm;" +
-      "GeloeschtAm",
+      "HintergrundAktiv;HintergrundText;Glueck;Hundert;EinsZuEins;Anzahl",
       zeilen[0]);
-    Assert.Contains(
-      ";W;1;Gigadynamax;0;;1;\"Paris; Eiffelturm\";1;0;1;1;2026-11-23T18:30:00Z;",
-      zeilen[1]);
+    Assert.EndsWith(";W;1;Gigadynamax;0;;1;\"Paris; Eiffelturm\";1;0;1;3", zeilen[1]);
 
     // Gemessen: zurueckgelesene Werte
     var gelesen = CsvSpeicher.Lesen<SucheEintrag, SucheEintragMap>(_pfad).Single();
@@ -97,10 +93,7 @@ public class CsvSpeicherTests : IDisposable
     Assert.True(gelesen.Glueck);
     Assert.False(gelesen.Hundert);
     Assert.True(gelesen.EinsZuEins);
-    Assert.Equal(1, gelesen.Anzahl);
-    Assert.Equal(zeit, gelesen.GeaendertAm);
-    Assert.Equal(DateTimeKind.Utc, gelesen.GeaendertAm.Kind);
-    Assert.Null(gelesen.GeloeschtAm);
+    Assert.Equal(3, gelesen.Anzahl);
   }
 
   [Fact]

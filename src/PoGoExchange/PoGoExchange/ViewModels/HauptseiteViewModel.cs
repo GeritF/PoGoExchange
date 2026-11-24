@@ -33,7 +33,7 @@ public sealed partial class HauptseiteViewModel : SeiteViewModel
   [RelayCommand]
   private void TauschlistenOeffnen()
   {
-    _navigation.Oeffnen(new TauschlistenViewModel(_bestand, Meldungshinweis));
+    _navigation.Oeffnen(new TauschlistenViewModel(_navigation, _bestand, Meldungshinweis));
   }
 
   [RelayCommand]

@@ -70,22 +70,16 @@ public class KonsistenzTests
   }
 
   [Fact]
-  public void ListenPruefen_MeldetListe_UndIgnoriertGeloeschte()
+  public void ListenPruefen_MeldetListeUndEintrag()
   {
     var habeOhneForm = new HabeEintrag { Guid = Guid.NewGuid(), PokemonGuid = _glumanda.Guid };
-    var geloeschtOhneForm = new UeberEintrag
-    {
-      Guid = Guid.NewGuid(),
-      PokemonGuid = _glumanda.Guid,
-      GeloeschtAm = DateTime.UtcNow
-    };
     var sucheBeliebig = new SucheEintrag { Guid = Guid.NewGuid(), PokemonGuid = _glumanda.Guid };
 
     var fehler = Konsistenz.ListenPruefen(
       _katalog,
       new[] { habeOhneForm },
       new[] { sucheBeliebig },
-      new[] { geloeschtOhneForm });
+      Array.Empty<UeberEintrag>());
 
     var einziger = Assert.Single(fehler);
     Assert.Equal("Habe ich", einziger.Liste);

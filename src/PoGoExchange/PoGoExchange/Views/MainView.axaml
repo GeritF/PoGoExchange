@@ -41,6 +41,12 @@
                 <DataTemplate DataType="vm:PlatzhalterViewModel">
                     <views:PlatzhalterView />
                 </DataTemplate>
+                <DataTemplate DataType="vm:SucheNeuViewModel">
+                    <views:SucheNeuView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:SuchZeileViewModel">
+                    <views:SuchZeileView />
+                </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>
     </DockPanel>

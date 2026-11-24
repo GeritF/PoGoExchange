@@ -9,11 +9,6 @@ public static class Anforderung
   // Nicht gesetzte Anforderungen gelten als "egal".
   public static bool Erfuellt(HabeEintrag exemplar, SucheEintrag suche)
   {
-    if (exemplar.GeloeschtAm != null || suche.GeloeschtAm != null)
-    {
-      return false;
-    }
-
     if (exemplar.PokemonGuid != suche.PokemonGuid)
     {
       return false;

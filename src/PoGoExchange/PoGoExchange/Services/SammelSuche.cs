@@ -38,9 +38,8 @@ public static class SammelSuche
     IEnumerable<HabeEintrag> habe,
     DateTime jetzt)
   {
-    var exemplare = habe.Where(h => h.GeloeschtAm == null).ToList();
+    var exemplare = habe.ToList();
     var vorhandeneZeilen = suche
-      .Where(e => e.GeloeschtAm == null)
       .Select(SuchZeilen.Schluessel)
       .ToHashSet();
 
@@ -113,8 +112,7 @@ public static class SammelSuche
       HintergrundText = vorlage.HintergrundText,
       Glueck = vorlage.Glueck,
       Hundert = vorlage.Hundert,
-      EinsZuEins = vorlage.EinsZuEins,
-      GeaendertAm = jetzt
+      EinsZuEins = vorlage.EinsZuEins
     };
   }
 }

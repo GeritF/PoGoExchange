@@ -202,28 +202,6 @@ public class TauschlisteTests
   }
 
   [Fact]
-  public void GeloeschteEintraege_FehlenImExport_AuchOhneFehlermeldung()
-  {
-    var geloeschtGueltig = Ueber(_glumandaForm);
-    geloeschtGueltig.GeloeschtAm = DateTime.UtcNow;
-    var geloeschtDefekt = new UeberEintrag
-    {
-      Guid = Guid.NewGuid(),
-      FormGuid = Guid.NewGuid(),
-      GeloeschtAm = DateTime.UtcNow
-    };
-
-    var ergebnis = Tauschliste.Erzeugen(
-      _katalog,
-      Array.Empty<SucheEintrag>(),
-      KeinHabe,
-      new[] { geloeschtGueltig, geloeschtDefekt });
-
-    Assert.Equal("", ergebnis.Text);
-    Assert.Empty(ergebnis.Fehler);
-  }
-
-  [Fact]
   public void FormBeliebig_WirdGekennzeichnetExportiert()
   {
     var suche = new[]

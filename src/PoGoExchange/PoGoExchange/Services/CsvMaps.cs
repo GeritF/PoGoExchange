@@ -37,11 +37,10 @@ public sealed class RegionBereichMap : ClassMap<RegionBereich>
   }
 }
 
-// Gemeinsame Spalten der drei Listen; Anfang und Ende getrennt,
-// damit die eigenen Spalten jeder Liste dazwischen stehen
+// Gemeinsame Spalten der drei Listen: Kennungen und Merkmale
 public abstract class ListenEintragMap<T> : ClassMap<T> where T : ListenEintrag
 {
-  protected void MapAnfang()
+  protected void MapMerkmale()
   {
     Map(m => m.Guid).Name("Guid").TypeConverter<OptionaleGuidKonverter>();
     Map(m => m.PokemonGuid).Name("PokemonGuid").TypeConverter<OptionaleGuidKonverter>();
@@ -54,22 +53,15 @@ public abstract class ListenEintragMap<T> : ClassMap<T> where T : ListenEintrag
     Map(m => m.HintergrundAktiv).Name("HintergrundAktiv").TypeConverter<WahrheitswertKonverter>();
     Map(m => m.HintergrundText).Name("HintergrundText").TypeConverter<TextKonverter>();
   }
-
-  protected void MapEnde()
-  {
-    Map(m => m.GeaendertAm).Name("GeaendertAm").TypeConverter<ZeitstempelKonverter>();
-    Map(m => m.GeloeschtAm).Name("GeloeschtAm").TypeConverter<OptionalerZeitstempelKonverter>();
-  }
 }
 
 public sealed class HabeEintragMap : ListenEintragMap<HabeEintrag>
 {
   public HabeEintragMap()
   {
-    MapAnfang();
+    MapMerkmale();
     Map(m => m.Glueck).Name("Glueck").TypeConverter<WahrheitswertKonverter>();
     Map(m => m.Hundert).Name("Hundert").TypeConverter<WahrheitswertKonverter>();
-    MapEnde();
   }
 }
 
@@ -77,12 +69,11 @@ public sealed class SucheEintragMap : ListenEintragMap<SucheEintrag>
 {
   public SucheEintragMap()
   {
-    MapAnfang();
+    MapMerkmale();
     Map(m => m.Glueck).Name("Glueck").TypeConverter<WahrheitswertKonverter>();
     Map(m => m.Hundert).Name("Hundert").TypeConverter<WahrheitswertKonverter>();
     Map(m => m.EinsZuEins).Name("EinsZuEins").TypeConverter<WahrheitswertKonverter>();
     Map(m => m.Anzahl).Name("Anzahl").TypeConverter<AnzahlKonverter>();
-    MapEnde();
   }
 }
 
@@ -90,8 +81,7 @@ public sealed class UeberEintragMap : ListenEintragMap<UeberEintrag>
 {
   public UeberEintragMap()
   {
-    MapAnfang();
-    MapEnde();
+    MapMerkmale();
   }
 }
 

@@ -44,7 +44,9 @@ public sealed class AnlegeErgebnis
   public required ZeilenStand Nachher { get; init; }
 }
 
-// Anlegen und Bearbeiten von Zeilen in "Suche ich"
+// Anlegen und Bearbeiten von Zeilen in "Suche ich".
+// Der Parameter jetzt wird derzeit nicht verwendet; er bleibt fuer
+// spaetere Erweiterungen und haelt die Aufrufe stabil.
 public static class SuchBearbeitung
 {
   // Liefert null, wenn der Text als Kostuem- oder Hintergrundbeschreibung erlaubt ist
@@ -71,7 +73,7 @@ public static class SuchBearbeitung
     SucheEintrag anforderung,
     string filter)
   {
-    var exemplare = habe.Where(h => h.GeloeschtAm == null).ToList();
+    var exemplare = habe.ToList();
     var ziele = new List<SuchZiel>();
     foreach (var pokemon in katalog.AllePokemon())
     {
@@ -133,7 +135,6 @@ public static class SuchBearbeitung
 
     var vorher = Stand(suche, habe, vorhanden);
     vorhanden.Anzahl += anzahl;
-    vorhanden.GeaendertAm = jetzt;
     return new AnlegeErgebnis
     {
       Eintrag = vorhanden,
@@ -192,13 +193,12 @@ public static class SuchBearbeitung
     foreach (var eintrag in eintraege)
     {
       MerkmaleUebernehmen(neueAnforderung, eintrag);
-      eintrag.GeaendertAm = jetzt;
     }
 
-    return Zusammenfuehren(suche, eintraege[0], jetzt);
+    return Zusammenfuehren(suche, eintraege[0]);
   }
 
-  // Setzt die Anzahl der Zeile; 0 loescht die Zeile
+  // Setzt die Anzahl der Zeile; 0 entfernt die Zeile
   public static void AnzahlSetzen(
     List<SucheEintrag> suche,
     SuchZeile zeile,
@@ -216,22 +216,19 @@ public static class SuchBearbeitung
       throw new InvalidOperationException("Die Zeile ist nicht mehr vorhanden");
     }
 
-    // Sollte es mehrere Datensaetze fuer die Zeile geben, bleibt nur einer
-    var behalten = eintraege[0];
+    // Sollte es mehrere Datensaetze fuer die Zeile geben, bleibt hoechstens einer
     foreach (var weiterer in eintraege.Skip(1))
     {
-      weiterer.GeloeschtAm = jetzt;
-      weiterer.GeaendertAm = jetzt;
+      suche.Remove(weiterer);
     }
 
-    behalten.GeaendertAm = jetzt;
     if (anzahl == 0)
     {
-      behalten.GeloeschtAm = jetzt;
+      suche.Remove(eintraege[0]);
       return;
     }
 
-    behalten.Anzahl = anzahl;
+    eintraege[0].Anzahl = anzahl;
   }
 
   // Neuer Datensatz mit den Anforderungen der Vorlage fuer Pokemon und Form
@@ -247,34 +244,27 @@ public static class SuchBearbeitung
       Guid = Guid.NewGuid(),
       PokemonGuid = pokemonGuid,
       FormGuid = formGuid,
-      Anzahl = anzahl,
-      GeaendertAm = jetzt
+      Anzahl = anzahl
     };
     MerkmaleUebernehmen(vorlage, eintrag);
     return eintrag;
   }
 
-  // Nicht geloeschte Datensaetze mit demselben Schluessel wie das Muster
+  // Datensaetze mit demselben Schluessel wie das Muster
   internal static List<SucheEintrag> Aktive(IEnumerable<SucheEintrag> suche, SucheEintrag muster)
   {
     var schluessel = SuchZeilen.Schluessel(muster);
-    return suche
-      .Where(e => e.GeloeschtAm == null && SuchZeilen.Schluessel(e) == schluessel)
-      .ToList();
+    return suche.Where(e => SuchZeilen.Schluessel(e) == schluessel).ToList();
   }
 
   // Alle weiteren Datensaetze derselben Zeile gehen in "behalten" auf
-  private static SucheEintrag Zusammenfuehren(
-    List<SucheEintrag> suche,
-    SucheEintrag behalten,
-    DateTime jetzt)
+  private static SucheEintrag Zusammenfuehren(List<SucheEintrag> suche, SucheEintrag behalten)
   {
-    var weitere = Aktive(suche, behalten).Where(e => !ReferenceEquals(e, behalten));
+    var weitere = Aktive(suche, behalten).Where(e => !ReferenceEquals(e, behalten)).ToList();
     foreach (var weiterer in weitere)
     {
       behalten.Anzahl += weiterer.Anzahl;
-      weiterer.GeloeschtAm = jetzt;
-      weiterer.GeaendertAm = jetzt;
+      suche.Remove(weiterer);
     }
 
     return behalten;

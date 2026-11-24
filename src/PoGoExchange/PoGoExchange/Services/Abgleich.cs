@@ -147,7 +147,6 @@ public static class Abgleich
   private static IEnumerable<UeberEintrag> UeberOhneDoppelte(IEnumerable<UeberEintrag> ueber)
   {
     return ueber
-      .Where(e => e.GeloeschtAm == null)
       .GroupBy(e => (
         e.PokemonGuid,
         e.FormGuid,

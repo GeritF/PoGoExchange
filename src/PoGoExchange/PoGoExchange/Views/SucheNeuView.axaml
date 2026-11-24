@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             xmlns:svc="using:PoGoExchange.Services"
+             xmlns:views="using:PoGoExchange.Views"
+             x:Class="PoGoExchange.Views.SucheNeuView"
+             x:DataType="vm:SucheNeuViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+      <TextBlock Text="Anforderungen" FontWeight="Bold" />
+      <views:AnforderungenView DataContext="{Binding Anforderungen}" />
+
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="Anzahl:" VerticalAlignment="Center" Width="100" />
+        <NumericUpDown Value="{Binding Anzahl}"
+                       Minimum="1" Increment="1" FormatString="0"
+                       MinWidth="150" />
+      </StackPanel>
+
+      <TextBlock Text="Pokemon w&#xE4;hlen" FontWeight="Bold" Margin="0,12,0,0" />
+      <TextBlock Text="Suche (Name oder Dex-Nummer):" />
+      <TextBox Text="{Binding Suchtext}" />
+      <TextBlock Text="{Binding MehrHinweis}"
+                 IsVisible="{Binding HatMehrHinweis}"
+                 Foreground="DarkOrange"
+                 TextWrapping="Wrap" />
+
+      <TextBlock Text="Verf&#xFC;gbar" FontWeight="Bold" Margin="0,8,0,0" />
+      <ListBox ItemsSource="{Binding Verfuegbar}"
+               SelectedItem="{Binding AuswahlVerfuegbar}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="svc:SuchZiel">
+            <TextBlock Text="{Binding Anzeige}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <TextBlock Text="Hast du schon" FontWeight="Bold" Margin="0,8,0,0" />
+      <ListBox ItemsSource="{Binding HastDuSchon}"
+               SelectedItem="{Binding AuswahlHastDuSchon}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="svc:SuchZiel">
+            <TextBlock Text="{Binding Anzeige}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <TextBlock Text="Nicht verf&#xFC;gbar" FontWeight="Bold" Margin="0,8,0,0" />
+      <ListBox ItemsSource="{Binding NichtVerfuegbar}"
+               SelectedItem="{Binding AuswahlNichtVerfuegbar}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="svc:SuchZiel">
+            <TextBlock Text="{Binding Anzeige}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <TextBlock Text="{Binding AuswahlText}" FontWeight="Bold" Margin="0,12,0,0"
+                 TextWrapping="Wrap" />
+      <Button Content="Speichern" Command="{Binding SpeichernCommand}" />
+      <TextBlock Text="{Binding Meldung}"
+                 IsVisible="{Binding HatMeldung}"
+                 Foreground="Red"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

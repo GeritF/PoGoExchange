@@ -49,10 +49,10 @@ public class DatenbestandTests : IDisposable
     return (pokemon.Guid, form.Guid);
   }
 
-  // Habe-Zeile mit allen Spalten: Shiny = 1, sonst Standardwerte
+  // Habe-Zeile mit allen Spalten: Shiny wie angegeben, sonst Standardwerte
   private static string HabeZeile(Guid guid, Guid pokemon, Guid form, string shiny = "1")
   {
-    return $"{guid};{pokemon};{form};;{shiny};;0;;0;;0;0;{Zeitstempel};";
+    return $"{guid};{pokemon};{form};;{shiny};;0;;0;;0;0";
   }
 
   [Fact]
@@ -102,7 +102,7 @@ public class DatenbestandTests : IDisposable
     var (pokemon, form) = Glumanda();
     var original =
       Kopf<HabeEintrag, HabeEintragMap>("Hundert") + "\r\n" +
-      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;0;{Zeitstempel};\r\n";
+      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;0\r\n";
     DateiSchreiben(Dateinamen.Habe, original);
 
     var bestand = Datenbestand.Laden(_ordner, Jetzt);
@@ -126,7 +126,7 @@ public class DatenbestandTests : IDisposable
     DateiSchreiben(
       Dateinamen.Habe,
       Kopf<HabeEintrag, HabeEintragMap>("Hundert") + "\r\n" +
-      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;0;{Zeitstempel};\r\n");
+      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;0\r\n");
 
     var bestand = Datenbestand.Laden(_ordner, Jetzt);
 
@@ -175,23 +175,21 @@ public class DatenbestandTests : IDisposable
   }
 
   [Fact]
-  public void FehlendeGuidUndZeitstempel_WerdenErgaenztUndGespeichert()
+  public void FehlendeGuid_WirdErgaenztUndGespeichert()
   {
     var (pokemon, form) = Glumanda();
     DateiSchreiben(
       Dateinamen.Habe,
-      Kopf<HabeEintrag, HabeEintragMap>("Guid", "GeaendertAm") + "\r\n" +
-      $"{pokemon};{form};;1;;0;;0;;0;0;\r\n");
+      Kopf<HabeEintrag, HabeEintragMap>("Guid") + "\r\n" +
+      $"{pokemon};{form};;1;;0;;0;;0;0\r\n");
 
     var erster = Datenbestand.Laden(_ordner, Jetzt);
     var eintrag = Assert.Single(erster.Habe);
     Assert.NotEqual(Guid.Empty, eintrag.Guid);
-    Assert.Equal(Jetzt, eintrag.GeaendertAm);
 
     // Gemessen: die ergaenzte GUID wurde in die Datei zurueckgeschrieben
-    var zweiter = Datenbestand.Laden(_ordner, Jetzt.AddHours(1));
+    var zweiter = Datenbestand.Laden(_ordner, Jetzt);
     Assert.Equal(eintrag.Guid, Assert.Single(zweiter.Habe).Guid);
-    Assert.Equal(Jetzt, zweiter.Habe[0].GeaendertAm);
   }
 
   [Fact]
@@ -202,15 +200,15 @@ public class DatenbestandTests : IDisposable
     bestand.Habe.Add(new HabeEintrag
     {
       Guid = Guid.NewGuid(), PokemonGuid = pokemon, FormGuid = form,
-      Shiny = true, Glueck = true, GeaendertAm = Jetzt
+      Shiny = true, Glueck = true
     });
     bestand.Suche.Add(new SucheEintrag
     {
-      Guid = Guid.NewGuid(), PokemonGuid = pokemon, Hundert = true, GeaendertAm = Jetzt
+      Guid = Guid.NewGuid(), PokemonGuid = pokemon, Hundert = true
     });
     bestand.Ueber.Add(new UeberEintrag
     {
-      Guid = Guid.NewGuid(), PokemonGuid = pokemon, FormGuid = form, GeaendertAm = Jetzt
+      Guid = Guid.NewGuid(), PokemonGuid = pokemon, FormGuid = form
     });
 
     Assert.Null(bestand.HabeSpeichern());
@@ -275,7 +273,7 @@ public class DatenbestandTests : IDisposable
 
     var bestand = Datenbestand.Laden(_ordner, Jetzt);
 
-    var aktiv = Assert.Single(bestand.Suche, e => e.GeloeschtAm == null);
+    var aktiv = Assert.Single(bestand.Suche);
     Assert.Equal(2, aktiv.Anzahl);
     Assert.Equal(2, bestand.Meldungen.Count);
     Assert.Contains(bestand.Meldungen, m => m.Text.Contains("ErledigtAm"));
@@ -291,11 +289,29 @@ public class DatenbestandTests : IDisposable
     DateiSchreiben(
       Dateinamen.Suche,
       Kopf<SucheEintrag, SucheEintragMap>() + "\r\n" +
-      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;0;0;0;0;{Zeitstempel};\r\n");
+      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;0;0;0;0\r\n");
 
     var bestand = Datenbestand.Laden(_ordner, Jetzt);
 
     Assert.True(bestand.IstGesperrt(Dateinamen.Suche));
     Assert.Contains(bestand.Meldungen, m => m.IstFehler && m.Text.Contains("mindestens 1"));
+  }
+
+  [Fact]
+  public void KommaStattSemikolon_SperrtDatei_OhneSieZuAendern()
+  {
+    var (pokemon, form) = Glumanda();
+    var kopf = Kopf<HabeEintrag, HabeEintragMap>().Replace(';', ',');
+    var zeile = HabeZeile(Guid.NewGuid(), pokemon, form).Replace(';', ',');
+    var original = kopf + "\r\n" + zeile + "\r\n";
+    DateiSchreiben(Dateinamen.Habe, original);
+
+    var bestand = Datenbestand.Laden(_ordner, Jetzt);
+
+    Assert.True(bestand.IstGesperrt(Dateinamen.Habe));
+    Assert.Empty(bestand.Habe);
+    Assert.Contains(bestand.Meldungen, m => m.IstFehler && m.Text.Contains("Komma"));
+    Assert.Equal(original, File.ReadAllText(Pfad(Dateinamen.Habe), Encoding.UTF8));
+    Assert.False(File.Exists(Pfad(Dateinamen.Habe) + ".bak_1"));
   }
 }

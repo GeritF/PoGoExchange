@@ -95,27 +95,20 @@ public sealed class Datenbestand
     return Speichern<PokemonForm, PokemonFormMap>(Dateinamen.EigeneFormen, EigeneFormen);
   }
 
-  // Ergaenzt fehlende Kennungen und Zeitstempel
+  // Ergaenzt fehlende Kennungen
   private List<T> ListeLaden<T, TMap>(string datei, DateTime jetzt)
     where T : ListenEintrag
     where TMap : ClassMap<T>, new()
   {
     return DateiLaden<T, TMap>(datei, eintrag =>
     {
-      var ergaenzt = false;
-      if (eintrag.Guid == Guid.Empty)
+      if (eintrag.Guid != Guid.Empty)
       {
-        eintrag.Guid = Guid.NewGuid();
-        ergaenzt = true;
+        return false;
       }
 
-      if (eintrag.GeaendertAm == DateTime.MinValue)
-      {
-        eintrag.GeaendertAm = jetzt;
-        ergaenzt = true;
-      }
-
-      return ergaenzt;
+      eintrag.Guid = Guid.NewGuid();
+      return true;
     });
   }
 
@@ -139,6 +132,24 @@ public sealed class Datenbestand
     {
       _gesperrt.Add(datei);
       Fehler(datei, "Datei konnte nicht gelesen werden: " + ex.Message);
+      return new List<T>();
+    }
+
+    // Keine einzige bekannte Spalte gefunden: Die Datei hat ein falsches Format
+    // (z.B. Komma statt Semikolon). Nicht reparieren, sondern sperren.
+    var erwartet = CsvSpeicher.Spaltennamen<T, TMap>();
+    var nichtsErkannt = ergebnis.FehlendeSpalten.Count == erwartet.Count;
+    var hatInhalt = ergebnis.Eintraege.Count > 0 || ergebnis.UnbekannteSpalten.Count > 0;
+    if (nichtsErkannt && hatInhalt)
+    {
+      _gesperrt.Add(datei);
+      var kommaHinweis = ergebnis.UnbekannteSpalten.Any(s => s.Contains(','))
+        ? " Vermutlich wurde ein Komma statt eines Semikolons als Trennzeichen verwendet."
+        : "";
+      Fehler(
+        datei,
+        "Die Kopfzeile enth\u00e4lt keine bekannte Spalte." + kommaHinweis +
+        " Die Datei wird nicht ver\u00e4ndert, bis der Fehler behoben ist.");
       return new List<T>();
     }
 
@@ -175,7 +186,7 @@ public sealed class Datenbestand
 
     if (ergaenzt)
     {
-      aenderungen.Add("fehlende Kennungen oder Zeitstempel erg\u00e4nzt");
+      aenderungen.Add("fehlende Kennungen erg\u00e4nzt");
     }
 
     if (aenderungen.Count > 0)
@@ -215,7 +226,6 @@ public sealed class Datenbestand
     }
 
     var gruppen = Suche
-      .Where(e => e.GeloeschtAm == null)
       .GroupBy(SuchZeilen.Schluessel)
       .Where(g => g.Count() > 1)
       .ToList();
@@ -230,11 +240,8 @@ public sealed class Datenbestand
       foreach (var weiterer in gruppe.Skip(1))
       {
         behalten.Anzahl += weiterer.Anzahl;
-        weiterer.GeloeschtAm = jetzt;
-        weiterer.GeaendertAm = jetzt;
+        Suche.Remove(weiterer);
       }
-
-      behalten.GeaendertAm = jetzt;
     }
 
     var pfad = Path.Combine(Ordner, Dateinamen.Suche);

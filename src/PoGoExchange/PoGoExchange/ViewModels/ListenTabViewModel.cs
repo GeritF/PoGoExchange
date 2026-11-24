@@ -12,20 +12,29 @@ public sealed record RegionKopf(string Region);
 
 // Eine Registerkarte mit Suchfeld und gruppierter Liste.
 // aufbauen(filter, mitErledigten) liefert die anzuzeigenden Gruppen.
+// neu: optional, oeffnet "Neuer Eintrag"; oeffnen: optional, oeffnet eine angetippte Zeile.
 public sealed partial class ListenTabViewModel : ViewModelBase
 {
   private readonly Func<string, bool, List<AnzeigeGruppe>> _aufbauen;
+  private readonly Action? _neu;
+  private readonly Action<AnzeigeZeile>? _oeffnen;
 
   public ListenTabViewModel(
     bool hatErledigtUmschalter,
-    Func<string, bool, List<AnzeigeGruppe>> aufbauen)
+    Func<string, bool, List<AnzeigeGruppe>> aufbauen,
+    Action? neu = null,
+    Action<AnzeigeZeile>? oeffnen = null)
   {
     HatErledigtUmschalter = hatErledigtUmschalter;
     _aufbauen = aufbauen;
+    _neu = neu;
+    _oeffnen = oeffnen;
     Aktualisieren();
   }
 
   public bool HatErledigtUmschalter { get; }
+
+  public bool HatNeu => _neu != null;
 
   // Ueberschriften (RegionKopf) und Zeilen (AnzeigeZeile) gemischt
   public ObservableCollection<object> Zeilen { get; } = new();
@@ -43,6 +52,18 @@ public sealed partial class ListenTabViewModel : ViewModelBase
   [ObservableProperty]
   private bool _rueckfrageSichtbar;
 
+  // Rueckmeldung nach einer Aktion, z.B. "1 von 3 bereits erledigt"
+  [ObservableProperty]
+  [NotifyPropertyChangedFor(nameof(HatRueckmeldung))]
+  private string _rueckmeldung = "";
+
+  public bool HatRueckmeldung => Rueckmeldung != "";
+
+  // Angetippte Zeile; wird nach dem Oeffnen zurueckgesetzt,
+  // damit dieselbe Zeile erneut angetippt werden kann
+  [ObservableProperty]
+  private object? _ausgewaehlt;
+
   public string ErledigtStatus => ErledigteAnzeigen
     ? "Erledigte werden angezeigt"
     : "Erledigte werden nicht angezeigt";
@@ -54,6 +75,26 @@ public sealed partial class ListenTabViewModel : ViewModelBase
   partial void OnSuchtextChanged(string value)
   {
     Aktualisieren();
+  }
+
+  partial void OnAusgewaehltChanged(object? value)
+  {
+    if (value == null)
+    {
+      return;
+    }
+
+    Ausgewaehlt = null;
+    if (value is AnzeigeZeile { Eintrag: not null } zeile && _oeffnen != null)
+    {
+      _oeffnen(zeile);
+    }
+  }
+
+  [RelayCommand]
+  private void Neu()
+  {
+    _neu?.Invoke();
   }
 
   // Einblenden nur nach Rueckfrage, Ausblenden sofort
@@ -84,7 +125,7 @@ public sealed partial class ListenTabViewModel : ViewModelBase
     RueckfrageSichtbar = false;
   }
 
-  private void Aktualisieren()
+  public void Aktualisieren()
   {
     Zeilen.Clear();
     foreach (var gruppe in _aufbauen(Suchtext, ErledigteAnzeigen))
