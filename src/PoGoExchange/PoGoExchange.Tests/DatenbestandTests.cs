@@ -258,4 +258,44 @@ public class DatenbestandTests : IDisposable
     Assert.Equal(Dateinamen.Habe, meldung.Datei);
     Assert.False(bestand.IstGesperrt(Dateinamen.Habe));
   }
+
+  [Fact]
+  public void AlteSuchdatei_WirdUmgestellt_UndDoppelteZusammengefuehrt()
+  {
+    var (pokemon, form) = Glumanda();
+    var alterKopf =
+      "Guid;PokemonGuid;FormGuid;Geschlecht;Shiny;Dynamax;KostuemAktiv;KostuemText;" +
+      "HintergrundAktiv;HintergrundText;Glueck;Hundert;EinsZuEins;ErledigtAm;GeaendertAm;" +
+      "GeloeschtAm";
+    DateiSchreiben(
+      Dateinamen.Suche,
+      alterKopf + "\r\n" +
+      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;1;0;0;2026-11-20T18:00:00Z;{Zeitstempel};\r\n" +
+      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;1;0;0;;{Zeitstempel};\r\n");
+
+    var bestand = Datenbestand.Laden(_ordner, Jetzt);
+
+    var aktiv = Assert.Single(bestand.Suche, e => e.GeloeschtAm == null);
+    Assert.Equal(2, aktiv.Anzahl);
+    Assert.Equal(2, bestand.Meldungen.Count);
+    Assert.Contains(bestand.Meldungen, m => m.Text.Contains("ErledigtAm"));
+    Assert.Contains(bestand.Meldungen, m => m.Text.Contains("zusammengef\u00fchrt"));
+    Assert.True(File.Exists(Pfad(Dateinamen.Suche) + ".bak_1"));
+    Assert.True(File.Exists(Pfad(Dateinamen.Suche) + ".bak_2"));
+  }
+
+  [Fact]
+  public void AnzahlNull_IstUngueltig_UndSperrtDatei()
+  {
+    var (pokemon, form) = Glumanda();
+    DateiSchreiben(
+      Dateinamen.Suche,
+      Kopf<SucheEintrag, SucheEintragMap>() + "\r\n" +
+      $"{Guid.NewGuid()};{pokemon};{form};;1;;0;;0;;0;0;0;0;{Zeitstempel};\r\n");
+
+    var bestand = Datenbestand.Laden(_ordner, Jetzt);
+
+    Assert.True(bestand.IstGesperrt(Dateinamen.Suche));
+    Assert.Contains(bestand.Meldungen, m => m.IstFehler && m.Text.Contains("mindestens 1"));
+  }
 }

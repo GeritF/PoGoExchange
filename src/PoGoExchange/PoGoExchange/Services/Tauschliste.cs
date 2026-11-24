@@ -33,9 +33,11 @@ public static class Tauschliste
   // Gliederung: Region (siehe Katalog), dann Abschnitt, dann Dex-Nummer und Text.
   // Leere Abschnitte und Regionen entfallen. Ungueltige Eintraege (siehe
   // Konsistenz) erscheinen nicht im Text, sondern in der Fehlerliste.
+  // "Habe ich" wird fuer die Zaehler gebraucht.
   public static TauschlistenErgebnis Erzeugen(
     Katalog katalog,
     IEnumerable<SucheEintrag> suche,
+    IEnumerable<HabeEintrag> habe,
     IEnumerable<UeberEintrag> ueber)
   {
     var fehler = new List<ExportFehler>();
@@ -43,7 +45,7 @@ public static class Tauschliste
     var gueltigeUeber = NurGueltige(katalog, ueber, ListenNamen.Ueber, true, fehler);
 
     var zeilen = new List<ExportZeile>();
-    zeilen.AddRange(SuchZeilenFuerExport(katalog, gueltigeSuche));
+    zeilen.AddRange(SuchZeilenFuerExport(katalog, gueltigeSuche, habe));
     zeilen.AddRange(UeberZeilenFuerExport(katalog, gueltigeUeber));
 
     return new TauschlistenErgebnis
@@ -96,11 +98,13 @@ public static class Tauschliste
   }
 
   // Nur Zeilen mit mindestens einem offenen Eintrag
+  // Nur Zeilen mit mindestens einem offenen Eintrag
   private static IEnumerable<ExportZeile> SuchZeilenFuerExport(
     Katalog katalog,
-    IEnumerable<SucheEintrag> suche)
+    IEnumerable<SucheEintrag> suche,
+    IEnumerable<HabeEintrag> habe)
   {
-    foreach (var zeile in SuchZeilen.Bilden(suche))
+    foreach (var zeile in SuchZeilen.Bilden(suche, habe))
     {
       if (zeile.Offen == 0)
       {

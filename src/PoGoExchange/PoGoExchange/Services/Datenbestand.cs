@@ -66,6 +66,7 @@ public sealed class Datenbestand
       Dateinamen.EigeneFormen, _ => false);
     bestand.Habe = bestand.ListeLaden<HabeEintrag, HabeEintragMap>(Dateinamen.Habe, jetzt);
     bestand.Suche = bestand.ListeLaden<SucheEintrag, SucheEintragMap>(Dateinamen.Suche, jetzt);
+    bestand.SucheZusammenfuehren(jetzt);
     bestand.Ueber = bestand.ListeLaden<UeberEintrag, UeberEintragMap>(Dateinamen.Ueber, jetzt);
 
     bestand.KatalogAufbauen();
@@ -202,6 +203,47 @@ public sealed class Datenbestand
         return ziel;
       }
     }
+  }
+
+  // Fuehrt Datensaetze mit gleicher Zeile (Pokemon, Form, Anforderungen) zusammen.
+  // Die Anzahlen werden addiert, die uebrigen Datensaetze als geloescht markiert.
+  private void SucheZusammenfuehren(DateTime jetzt)
+  {
+    if (_gesperrt.Contains(Dateinamen.Suche))
+    {
+      return;
+    }
+
+    var gruppen = Suche
+      .Where(e => e.GeloeschtAm == null)
+      .GroupBy(SuchZeilen.Schluessel)
+      .Where(g => g.Count() > 1)
+      .ToList();
+    if (gruppen.Count == 0)
+    {
+      return;
+    }
+
+    foreach (var gruppe in gruppen)
+    {
+      var behalten = gruppe.First();
+      foreach (var weiterer in gruppe.Skip(1))
+      {
+        behalten.Anzahl += weiterer.Anzahl;
+        weiterer.GeloeschtAm = jetzt;
+        weiterer.GeaendertAm = jetzt;
+      }
+
+      behalten.GeaendertAm = jetzt;
+    }
+
+    var pfad = Path.Combine(Ordner, Dateinamen.Suche);
+    var sicherung = SicherungsKopie(pfad);
+    CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(pfad, Suche);
+    Hinweis(
+      Dateinamen.Suche,
+      $"Doppelte Zeilen zusammengef\u00fchrt: {gruppen.Count}. " +
+      $"Die Datei vor der \u00c4nderung wurde als {Path.GetFileName(sicherung)} gesichert.");
   }
 
   // Nutzdaten aus dem Programm plus eigene Formen des Spielers

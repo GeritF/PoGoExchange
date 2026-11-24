@@ -179,3 +179,35 @@ public sealed class OptionaleGuidKonverter : DefaultTypeConverter
     return value is Guid guid && guid != Guid.Empty ? guid.ToString() : "";
   }
 }
+
+// Anzahl in "Suche ich": leer = 1, sonst ganze Zahl ab 1
+public sealed class AnzahlKonverter : DefaultTypeConverter
+{
+  public override object? ConvertFromString(
+    string? text,
+    IReaderRow row,
+    MemberMapData memberMapData)
+  {
+    var t = TextBereinigung.Bereinigen(text);
+    if (t == "")
+    {
+      return 1;
+    }
+
+    var anzahl = int.Parse(t, NumberStyles.None, CultureInfo.InvariantCulture);
+    if (anzahl < 1)
+    {
+      throw new FormatException($"Anzahl muss mindestens 1 sein: '{t}'");
+    }
+
+    return anzahl;
+  }
+
+  public override string? ConvertToString(
+    object? value,
+    IWriterRow row,
+    MemberMapData memberMapData)
+  {
+    return value is int anzahl ? anzahl.ToString(CultureInfo.InvariantCulture) : "1";
+  }
+}

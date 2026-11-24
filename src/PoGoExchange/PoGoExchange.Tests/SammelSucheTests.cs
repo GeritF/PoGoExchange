@@ -115,8 +115,6 @@ public class SammelSucheTests
 
     // Nur Glumanda ist ein 100er; das Vulpix ohne 100er zaehlt nicht
     Assert.Equal(1, ergebnis.SofortErledigt);
-    var glumanda = ergebnis.NeueEintraege.Single(e => e.FormGuid == _glumandaForm.Guid);
-    Assert.Equal(Jetzt, glumanda.ErledigtAm);
   }
 
   [Fact]
@@ -128,8 +126,6 @@ public class SammelSucheTests
       _katalog, Hundert, SammelModus.ProPokemon,
       Array.Empty<SucheEintrag>(), habe, Jetzt);
 
-    var vulpix = ergebnis.NeueEintraege.Single(e => e.PokemonGuid == _vulpix.Guid);
-    Assert.NotNull(vulpix.ErledigtAm);
     Assert.Equal(1, ergebnis.SofortErledigt);
   }
 
@@ -185,7 +181,7 @@ public class SammelSucheTests
       Assert.True(e.Hundert);
       Assert.True(e.EinsZuEins);
       Assert.Equal(Jetzt, e.GeaendertAm);
-      Assert.Null(e.ErledigtAm);
+      Assert.Equal(1, e.Anzahl);
     });
     Assert.Equal(
       ergebnis.NeueEintraege.Count,

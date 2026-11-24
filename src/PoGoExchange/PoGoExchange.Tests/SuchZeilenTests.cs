@@ -8,36 +8,31 @@ namespace PoGoExchange.Tests;
 public class SuchZeilenTests
 {
   private static readonly Guid Glumanda = Guid.NewGuid();
+  private static readonly Guid GlumandaForm = Guid.NewGuid();
 
-  private static SucheEintrag Suche(bool erledigt = false, bool hundert = false) => new()
+  private static SucheEintrag Suche(int anzahl = 1, bool hundert = false)
   {
-    Guid = Guid.NewGuid(),
-    FormGuid = Glumanda,
-    Shiny = true,
-    Hundert = hundert,
-    ErledigtAm = erledigt ? DateTime.UtcNow : null
-  };
-
-  [Fact]
-  public void GemischteHaken_ErgebenGetrennteZeilen()
-  {
-    // 3x Glumanda Shiny (1 erledigt) und 1x Glumanda Shiny [100er]
-    var zeilen = SuchZeilen.Bilden(new[]
+    return new SucheEintrag
     {
-      Suche(erledigt: true), Suche(), Suche(), Suche(hundert: true)
-    });
+      Guid = Guid.NewGuid(),
+      PokemonGuid = Glumanda,
+      FormGuid = GlumandaForm,
+      Shiny = true,
+      Hundert = hundert,
+      Anzahl = anzahl
+    };
+  }
 
-    Assert.Equal(2, zeilen.Count);
-
-    var normal = zeilen.Single(z => !z.Muster.Hundert);
-    Assert.Equal(1, normal.Erledigt);
-    Assert.Equal(3, normal.Ziel);
-    Assert.Equal("(1/3)", normal.Zaehler);
-
-    var hundert = zeilen.Single(z => z.Muster.Hundert);
-    Assert.Equal(0, hundert.Erledigt);
-    Assert.Equal(1, hundert.Ziel);
-    Assert.Equal("", hundert.Zaehler);
+  private static HabeEintrag Habe(bool hundert = false)
+  {
+    return new HabeEintrag
+    {
+      Guid = Guid.NewGuid(),
+      PokemonGuid = Glumanda,
+      FormGuid = GlumandaForm,
+      Shiny = true,
+      Hundert = hundert
+    };
   }
 
   [Theory]
@@ -45,22 +40,56 @@ public class SuchZeilenTests
   [InlineData(1, 1, "(1/1)")]
   [InlineData(0, 2, "(0/2)")]
   [InlineData(2, 3, "(2/3)")]
-  public void Zaehler_StandardfallWirdAusgeblendet(int erledigt, int ziel, string erwartet)
+  [InlineData(7, 5, "(5/5)")]
+  public void Zaehler_AusHabeIch_BegrenztAufAnzahl(int passende, int anzahl, string erwartet)
   {
-    var eintraege = Enumerable.Range(0, ziel).Select(i => Suche(erledigt: i < erledigt));
-    var zeile = SuchZeilen.Bilden(eintraege).Single();
+    var habe = Enumerable.Range(0, passende).Select(_ => Habe()).ToList();
+
+    var zeile = SuchZeilen.Bilden(new[] { Suche(anzahl) }, habe).Single();
 
     Assert.Equal(erwartet, zeile.Zaehler);
   }
 
   [Fact]
-  public void GeloeschteEintraege_WerdenIgnoriert()
+  public void UnabhaengigeZiele_ExemplarZaehltInJederPassendenZeile()
+  {
+    // 5x Shiny und 1x Shiny 100er; vorhanden ist ein Shiny 100er
+    var suche = new[] { Suche(5), Suche(1, hundert: true) };
+    var habe = new[] { Habe(hundert: true) };
+
+    var zeilen = SuchZeilen.Bilden(suche, habe);
+
+    Assert.Equal("(1/5)", zeilen.Single(z => !z.Muster.Hundert).Zaehler);
+    Assert.Equal("(1/1)", zeilen.Single(z => z.Muster.Hundert).Zaehler);
+  }
+
+  [Fact]
+  public void GeloeschteHabeEintraege_ZaehlenNicht()
+  {
+    var geloescht = Habe();
+    geloescht.GeloeschtAm = DateTime.UtcNow;
+
+    var zeile = SuchZeilen.Bilden(new[] { Suche(2) }, new[] { geloescht, Habe() }).Single();
+
+    Assert.Equal(1, zeile.Erledigt);
+  }
+
+  [Fact]
+  public void GeloeschteSucheintraege_WerdenIgnoriert()
   {
     var geloescht = Suche();
     geloescht.GeloeschtAm = DateTime.UtcNow;
 
-    var zeile = SuchZeilen.Bilden(new[] { Suche(), geloescht }).Single();
-    Assert.Equal(1, zeile.Ziel);
+    Assert.Empty(SuchZeilen.Bilden(new[] { geloescht }, Array.Empty<HabeEintrag>()));
+  }
+
+  [Fact]
+  public void DoppelteDatensaetze_WerdenZuEinerZeileAddiert()
+  {
+    var zeile = SuchZeilen.Bilden(
+      new[] { Suche(2), Suche(3) }, Array.Empty<HabeEintrag>()).Single();
+
+    Assert.Equal(5, zeile.Ziel);
   }
 
   [Fact]
@@ -70,24 +99,18 @@ public class SuchZeilenTests
     var b = Suche();
     b.EinsZuEins = true;
 
-    Assert.Equal(2, SuchZeilen.Bilden(new[] { a, b }).Count);
+    Assert.Equal(2, SuchZeilen.Bilden(new[] { a, b }, Array.Empty<HabeEintrag>()).Count);
   }
 
   [Fact]
   public void Kostuemtext_GrossKleinschreibungEgal_OhneHakenIgnoriert()
   {
-    var a = Suche();
-    a.KostuemAktiv = true;
-    a.KostuemText = "Partyhut";
-    var b = Suche();
-    b.KostuemAktiv = true;
-    b.KostuemText = "partyhut";
-    var c = Suche();
-    c.KostuemAktiv = false;
-    c.KostuemText = "Zylinder";
+    var a = Suche(); a.KostuemAktiv = true; a.KostuemText = "Partyhut";
+    var b = Suche(); b.KostuemAktiv = true; b.KostuemText = "partyhut";
+    var c = Suche(); c.KostuemAktiv = false; c.KostuemText = "Zylinder";
     var d = Suche();
 
-    var zeilen = SuchZeilen.Bilden(new[] { a, b, c, d });
+    var zeilen = SuchZeilen.Bilden(new[] { a, b, c, d }, Array.Empty<HabeEintrag>());
 
     // a und b gehoeren zusammen, c und d ebenfalls (Text ohne Haken zaehlt nicht)
     Assert.Equal(2, zeilen.Count);
@@ -101,6 +124,21 @@ public class SuchZeilenTests
     var beliebig = Suche();
     beliebig.FormGuid = Guid.Empty;
 
-    Assert.Equal(2, SuchZeilen.Bilden(new[] { bestimmt, beliebig }).Count);
+    var zeilen = SuchZeilen.Bilden(new[] { bestimmt, beliebig }, Array.Empty<HabeEintrag>());
+
+    Assert.Equal(2, zeilen.Count);
+  }
+
+  [Fact]
+  public void FormBeliebig_ZaehltExemplareJederForm()
+  {
+    var beliebig = Suche(2);
+    beliebig.FormGuid = Guid.Empty;
+    var andereForm = Habe();
+    andereForm.FormGuid = Guid.NewGuid();
+
+    var zeile = SuchZeilen.Bilden(new[] { beliebig }, new[] { Habe(), andereForm }).Single();
+
+    Assert.Equal("(2/2)", zeile.Zaehler);
   }
 }

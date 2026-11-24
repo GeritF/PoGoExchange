@@ -21,7 +21,8 @@ public sealed class SammelErgebnis
   // Ziele, fuer die es dieselbe Zeile in "Suche ich" bereits gab
   public required int Uebersprungen { get; init; }
 
-  public int SofortErledigt => NeueEintraege.Count(e => e.ErledigtAm != null);
+  // Neue Zeilen, fuer die es bereits ein passendes Exemplar in "Habe ich" gibt
+  public required int SofortErledigt { get; init; }
 }
 
 // Legt viele Sucheintraege mit denselben Anforderungen auf einmal an,
@@ -37,15 +38,15 @@ public static class SammelSuche
     IEnumerable<HabeEintrag> habe,
     DateTime jetzt)
   {
-    var bisherige = suche.ToList();
-    var exemplare = habe.ToList();
-    var vorhandeneZeilen = bisherige
+    var exemplare = habe.Where(h => h.GeloeschtAm == null).ToList();
+    var vorhandeneZeilen = suche
       .Where(e => e.GeloeschtAm == null)
       .Select(SuchZeilen.Schluessel)
       .ToHashSet();
 
     var neu = new List<SucheEintrag>();
     var uebersprungen = 0;
+    var sofortErledigt = 0;
     foreach (var (pokemonGuid, formGuid) in Ziele(katalog, modus))
     {
       var eintrag = NeuerEintrag(vorlage, pokemonGuid, formGuid, jetzt);
@@ -55,15 +56,20 @@ public static class SammelSuche
         continue;
       }
 
-      if (Plausibilitaet.SofortErledigbar(eintrag, bisherige, exemplare) > 0)
+      if (exemplare.Any(h => Anforderung.Erfuellt(h, eintrag)))
       {
-        eintrag.ErledigtAm = jetzt;
+        sofortErledigt++;
       }
 
       neu.Add(eintrag);
     }
 
-    return new SammelErgebnis { NeueEintraege = neu, Uebersprungen = uebersprungen };
+    return new SammelErgebnis
+    {
+      NeueEintraege = neu,
+      Uebersprungen = uebersprungen,
+      SofortErledigt = sofortErledigt
+    };
   }
 
   private static IEnumerable<(Guid PokemonGuid, Guid FormGuid)> Ziele(

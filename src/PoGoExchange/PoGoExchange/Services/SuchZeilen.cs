@@ -5,13 +5,15 @@ using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
-// Eine Zeile in "Suche ich": alle Eintraege mit gleicher Form,
-// gleichen Merkmalen und gleichen Werten fuer Glueck, Hundert, EinsZuEins
+// Eine Zeile in "Suche ich": ein eigenstaendiges Ziel mit Anzahl.
+// Der Fortschritt wird aus "Habe ich" berechnet: passende Exemplare,
+// begrenzt auf die Anzahl. Ein Exemplar zaehlt in jeder Zeile,
+// deren Anforderungen es erfuellt.
 public sealed class SuchZeile
 {
   public required SucheEintrag Muster { get; init; }
-  public int Erledigt { get; init; }
-  public int Ziel { get; init; }
+  public required int Erledigt { get; init; }
+  public required int Ziel { get; init; }
   public int Offen => Ziel - Erledigt;
 
   // Leer beim Standardfall (0/1)
@@ -20,20 +22,29 @@ public sealed class SuchZeile
 
 public static class SuchZeilen
 {
-  public static List<SuchZeile> Bilden(IEnumerable<SucheEintrag> eintraege) =>
-    eintraege
-      .Where(e => e.GeloeschtAm == null)
+  // Datensaetze mit gleichem Schluessel werden zu einer Zeile addiert
+  public static List<SuchZeile> Bilden(
+    IEnumerable<SucheEintrag> suche,
+    IEnumerable<HabeEintrag> habe)
+  {
+    var exemplare = habe.Where(h => h.GeloeschtAm == null).ToList();
+    return suche
+      .Where(e => e.GeloeschtAm == null && e.Anzahl > 0)
       .GroupBy(Schluessel)
-      .Select(
-        g =>
-        new SuchZeile
+      .Select(g =>
+      {
+        var muster = g.First();
+        var ziel = g.Sum(e => e.Anzahl);
+        var passend = exemplare.Count(h => Anforderung.Erfuellt(h, muster));
+        return new SuchZeile
         {
-          Muster = g.First(),
-          Erledigt = g.Count(e => e.ErledigtAm != null),
-          Ziel = g.Count()
-        }
-      )
+          Muster = muster,
+          Ziel = ziel,
+          Erledigt = Math.Min(passend, ziel)
+        };
+      })
       .ToList();
+  }
 
   // Freie Texte zaehlen nur bei gesetztem Haken, Vergleich in Kleinbuchstaben
   internal static ZeilenSchluessel Schluessel(SucheEintrag e) => new(

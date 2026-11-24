@@ -12,7 +12,8 @@ public sealed class TauschlistenViewModel : SeiteViewModel
     Suche = new ListenTabViewModel(true, (filter, mitErledigten) =>
       bestand == null
         ? new List<AnzeigeGruppe>()
-        : ListenAnzeige.Suche(bestand.Katalog, bestand.Suche, mitErledigten, filter));
+        : ListenAnzeige.Suche(
+          bestand.Katalog, bestand.Suche, bestand.Habe, mitErledigten, filter));
 
     Habe = new ListenTabViewModel(false, (filter, _) =>
       bestand == null

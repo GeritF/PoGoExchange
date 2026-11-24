@@ -35,10 +35,11 @@ public static class Abgleich
   public static AbgleichErgebnis Durchfuehren(
     ImportErgebnis fremd,
     IEnumerable<SucheEintrag> meineSuche,
+    IEnumerable<HabeEintrag> meinHabe,
     IEnumerable<UeberEintrag> meinUeber)
   {
     // Eigene Seite: offene Suchzeilen (je Zeile ein Vertreter)
-    var meineOffeneSuche = SuchZeilen.Bilden(meineSuche)
+    var meineOffeneSuche = SuchZeilen.Bilden(meineSuche, meinHabe)
       .Where(z => z.Offen > 0)
       .Select(z => z.Muster)
       .ToList();

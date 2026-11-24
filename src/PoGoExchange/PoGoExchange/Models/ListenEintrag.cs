@@ -40,13 +40,14 @@ public sealed class HabeEintrag : ListenEintrag
   }
 }
 
-// Eintrag in "Suche ich" (suche_ich.csv)
+// Eintrag in "Suche ich" (suche_ich.csv): eine Zeile mit Anzahl.
+// Der Fortschritt wird aus "Habe ich" berechnet und nicht gespeichert.
 public sealed class SucheEintrag : ListenEintrag
 {
   public bool Glueck { get; set; }
   public bool Hundert { get; set; }
   public bool EinsZuEins { get; set; }
-  public DateTime? ErledigtAm { get; set; }
+  public int Anzahl { get; set; } = 1;
 }
 
 // Eintrag in "Habe ich ueber" (habe_ich_ueber.csv)

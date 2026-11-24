@@ -49,9 +49,9 @@ public class ListenAnzeigeTests
     };
   }
 
-  private static SucheEintrag Suche(
+    private static SucheEintrag Suche(
     PokemonForm form,
-    bool erledigt = false,
+    int anzahl = 1,
     bool glueck = false,
     bool einsZuEins = false)
   {
@@ -63,7 +63,19 @@ public class ListenAnzeigeTests
       Shiny = true,
       Glueck = glueck,
       EinsZuEins = einsZuEins,
-      ErledigtAm = erledigt ? DateTime.UtcNow : null
+      Anzahl = anzahl
+    };
+  }
+
+  private static HabeEintrag Habe(PokemonForm form, bool glueck = false)
+  {
+    return new HabeEintrag
+    {
+      Guid = Guid.NewGuid(),
+      PokemonGuid = form.PokemonGuid,
+      FormGuid = form.Guid,
+      Shiny = true,
+      Glueck = glueck
     };
   }
 
@@ -72,7 +84,7 @@ public class ListenAnzeigeTests
   {
     var suche = new[] { Suche(_flabebeRot), Suche(_vulpixAlola), Suche(_glumandaForm) };
 
-    var gruppen = ListenAnzeige.Suche(_katalog, suche, false, "");
+    var gruppen = ListenAnzeige.Suche(_katalog, suche, Array.Empty<HabeEintrag>(), false, "");
 
     Assert.Equal(new[] { "Kanto", "Kalos" }, gruppen.Select(g => g.Region));
     Assert.Equal(
@@ -84,10 +96,11 @@ public class ListenAnzeigeTests
   [Fact]
   public void Suche_ErledigteZeilen_NurAufWunsch()
   {
-    var suche = new[] { Suche(_glumandaForm, erledigt: true) };
+    var suche = new[] { Suche(_glumandaForm) };
+    var habe = new[] { Habe(_glumandaForm) };
 
-    var ohne = ListenAnzeige.Suche(_katalog, suche, false, "");
-    var mit = ListenAnzeige.Suche(_katalog, suche, true, "");
+    var ohne = ListenAnzeige.Suche(_katalog, suche, habe, false, "");
+    var mit = ListenAnzeige.Suche(_katalog, suche, habe, true, "");
 
     Assert.Empty(ohne);
     var zeile = mit.Single().Zeilen.Single();
@@ -98,14 +111,10 @@ public class ListenAnzeigeTests
   [Fact]
   public void Suche_ZusatzEnthaeltBedingungen1zu1UndZaehler()
   {
-    var suche = new[]
-    {
-      Suche(_glumandaForm, erledigt: true, glueck: true, einsZuEins: true),
-      Suche(_glumandaForm, glueck: true, einsZuEins: true),
-      Suche(_glumandaForm, glueck: true, einsZuEins: true)
-    };
+    var suche = new[] { Suche(_glumandaForm, anzahl: 3, glueck: true, einsZuEins: true) };
+    var habe = new[] { Habe(_glumandaForm, glueck: true) };
 
-    var zeile = ListenAnzeige.Suche(_katalog, suche, false, "").Single().Zeilen.Single();
+    var zeile = ListenAnzeige.Suche(_katalog, suche, habe, false, "").Single().Zeilen.Single();
 
     Assert.Equal("#4 Glumanda - Shiny [Gl\u00fcck, 1:1] (1/3)", zeile.Anzeige);
   }
@@ -120,7 +129,7 @@ public class ListenAnzeigeTests
   {
     var suche = new[] { Suche(_flabebeRot), Suche(_vulpixAlola), Suche(_glumandaForm) };
 
-    var gruppen = ListenAnzeige.Suche(_katalog, suche, false, filter);
+    var gruppen = ListenAnzeige.Suche(_katalog, suche, Array.Empty<HabeEintrag>(), false, filter);
 
     Assert.Equal(erwarteteZeilen, gruppen.Sum(g => g.Zeilen.Count));
   }

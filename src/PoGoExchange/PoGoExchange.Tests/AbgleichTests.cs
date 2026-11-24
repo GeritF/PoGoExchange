@@ -56,7 +56,6 @@ public class AbgleichTests
     PokemonForm form,
     bool shiny = false,
     bool einsZuEins = false,
-    bool erledigt = false,
     Geschlecht geschlecht = Geschlecht.Unbestimmt)
   {
     return new SucheEintrag
@@ -66,8 +65,7 @@ public class AbgleichTests
       FormGuid = form.Guid,
       Shiny = shiny,
       EinsZuEins = einsZuEins,
-      Geschlecht = geschlecht,
-      ErledigtAm = erledigt ? DateTime.UtcNow : null
+      Geschlecht = geschlecht
     };
   }
 
@@ -85,10 +83,12 @@ public class AbgleichTests
   private AbgleichErgebnis Abgleichen(
     string fremderText,
     SucheEintrag[] meineSuche,
-    UeberEintrag[] meinUeber)
+    UeberEintrag[] meinUeber,
+    HabeEintrag[]? meinHabe = null)
   {
     var fremd = TauschlistenImport.Einlesen(_katalog, fremderText);
-    return Abgleich.Durchfuehren(fremd, meineSuche, meinUeber);
+    return Abgleich.Durchfuehren(
+      fremd, meineSuche, meinHabe ?? Array.Empty<HabeEintrag>(), meinUeber);
   }
 
   [Fact]
@@ -203,10 +203,19 @@ public class AbgleichTests
   [Fact]
   public void ErledigteSuche_WirdNichtAbgeglichen()
   {
+    var habe = new[]
+    {
+      new HabeEintrag
+      {
+        Guid = Guid.NewGuid(), PokemonGuid = _glumanda.Guid, FormGuid = _glumandaForm.Guid
+      }
+    };
+
     var ergebnis = Abgleichen(
       "Kanto abzugeben:\n- #4 Glumanda\n",
-      new[] { Suche(_glumandaForm, erledigt: true) },
-      Array.Empty<UeberEintrag>());
+      new[] { Suche(_glumandaForm) },
+      Array.Empty<UeberEintrag>(),
+      habe);
 
     Assert.Empty(ergebnis.ErHat);
   }

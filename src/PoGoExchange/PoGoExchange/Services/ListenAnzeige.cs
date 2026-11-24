@@ -32,12 +32,13 @@ public static class ListenAnzeige
   public static List<AnzeigeGruppe> Suche(
     Katalog katalog,
     IEnumerable<SucheEintrag> suche,
+    IEnumerable<HabeEintrag> habe,
     bool mitErledigten,
     string filter)
   {
     var zeilen = new List<AnzeigeZeile>();
     var gueltig = Pruefen(katalog, suche, false, zeilen);
-    foreach (var zeile in SuchZeilen.Bilden(gueltig))
+    foreach (var zeile in SuchZeilen.Bilden(gueltig, habe))
     {
       var erledigt = zeile.Offen == 0;
       if (erledigt && !mitErledigten)

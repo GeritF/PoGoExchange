@@ -81,7 +81,7 @@ public sealed class SucheEintragMap : ListenEintragMap<SucheEintrag>
     Map(m => m.Glueck).Name("Glueck").TypeConverter<WahrheitswertKonverter>();
     Map(m => m.Hundert).Name("Hundert").TypeConverter<WahrheitswertKonverter>();
     Map(m => m.EinsZuEins).Name("EinsZuEins").TypeConverter<WahrheitswertKonverter>();
-    Map(m => m.ErledigtAm).Name("ErledigtAm").TypeConverter<OptionalerZeitstempelKonverter>();
+    Map(m => m.Anzahl).Name("Anzahl").TypeConverter<AnzahlKonverter>();
     MapEnde();
   }
 }

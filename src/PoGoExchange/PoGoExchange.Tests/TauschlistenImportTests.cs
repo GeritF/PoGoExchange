@@ -124,6 +124,7 @@ public class TauschlistenImportTests
       {
         glumandaEinsZuEins, glumanda100er, vulpixAlola, vulpixBeliebig, flabebeWeiblich, glurakGiga
       },
+      Array.Empty<HabeEintrag>(),
       new[] { vulpixUeber, glurakUeber });
     var import = TauschlistenImport.Einlesen(_katalog, export.Text);
 
