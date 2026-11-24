@@ -32,6 +32,44 @@ Das Programm trennt zwei Arten von Daten:
 - **Persoenliche Listen**: Was habe ich, was suche ich, was kann ich
   abgeben? Diese Daten gehoeren jedem Spieler selbst.
 
+## Aufbau der Oberflaeche
+
+Die Hauptseite fuehrt ueber Kacheln zu den Bereichen:
+
+- **Tauschlisten**: die drei persoenlichen Listen als Registerkarten
+  "Suche ich", "Habe ich" und "Habe ich ueber"
+- **Import/Export**: eigene Tauschliste erzeugen, fremde Listen abgleichen
+  (folgt in einem spaeteren Bauschritt)
+- **Verwaltung**: Datenordner, Anzahl der Eintraege und Lademeldungen, mit
+  einem Button zum Kopieren in die Zwischenablage
+- **Beenden**
+
+In allen Listen gilt:
+
+- Oben steht ein Suchfeld. Eine Zahl (auch mit `#`, z.B. `#37`) filtert nach
+  Dex-Nummer, sonst wird im Namen gesucht.
+- Die Eintraege sind nach Region gruppiert und nach Dex-Nummer sortiert.
+- Eintraege, die nicht zu den Nutzdaten passen (z.B. unbekanntes Pokemon),
+  stehen in einer eigenen Gruppe "Fehlerhafte Eintraege" am Ende.
+- Gab es beim Laden Meldungen, weist eine Hinweisleiste darauf hin.
+
+In "Suche ich" zusaetzlich:
+
+- Jede Zeile zeigt ihre Bedingungen in eckigen Klammern (Glueck, 100er, 1:1)
+  und den Fortschritt, z.B. `#4 Glumanda - Shiny [Glueck, 1:1] (1/3)`.
+- Vollstaendig erledigte Zeilen sind ausgeblendet. Der Button "Erledigte
+  anzeigen" blendet sie nach einer Rueckfrage ein; sie erscheinen dann blass
+  und durchgestrichen. Ein Hinweis zeigt jeweils, ob erledigte Zeilen
+  angezeigt werden.
+
+Navigation:
+
+- Jede Unterseite hat oben einen sichtbaren Zurueck-Button, auf allen
+  Plattformen.
+- Die Zurueck-Taste bzw. -Geste von Android wirkt wie der Zurueck-Button. Auf
+  der Hauptseite wird sie abgefangen, damit die App nicht versehentlich
+  verlassen wird; dafuer gibt es den Button "Beenden".
+
 ## Formen und Merkmale
 
 Ein Pokemon kann in verschiedenen **Formen** vorkommen:
@@ -76,47 +114,87 @@ schon gibt, wird dabei abgelehnt.
 
 Jeder Spieler fuehrt drei Listen:
 
-- **Habe ich**: Pokemon, die man besitzt, mit allen Merkmalen.
-- **Suche ich**: Pokemon, die man noch haben moechte. Eine Form mit denselben
-  Anforderungen kann mehrfach eingetragen werden (z.B. 3x Glumanda Shiny).
-  Zusaetzlich:
-  - "1:1 moeglich": Man wuerde dasselbe Pokemon im Tausch zurueckgeben.
-- **Habe ich ueber**: Pokemon, die man abgeben kann, mit ihren Merkmalen
-  (ohne Glueck und 100er).
+- **Habe ich** ist die "Fertig"-Liste: Exemplare, die man hat (auch bereits
+  getauschte), mit allen Merkmalen. Sie zeigt den Fortschritt der Suche und
+  ist keine vollstaendige Inventur aller Pokemon.
+- **Suche ich** enthaelt Zeilen mit einer Anzahl, z.B. "3x Glumanda Shiny
+  [Glueck]". Jede Zeile ist ein eigenstaendiges Ziel. Zusaetzlich gibt es
+  "1:1 moeglich": Man wuerde dasselbe Pokemon im Tausch zurueckgeben.
+- **Habe ich ueber** enthaelt tauschbare Pokemon (noch nicht getauscht, kein
+  Crypto usw.), die man abgeben kann, mit ihren Merkmalen (ohne Glueck und
+  100er). Diese Liste wird getrennt von "Habe ich" gepflegt; es gibt keine
+  Verknuepfung zwischen beiden.
+
+Fortschritt in "Suche ich":
+
+- Der Fortschritt wird nicht gespeichert, sondern aus "Habe ich" berechnet:
+  Anzahl der passenden Exemplare, hoechstens die gesuchte Anzahl. Bei 7
+  passenden Exemplaren und 5 gesuchten zeigt die Zeile `(5/5)`.
+- Ein Exemplar zaehlt in **jeder** Zeile, deren Anforderungen es erfuellt.
+  Beispiel: Gesucht werden "5x Glumanda Shiny" und "1x Glumanda Shiny
+  [100er]". Ein Shiny-100er ergibt `(1/5)` und `(1/1)`.
+- Wer "5 Shinys, davon einer als 100er" sucht, traegt deshalb "5x Shiny" und
+  "1x Shiny [100er]" ein, nicht "4x Shiny" und "1x Shiny [100er]".
 
 Regeln:
 
 - Gluecks-Pokemon wurden bereits getauscht und koennen nicht erneut
-  getauscht werden. Sie lassen sich daher nicht nach "Habe ich ueber"
-  verschieben.
-- Mit "Von 'Suche ich' nach 'Habe ich' verschieben" wird ein erfolgreicher
-  Tausch eingetragen. Der Sucheintrag wird dabei als erledigt markiert, in
-  "Habe ich" entsteht ein neues Exemplar. Die Merkmale des neuen Exemplars
-  koennen dabei angepasst werden (z.B. ist es ein 100er geworden). War die
-  Suche "Form beliebig", muss fuer das neue Exemplar die tatsaechliche Form
-  angegeben werden. Der Sucheintrag selbst bleibt unveraendert.
-- Wird ein Exemplar entwickelt, geaendert oder geloescht, schlaegt das
-  Programm vor, welche erledigten Sucheintraege angepasst werden sollen. Es
-  aendert nichts selbststaendig (siehe "Pokemon entwickeln" und "Exemplare
-  aendern oder loeschen").
+  getauscht werden. In "Habe ich ueber" gibt es daher keinen Glueck-Haken.
+- Mit "Erhalten" wird ein erfolgreicher Tausch eingetragen: In "Habe ich"
+  entsteht ein neues Exemplar, vorbelegt mit den Anforderungen der Zeile
+  (z.B. Shiny und Glueck). Was die Zeile offen laesst, kann ergaenzt werden.
+  War die Suche "Form beliebig", muss die tatsaechliche Form angegeben werden.
+  Die Zeile in "Suche ich" bleibt unveraendert, ihr Zaehler steigt.
+- Wird ein Exemplar in "Habe ich" geaendert oder geloescht, werden die Zaehler
+  einfach neu berechnet. Beim Entwickeln bietet das Programm zusaetzlich an,
+  die Suche anzupassen (siehe "Pokemon entwickeln").
 
 ## Pokemon zu "Suche ich" hinzufuegen
 
-Die Auswahl zeigt drei getrennte Listen:
+Die Seite "Neuer Sucheintrag" (Button "+ Neu" in "Suche ich") ist in zwei
+Teile gegliedert:
 
-1. **Verfuegbar**: Formen, die es im Spiel gibt.
-2. **Hast du schon**: Formen, zu denen es bereits Exemplare in "Habe ich"
-   gibt.
-3. **Nicht verfuegbar**: Formen, deren Shiny es noch nicht gibt, wenn Shiny
-   gesucht wird (z.B. ein Shiny, das erst zum naechsten Community Day
-   erscheint). Bei "Form beliebig" gilt das Shiny als verfuegbar, sobald es
-   fuer mindestens eine Form des Pokemon verfuegbar ist.
+1. **Anforderungen** oben: Geschlecht, Shiny, Dynamax, Kostuem, Hintergrund,
+   Glueck, 100er, 1:1 und die Anzahl (voreingestellt 1).
+2. **Auswahl des Pokemon** unten: Suchfeld und darunter drei Abschnitte. Jedes
+   Ziel ist eine bestimmte Form (z.B. "Vulpix - Alola") oder ein Pokemon mit
+   "Form beliebig" (z.B. "Vulpix - Form (beliebig)"):
+   - **Verfuegbar**: alle uebrigen Ziele.
+   - **Hast du schon**: Ziele, fuer die es in "Habe ich" bereits ein Exemplar
+     gibt, das die Anforderungen erfuellt.
+   - **Nicht verfuegbar**: Shiny ist gefordert, aber fuer dieses Ziel noch
+     nicht im Spiel verfuegbar (z.B. ein Shiny, das erst zum naechsten
+     Community Day erscheint). Bei "Form beliebig" gilt das Shiny als
+     verfuegbar, sobald es fuer mindestens eine Form verfuegbar ist.
 
-Alle drei Listen sind auswaehlbar.
+Alle drei Abschnitte sind auswaehlbar. Sie aktualisieren sich, sobald die
+Anforderungen geaendert werden. "Form beliebig" wird nur bei Pokemon mit
+mehreren Formen angeboten; archivierte Formen sind nicht waehlbar.
 
-Gibt es in "Habe ich" bereits Exemplare, die die Anforderungen erfuellen,
-bietet das Programm an, entsprechend viele der neuen Sucheintraege sofort als
-erledigt zu markieren.
+Nach dem Speichern zeigt das Programm, wie viele davon bereits erledigt sind,
+z.B. "1 von 3 bereits erledigt". Gibt es dieselbe Zeile schon, wird ihre
+Anzahl erhoeht, z.B. "Diese Zeile gab es bereits: 1/2, zusammen jetzt: 1/5",
+und die Zeile wird zum Nachkorrigieren geoeffnet.
+
+Beschreibungen fuer Kostuem und Hintergrund duerfen keine Anfuehrungszeichen
+und keine Zeilenumbrueche enthalten.
+
+## Zeile in "Suche ich" bearbeiten
+
+Antippen einer Zeile oeffnet sie:
+
+- **Anforderungen aendern** gilt fuer die Zeile. Pokemon und Form lassen sich
+  nicht aendern; dafuer wird eine neue Zeile angelegt und die alte auf
+  Anzahl 0 gesetzt.
+- Ergeben die geaenderten Anforderungen eine Zeile, die es bereits gibt,
+  fragt das Programm mit Aufschluesselung nach, z.B. "Diese Zeile: 2/4,
+  gefundene Zeile: 1/3, zusammen: 3/7. Zusammenfuehren?". Bei "Ja" werden
+  beide Zeilen zusammengefuehrt (die Anzahlen addiert) und die zusammengefuehrte
+  Zeile geoeffnet; bei "Nein" bleibt man in der Bearbeitung.
+- **Anzahl aendern** ueberschreibt die Anzahl ohne Rueckfrage.
+- **Loeschen**: Der Button zeigt nur den Hinweis "Setze die Anzahl auf 0, um
+  die Zeile zu loeschen". Anzahl 0 loescht die Zeile. So ist eindeutig, dass
+  die ganze Zeile entfernt wird und nicht nur ein Stueck.
 
 ## Sammel-Suche
 
@@ -129,7 +207,8 @@ legt fest, wie:
 - **Einer pro Pokemon**: jeweils ein Eintrag mit "Form beliebig".
 
 Eintraege, fuer die es in "Habe ich" bereits ein passendes Exemplar gibt,
-werden sofort als erledigt markiert. Gibt es dieselbe Zeile (gleiches
+zaehlen sofort als erledigt; das Programm meldet, wie viele das sind. Gibt
+es dieselbe Zeile (gleiches
 Pokemon, gleiche Form, gleiche Anforderungen) in "Suche ich" bereits, wird
 sie nicht noch einmal angelegt. Wer "Von jedem ein 100er" versehentlich
 zweimal startet, bekommt so keine doppelten Eintraege. Das Programm meldet,
@@ -149,24 +228,25 @@ Ablauf:
 1. In "Habe ich" das Exemplar auswaehlen und "Entwickeln" waehlen.
 2. Die Zielform auswaehlen, z.B. Glurak.
 3. Das Exemplar bekommt die neue Form. Alle Merkmale (Shiny, Glueck, 100er,
-   Hintergrund usw.) bleiben erhalten und koennen danach bei Bedarf angepasst
-   werden.
-4. Das Programm zeigt alle Zeilen aus "Suche ich" mit erledigten Eintraegen
-   derselben Form, deren Anforderungen das Exemplar erfuellt.
-5. Man hakt an, welche Zeilen "mit hochgezogen" werden sollen. Pro
-   angehakter Zeile wird genau ein erledigter Eintrag auf die neue Form
-   umgestellt und bleibt erledigt. Nicht angehakte Zeilen bleiben unveraendert.
+   Hintergrund usw.) bleiben erhalten und koennen danach angepasst werden.
+4. Das Programm zeigt die Zeilen aus "Suche ich", deren Anforderungen das
+   Exemplar vor der Entwicklung erfuellt hat. Alle sind angehakt.
+5. Fuer jede angehakte Zeile wird die Suche "mit hochgezogen": Die Anzahl der
+   Zeile sinkt um 1 (bei 0 ist die Zeile geloescht), und eine Zeile mit
+   denselben Anforderungen fuer die neue Form steigt um 1 oder wird mit
+   Anzahl 1 neu angelegt. Bei "Form beliebig" wechselt nur das Pokemon, die
+   Zeile bleibt "Form beliebig".
 
 **Beispiel 1: Einfache Entwicklung**
 
 Vorher:
 
 - Habe ich: 3x Glumanda Shiny
-- Suche ich: 3x Glumanda Shiny, alle erledigt (3/3)
+- Suche ich: Glumanda - Shiny (3/3)
 
 Ein Glumanda wird zu Glurak entwickelt. Das Programm zeigt:
 
-- [ ] Glumanda - Shiny (3 erledigt)
+- [x] Glumanda - Shiny (3/3)
 
 Mit Haken nachher:
 
@@ -176,88 +256,35 @@ Mit Haken nachher:
 Ohne Haken nachher:
 
 - Habe ich: 2x Glumanda Shiny, 1x Glurak Shiny
-- Suche ich: Glumanda - Shiny (3/3)
-
-Im zweiten Fall gibt es in "Habe ich" nur noch 2 passende Glumanda fuer 3
-erledigte Eintraege. Die Plausibilitaetspruefung weist darauf hin (siehe
-unten).
+- Suche ich: Glumanda - Shiny (2/3)
 
 **Beispiel 2: Mehrere Zeilen**
 
 Vorher:
 
-- Habe ich: 3x Glumanda Shiny, eines davon ist ein 100er
-- Suche ich: 3x Glumanda Shiny (3/3), 1x Glumanda Shiny [100er] (1/1)
+- Habe ich: 2x Glumanda Shiny, eines davon ist ein 100er
+- Suche ich: Glumanda - Shiny (2/2), Glumanda - Shiny [100er] (1/1)
 
-Das 100er-Glumanda wird zu Glurak entwickelt. Das Programm zeigt:
+Wird das 100er-Glumanda entwickelt, bietet das Programm beide Zeilen an. Wird
+das andere Glumanda entwickelt, nur die erste, denn dieses Exemplar erfuellt
+die Anforderung "100er" nicht.
 
-- [ ] Glumanda - Shiny (3 erledigt)
-- [ ] Glumanda - Shiny [100er] (1 erledigt)
+**Beispiel 3: Zielzeile gibt es schon**
 
-Sind beide Zeilen angehakt, nachher:
+Gibt es in "Suche ich" bereits "Glurak - Shiny (0/1)", wird beim Hochziehen
+deren Anzahl erhoeht: "Glurak - Shiny (1/2)". Es entsteht keine zweite Zeile.
 
-- Habe ich: 2x Glumanda Shiny, 1x Glurak Shiny 100er
-- Suche ich: Glumanda - Shiny (2/2), Glurak - Shiny (1/1),
-  Glurak - Shiny [100er] (1/1)
+**Beispiel 4: Keine passende Suche**
 
-Wird stattdessen ein Glumanda ohne 100er entwickelt, erscheint nur die erste
-Zeile, denn dieses Exemplar erfuellt die Anforderung "100er" nicht.
-
-**Beispiel 3: Keine passende Suche**
-
-Gibt es zu dem Exemplar keine erledigten Sucheintraege (z.B. weil es nie
-gesucht wurde), wird nur das Exemplar umgestellt. Es erscheint keine Auswahl.
+Erfuellt das Exemplar keine Zeile in "Suche ich", wird nur das Exemplar
+umgestellt. Es erscheint keine Auswahl.
 
 ## Exemplare aendern oder loeschen
 
-Wird ein Exemplar in "Habe ich" geloescht oder so geaendert, dass es
-Anforderungen nicht mehr erfuellt, zeigt das Programm die betroffenen Zeilen
-aus "Suche ich" mit erledigten Eintraegen. Man hakt an, in welchen Zeilen ein
-Eintrag wieder geoeffnet werden soll. Pro angehakter Zeile wird genau ein
-Eintrag wieder offen. Das Programm aendert nichts selbststaendig.
-
-**Beispiel 4: Exemplar geloescht**
-
-Vorher:
-
-- Habe ich: 3x Glumanda Shiny
-- Suche ich: Glumanda - Shiny (3/3)
-
-Ein Glumanda wurde versehentlich eingetragen und wird geloescht. Das
-Programm zeigt:
-
-- [ ] Glumanda - Shiny (3 erledigt): einen Eintrag wieder oeffnen
-
-Mit Haken nachher:
-
-- Habe ich: 2x Glumanda Shiny
-- Suche ich: Glumanda - Shiny (2/3), erscheint wieder unter "fehlt"
-
-**Beispiel 5: Merkmal geaendert**
-
-Vorher:
-
-- Habe ich: 1x Glumanda Shiny mit Glueck
-- Suche ich: Glumanda - Shiny [Glueck] (1/1), Glumanda - Shiny (1/1)
-
-Der Glueck-Haken war ein Versehen und wird entfernt. Das Exemplar erfuellt
-"Shiny" weiterhin, "Shiny mit Glueck" aber nicht mehr. Das Programm zeigt
-daher nur:
-
-- [ ] Glumanda - Shiny [Glueck] (1 erledigt): einen Eintrag wieder oeffnen
-
-Mit Haken nachher:
-
-- Suche ich: Glumanda - Shiny [Glueck] (0/1), Glumanda - Shiny (1/1)
-
-## Plausibilitaetspruefung
-
-Das Programm vergleicht pro Zeile in "Suche ich" die Anzahl der erledigten
-Eintraege mit der Anzahl passender Exemplare in "Habe ich". Gibt es mehr
-erledigte Eintraege als passende Exemplare, erscheint ein Hinweis, z.B.
-"Glumanda - Shiny: 3 erledigt, aber nur 2 passende Exemplare vorhanden". Die
-Pruefung korrigiert nichts. Man kann den Hinweis bestaetigen oder einen
-Eintrag wieder oeffnen.
+Wird ein Exemplar in "Habe ich" geaendert oder geloescht, berechnet das
+Programm die Zaehler in "Suche ich" einfach neu. Vorschlaege sind nicht
+noetig. Beispiel: Wird beim Glumanda der Glueck-Haken entfernt, zaehlt es fuer
+"Glumanda - Shiny [Glueck]" nicht mehr, fuer "Glumanda - Shiny" weiterhin.
 
 ## Tauschliste erstellen
 
@@ -279,8 +306,8 @@ Kanto abzugeben:
 - #2 Bisaknosp - Shiny
 ```
 
-Die Angabe "(1/3)" bedeutet: 1 erledigt, 3 als Ziel. Bei einem einzelnen,
-noch offenen Sucheintrag entfaellt die Angabe. Angaben in eckigen Klammern
+Die Angabe "(1/3)" bedeutet: 1 passendes Exemplar in "Habe ich", 3 gesucht.
+Bei einer einzelnen, noch offenen Suche entfaellt die Angabe. Angaben in eckigen Klammern
 wie "[Glueck]" oder "[100er]" zeigen, welche Anforderung nur der eigene
 Zaehler beruecksichtigt. Fuer den Tauschpartner sind sie ohne Bedeutung, da
 Glueck und Werte erst durch den Tausch entstehen.
@@ -376,7 +403,7 @@ Die persoenlichen Daten liegen im Benutzerordner der jeweiligen Plattform:
 |-----------|-----------------------------------------------|
 | Linux     | `~/.local/share/PoGoExchange`                 |
 | Windows   | `%LOCALAPPDATA%\PoGoExchange`                 |
-| Android   | im privaten Bereich der App (von aussen nicht sichtbar) |
+| Android   | `/data/user/0/com.GeritF.PoGoExchange/files/PoGoExchange` (privater Bereich der App, von aussen nicht sichtbar) |
 
 Beim ersten Start legt das Programm dort leere Dateien mit Kopfzeile an
 (`habe_ich.csv`, `suche_ich.csv`, `habe_ich_ueber.csv`, `eigene_formen.csv`).
@@ -409,6 +436,9 @@ gefundene Probleme als Meldung an:
   Namen der Sicherung.
 - **Fehlende Kennungen** (GUID) werden neu erzeugt, **fehlende Zeitstempel**
   auf den Zeitpunkt des Ladens gesetzt.
+- **Doppelte Zeilen** in `suche_ich.csv` (gleiches Pokemon, gleiche Form,
+  gleiche Anforderungen) werden zu einer Zeile zusammengefuehrt, die Anzahlen
+  addiert. Auch hier wird die Datei vorher gesichert.
 - **Ungueltige Werte** (z.B. `x` in einer Ja/Nein-Spalte) werden mit
   Zeilennummer gemeldet. Die betroffene Datei wird dann **gesperrt**: Die
   lesbaren Eintraege werden angezeigt, die Datei wird aber nicht veraendert,
@@ -595,9 +625,12 @@ Speichern getrimmt.
 | Glueck        | `1` = muss Glueck haben, `0` = egal          |
 | Hundert       | `1` = muss 100er sein, `0` = egal            |
 | EinsZuEins    | `0` / `1` (1:1-Tausch moeglich)              |
-| ErledigtAm    | Leer = offen, sonst Zeitstempel der Erledigung |
+| Anzahl        | Gesuchte Anzahl, ganze Zahl ab 1; leer = 1   |
 | GeaendertAm   | Zeitstempel der letzten Aenderung            |
 | GeloeschtAm   | Leer oder Zeitstempel der Loeschung          |
+
+Pro Zeile in "Suche ich" gibt es genau einen Datensatz. Der Fortschritt
+wird nicht gespeichert, sondern aus `habe_ich.csv` berechnet.
 
 ### habe_ich_ueber.csv
 
@@ -669,9 +702,10 @@ Glumanda
   zurueckgeben wuerde (`EinsZuEins` = `1`).
 - "fehlt" enthaelt die uebrigen gesuchten Pokemon.
 - "abzugeben" enthaelt die Eintraege aus "Habe ich ueber".
-- Sucheintraege mit gleicher Form, gleichen Merkmalen sowie gleichen Werten
-  fuer `Glueck`, `Hundert` und `EinsZuEins` bilden eine Zeile. Die Zeile
-  erscheint nur, wenn mindestens ein Eintrag offen ist.
+- Jede Zeile aus "Suche ich" erscheint, solange sie nicht vollstaendig
+  erledigt ist.
+- `Erledigt` ist die Anzahl passender Exemplare in "Habe ich", hoechstens
+  `Ziel`; `Ziel` ist die gesuchte Anzahl.
 - `[<Zaehlbedingungen>]` enthaelt `Glueck` und/oder `100er`, durch Komma
   getrennt, und entfaellt, wenn keine gesetzt ist.
 - `(Erledigt/Ziel)` entfaellt bei `(0/1)`.
@@ -772,47 +806,50 @@ Glueck und Werte (IV) entstehen beim Tausch neu.
 - In "Habe ich ueber" gibt es sie nicht: Gluecks-Pokemon sind nicht erneut
   tauschbar, und die Werte aendern sich beim Tausch.
 
-## Erledigt statt Loeschen bei "Suche ich"
+## Zeilen in "Suche ich" und ihre Zaehler
 
-Ein erfolgreich gesuchtes Pokemon wird nicht aus "Suche ich" entfernt,
-sondern mit `ErledigtAm` markiert. Nur so bleibt der Zaehler auch bei
-gemischten Anforderungen eindeutig.
+Jede Zeile in "Suche ich" ist ein eigenstaendiges Ziel mit einer Anzahl.
+Gespeichert wird nur die Anzahl. Der Fortschritt wird bei jeder Anzeige aus
+"Habe ich" berechnet:
 
-Beispiel: Gesucht werden 5x Glumanda Shiny, davon 1x mit `Hundert` = `1`.
-Kommt zuerst der 100er, wird dieser Eintrag erledigt. Wuerde er stattdessen
-geloescht, wuerde der 100er in "Habe ich" anschliessend auch fuer die vier
-Eintraege ohne Anforderung zaehlen, und der Zaehler zeigte (1/5) statt (0/4).
+- Ziel = gesuchte Anzahl
+- Erledigt = Anzahl der passenden Exemplare, hoechstens das Ziel
 
-Zaehler einer Zeile:
+Ein Exemplar zaehlt in jeder Zeile, deren Anforderungen es erfuellt. Damit
+sind die Zaehler bei unabhaengigen Zielen korrekt, z.B. bei "Von jedem ein
+Shiny mit Glueck" und zusaetzlich "Von jedem ein 100er": Ein
+Shiny-Gluecks-100er erfuellt beide Ziele. Eine neue Zeile veraendert keine
+bestehende, niemand muss Ueberschneidungen von Hand herausrechnen.
 
-- Ziel: Anzahl aller Sucheintraege der Zeile (offen und erledigt).
-- Erledigt: Anzahl der erledigten Sucheintraege der Zeile.
+Ein Ziel, das man in Teile zerlegen moechte ("5 Shinys, davon einer als
+100er"), wird als zwei unabhaengige Ziele formuliert: "5x Shiny" und "1x Shiny
+[100er]".
 
-Ein Exemplar darf mehrere Sucheintraege erfuellen, wenn diese zu
-verschiedenen Zeilen gehoeren. Beispiel: Ein Shiny-Gluecks-100er erfuellt
-"Shiny mit Glueck" und "100er". Innerhalb einer Zeile duerfen nicht mehr
-Eintraege automatisch als erledigt markiert werden, als es passende
-Exemplare in "Habe ich" gibt.
+### Warum kein gespeicherter Erledigt-Status
 
-## Warum es keine Verknuepfung zwischen Sucheintrag und Exemplar gibt
+In einer frueheren Planung bekam jeder gesuchte Exemplar-Platz einen eigenen
+Datensatz mit Zeitstempel "erledigt". Damit liess sich ein aufgeteiltes Ziel
+("4x Shiny + 1x Shiny 100er") exakt zaehlen, weil festgehalten wurde, fuer
+welche Zeile ein Exemplar gezaehlt hat. Der Preis war hoch: Erledigt
+markieren, Wiederoeffnen nach Aenderungen, Vorschlaege beim Loeschen und eine
+Plausibilitaetspruefung, falls Erledigt-Status und "Habe ich" auseinanderlaufen.
+Mit eigenstaendigen Zielen entfaellt all das, und das Verhalten ist leichter
+nachzuvollziehen.
 
-Ein erledigter Sucheintrag speichert nicht, welches Exemplar ihn erledigt
-hat. Das ist nicht noetig: Alle Eintraege einer Zeile haben dieselbe Form
-und dieselben Anforderungen und sind damit untereinander austauschbar. Es ist
-also gleichgueltig, welcher von ihnen beim Entwickeln umgestellt oder beim
-Loeschen wieder geoeffnet wird.
+### Doppelte Datensaetze
 
-Welche Zeilen betroffen sein koennen, ergibt sich aus dem Exemplar selbst:
-Es sind die Zeilen mit derselben Form, deren Anforderungen das Exemplar vor
-der Aenderung erfuellt hat. Welche davon tatsaechlich angepasst werden,
-entscheidet der Anwender, weil nur er weiss, fuer welches Ziel ein Exemplar
-gedacht war. Deshalb schlaegt das Programm Anpassungen nur vor und fuehrt sie
-nie selbststaendig aus.
+Datensaetze mit gleichem Pokemon, gleicher Form und gleichen Anforderungen
+bilden eine Zeile. Entstehen sie trotzdem (z.B. durch Bearbeiten der Datei von
+Hand), addiert die Anzeige ihre Anzahlen, und beim naechsten Laden werden sie
+zu einem Datensatz zusammengefuehrt.
 
-Ohne Verknuepfung kann es vorkommen, dass eine Zeile mehr erledigte
-Eintraege hat als passende Exemplare, z.B. wenn beim Entwickeln eine Zeile
-nicht angehakt wurde. Die Plausibilitaetspruefung macht solche Faelle
-sichtbar, ohne sie automatisch zu korrigieren.
+### Entwickeln
+
+Beim Entwickeln kann das Programm nicht wissen, fuer welche Ziele ein Exemplar
+gedacht war. Es bietet deshalb alle Zeilen an, deren Anforderungen das
+Exemplar vorher erfuellt hat, und der Anwender entscheidet per Haken. Das
+Hochziehen verschiebt jeweils eine Einheit der Anzahl von der alten auf die
+neue Form.
 
 Entwicklungsketten sind bewusst nicht enthalten, um den Pflegeaufwand der
 Nutzdaten gering zu halten. Die Zielform beim Entwickeln wird deshalb von
@@ -1039,14 +1076,17 @@ aeltere Dateien funktionieren:
    bleiben leer und erhalten damit ihren Standardwert.
 3. Jeden Datensatz einzeln umwandeln. Fehlerhafte Datensaetze werden mit
    Zeilennummer gemeldet (Leerzeilen werden dabei nicht mitgezaehlt).
+4. Nur `suche_ich.csv`: Datensaetze derselben Zeile zusammenfuehren, die
+   Anzahlen addieren. Die ueberzaehligen Datensaetze werden als geloescht
+   markiert.
 
 Ergebnis:
 
 - Gibt es fehlerhafte Datensaetze, wird die Datei gesperrt und nicht
   geschrieben, bis der Fehler behoben ist. Wuerde das Programm sie
   speichern, gingen die fehlerhaften Zeilen verloren.
-- Fehlten Spalten, gab es unbekannte Spalten oder mussten Kennungen bzw.
-  Zeitstempel ergaenzt werden, wird die Datei zuerst als `<datei>.bak_<N>`
+- Fehlten Spalten, gab es unbekannte Spalten, mussten Kennungen bzw.
+  Zeitstempel ergaenzt oder doppelte Zeilen zusammengefuehrt werden, wird die Datei zuerst als `<datei>.bak_<N>`
   gesichert (naechste freie Nummer) und dann im aktuellen Format neu
   geschrieben. Diese Sicherungen zaehlen nicht zu den regulaeren Sicherungen
   und werden nicht automatisch geloescht.
@@ -1076,8 +1116,9 @@ zugeordnet werden koennen.
 - Android speichert die Daten in einem privaten Bereich. Der Zugriff von
   aussen erfolgt ueber Export und Import (Exportpaket).
 - Der Datenordner wird ueber `Environment.SpecialFolder.LocalApplicationData`
-  ermittelt (siehe "Wo die Daten liegen"). Unter Android ist der genaue Pfad
-  noch beim ersten Test zu pruefen.
+  ermittelt (siehe "Wo die Daten liegen"). Unter Android ergibt das
+  `/data/user/0/com.GeritF.PoGoExchange/files/PoGoExchange` (gemessen auf dem
+  Entwicklungsgeraet).
 
 ---
 
@@ -1104,6 +1145,19 @@ zugeordnet werden koennen.
 - Fuer eigene Tests mit Beispieldaten werden die CSV-Dateien einfach in den
   Datenordner kopiert. Beispieldaten fuer persoenliche Listen sind bewusst
   nicht im Repository, damit jeder Anwender mit leeren Listen beginnt.
+- Die Fachlogik fuer "Suche ich" liegt in `Services/SuchZeilen.cs` (Zeilen
+  und Zaehler), `Services/SuchBearbeitung.cs` (Ziele, Anlegen, Aendern,
+  Anzahl) und `Services/Entwicklung.cs` (Entwickeln und Hochziehen). Die
+  Aufbereitung fuer die Anzeige uebernimmt `Services/ListenAnzeige.cs`.
+- Die Oberflaeche verwendet eine eigene, testbare Navigation
+  (`ViewModels/Navigation.cs`) mit einem Seitenstapel. Seiten werden in
+  `Views/MainView.axaml` ausdruecklich ihren ViewModels zugeordnet, nicht ueber
+  den `ViewLocator` (keine Reflexion, sicher fuer optimierte Android-Builds).
+- Plattformfunktionen (Beenden, Zwischenablage) stellt die Oberflaeche ueber
+  `AppActions` bereit, damit die ViewModels keine Oberflaechentypen brauchen.
+- `test/DatenAufsHandy.sh` kopiert die persoenlichen Daten vom PC in die
+  Debug-App auf dem Handy (ueber `adb` und `run-as`). Das funktioniert nur mit
+  Debug-Versionen und ueberschreibt die Daten auf dem Handy.
 - Die Konsistenz der persoenlichen Listen (Verweise auf Pokemon und Formen)
   prueft `Services/Konsistenz.cs`; die Namen der Listen fuer Meldungen
   stehen in `ListenNamen`.
