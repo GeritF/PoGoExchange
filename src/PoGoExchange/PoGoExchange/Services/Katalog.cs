@@ -127,4 +127,10 @@ public sealed class Katalog
   {
     return _formenNachPokemon[pokemonGuid];
   }
+
+  // Alle Pokemon nach Dex-Nummer sortiert
+  public IEnumerable<Pokemon> AllePokemon()
+  {
+    return _pokemon.Values.OrderBy(p => p.DexNr);
+  }
 }
