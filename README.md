@@ -129,9 +129,14 @@ legt fest, wie:
 - **Einer pro Pokemon**: jeweils ein Eintrag mit "Form beliebig".
 
 Eintraege, fuer die es in "Habe ich" bereits ein passendes Exemplar gibt,
-werden sofort als erledigt markiert. Da eine Sammel-Suche sehr viele
-Eintraege erzeugt, schlaegt das Programm vorher vor, eine Sicherung
-anzulegen.
+werden sofort als erledigt markiert. Gibt es dieselbe Zeile (gleiches
+Pokemon, gleiche Form, gleiche Anforderungen) in "Suche ich" bereits, wird
+sie nicht noch einmal angelegt. Wer "Von jedem ein 100er" versehentlich
+zweimal startet, bekommt so keine doppelten Eintraege. Das Programm meldet,
+wie viele Eintraege uebersprungen wurden.
+
+Da eine Sammel-Suche sehr viele Eintraege erzeugt, schlaegt das Programm
+vorher vor, eine Sicherung anzulegen.
 
 ## Pokemon entwickeln
 
@@ -363,6 +368,54 @@ entfernt, aber noch in den eigenen Listen verwendet werden, bleiben erhalten
 und werden als "ungueltig" angezeigt, mit der Aufforderung, eine andere Form
 auszuwaehlen.
 
+## Wo die Daten liegen
+
+Die persoenlichen Daten liegen im Benutzerordner der jeweiligen Plattform:
+
+| Plattform | Datenordner                                   |
+|-----------|-----------------------------------------------|
+| Linux     | `~/.local/share/PoGoExchange`                 |
+| Windows   | `%LOCALAPPDATA%\PoGoExchange`                 |
+| Android   | im privaten Bereich der App (von aussen nicht sichtbar) |
+
+Beim ersten Start legt das Programm dort leere Dateien mit Kopfzeile an
+(`habe_ich.csv`, `suche_ich.csv`, `habe_ich_ueber.csv`, `eigene_formen.csv`).
+Jede Aenderung wird sofort gespeichert.
+
+Unter Android erfolgt der Zugriff von aussen ueber Export und Import (siehe
+"Abgleich zwischen Geraeten").
+
+### Daten mit Excel oder LibreOffice bearbeiten
+
+Die Dateien koennen mit einer Tabellenkalkulation bearbeitet werden, solange
+das Programm geschlossen ist. Dabei ist zu beachten:
+
+- Beim Oeffnen alle Spalten als **Text** importieren. Sonst kann z.B.
+  LibreOffice Zeitstempel als Datum erkennen und beim Speichern in einem
+  anderen Format zurueckschreiben.
+- Beim Speichern das Format "Text CSV" mit Zeichensatz **UTF-8** und
+  **Semikolon** als Trennzeichen waehlen.
+- Eigene Spalten (z.B. "Notiz") werden vom Programm nicht uebernommen
+  (siehe unten).
+
+### Pruefung beim Laden
+
+Beim Start prueft das Programm alle persoenlichen Dateien und zeigt
+gefundene Probleme als Meldung an:
+
+- **Fehlende Spalten** werden ergaenzt, **unbekannte Spalten** entfernt
+  (z.B. nach einem Versionswechsel oder einer eigenen Spalte). Die Datei wird
+  vorher gesichert, z.B. als `habe_ich.csv.bak_1`. Die Meldung nennt den
+  Namen der Sicherung.
+- **Fehlende Kennungen** (GUID) werden neu erzeugt, **fehlende Zeitstempel**
+  auf den Zeitpunkt des Ladens gesetzt.
+- **Ungueltige Werte** (z.B. `x` in einer Ja/Nein-Spalte) werden mit
+  Zeilennummer gemeldet. Die betroffene Datei wird dann **gesperrt**: Die
+  lesbaren Eintraege werden angezeigt, die Datei wird aber nicht veraendert,
+  bis der Fehler behoben ist. So gehen keine Daten verloren.
+- **Verweise**, die nicht zu den Nutzdaten passen (z.B. unbekanntes Pokemon),
+  werden als Hinweis gemeldet. Die Datei bleibt bearbeitbar.
+
 ## Sicherungen
 
 Sicherungen entstehen:
@@ -400,6 +453,7 @@ LibreOffice geoeffnet werden.
 |----------------|-------------------------------------------------------------------|
 | Kodierung      | UTF-8 mit BOM                                                     |
 | Trennzeichen   | Semikolon `;`                                                     |
+| Zeilenumbruch  | Schreiben mit Windows-Zeilenumbruch (CRLF), Lesen mit CRLF oder LF |
 | Erste Zeile    | Spaltenueberschriften                                             |
 | GUID           | 36 Zeichen, Kleinbuchstaben, mit Bindestrichen                    |
 | Wahrheitswerte | `1` = ja, `0` = nein                                              |
@@ -955,9 +1009,55 @@ Heimnetz wird das als ausreichend angesehen.
   Akzent, Nidoran mit Geschlechtssymbol). Ohne BOM oeffnet Excel die Datei
   nicht korrekt.
 - **Semikolon**: Standard-Trennzeichen eines deutschen Excel.
+- **Windows-Zeilenumbruch beim Schreiben**: entspricht dem ueblichen
+  CSV-Format. Gelesen werden auch Dateien mit Linux-Zeilenumbruch. Bei der
+  verwendeten Bibliothek CsvHelper darf `NewLine` dafuer nur beim Schreiben
+  gesetzt werden: Ist es beim Lesen gesetzt, wird ausschliesslich dieser
+  Zeilenumbruch akzeptiert. Die Tauschliste (Text fuer Messenger) verwendet
+  dagegen immer einen einfachen Zeilenvorschub.
+- **Kopfzeile immer vorhanden**: Auch eine leere Liste wird mit Kopfzeile
+  geschrieben, damit die Spalten in einer Tabellenkalkulation sichtbar sind.
+- **Sicheres Speichern**: Es wird zuerst in eine temporaere Datei
+  geschrieben, die dann die alte ersetzt. Bricht das Speichern ab (z.B. weil
+  Android die App beendet), bleibt die alte Datei vollstaendig erhalten.
+- **`.gitattributes`**: Im Repository sind CSV-Dateien von der
+  Zeilenende-Umwandlung durch Git ausgenommen (`*.csv -text`), damit BOM und
+  Zeilenumbrueche erhalten bleiben. Shell-Skripte behalten immer LF
+  (`*.sh text eol=lf`).
 - **Keine Anfuehrungszeichen in freien Texten**: Im Export begrenzen
   Anfuehrungszeichen die freien Texte, deshalb duerfen diese selbst keine
   enthalten.
+
+## Laden der persoenlichen Dateien
+
+Die Dateien werden tolerant gelesen, damit auch von Hand bearbeitete oder
+aeltere Dateien funktionieren:
+
+1. Rohdaten lesen und die Kopfzeile mit den erwarteten Spalten vergleichen.
+   Die Reihenfolge der Spalten spielt keine Rolle.
+2. Datensaetze in die erwartete Spaltenreihenfolge bringen, fehlende Spalten
+   bleiben leer und erhalten damit ihren Standardwert.
+3. Jeden Datensatz einzeln umwandeln. Fehlerhafte Datensaetze werden mit
+   Zeilennummer gemeldet (Leerzeilen werden dabei nicht mitgezaehlt).
+
+Ergebnis:
+
+- Gibt es fehlerhafte Datensaetze, wird die Datei gesperrt und nicht
+  geschrieben, bis der Fehler behoben ist. Wuerde das Programm sie
+  speichern, gingen die fehlerhaften Zeilen verloren.
+- Fehlten Spalten, gab es unbekannte Spalten oder mussten Kennungen bzw.
+  Zeitstempel ergaenzt werden, wird die Datei zuerst als `<datei>.bak_<N>`
+  gesichert (naechste freie Nummer) und dann im aktuellen Format neu
+  geschrieben. Diese Sicherungen zaehlen nicht zu den regulaeren Sicherungen
+  und werden nicht automatisch geloescht.
+- Fehlt eine Datei, wird sie leer mit Kopfzeile angelegt.
+
+Unbekannte Spalten werden nicht aufbewahrt, weil sie auch von einem
+Versionskonflikt stammen koennen (z.B. eine Datei aus einer neueren
+Programmversion). Die Sicherung erhaelt den urspruenglichen Inhalt.
+
+Die mitgelieferten Nutzdaten werden nicht so geprueft: Sie sind Teil des
+Programms und werden durch die Tests in `NutzdatenTests` abgesichert.
 
 ## Sprache
 
@@ -975,6 +1075,9 @@ zugeordnet werden koennen.
   Aenderungen sofort gespeichert und nicht erst beim Beenden.
 - Android speichert die Daten in einem privaten Bereich. Der Zugriff von
   aussen erfolgt ueber Export und Import (Exportpaket).
+- Der Datenordner wird ueber `Environment.SpecialFolder.LocalApplicationData`
+  ermittelt (siehe "Wo die Daten liegen"). Unter Android ist der genaue Pfad
+  noch beim ersten Test zu pruefen.
 
 ---
 
@@ -996,6 +1099,11 @@ zugeordnet werden koennen.
 - Der Code-Stil ist in `src/PoGoExchange/.editorconfig` festgelegt:
   Einrueckung mit 2 Leerzeichen, geschweifte Klammern auch bei einzeiligen
   `if`-Bloecken, Zeilen bis etwa 100 Zeichen.
+- Laden und Speichern der Daten uebernimmt `Services/Datenbestand.cs`, das
+  tolerante Lesen der CSV-Dateien `CsvSpeicher.LesenMitPruefung`.
+- Fuer eigene Tests mit Beispieldaten werden die CSV-Dateien einfach in den
+  Datenordner kopiert. Beispieldaten fuer persoenliche Listen sind bewusst
+  nicht im Repository, damit jeder Anwender mit leeren Listen beginnt.
 - Die Konsistenz der persoenlichen Listen (Verweise auf Pokemon und Formen)
   prueft `Services/Konsistenz.cs`; die Namen der Listen fuer Meldungen
   stehen in `ListenNamen`.
