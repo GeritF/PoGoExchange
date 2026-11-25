@@ -13,6 +13,8 @@
                  Foreground="Green"
                  TextWrapping="Wrap" />
 
+      <Button Content="Erhalten" Command="{Binding ErhaltenCommand}" />
+
       <TextBlock Text="Anforderungen" FontWeight="Bold" Margin="0,12,0,0" />
       <views:AnforderungenView DataContext="{Binding Anforderungen}" />
       <Button Content="Anforderungen &#xFC;bernehmen"

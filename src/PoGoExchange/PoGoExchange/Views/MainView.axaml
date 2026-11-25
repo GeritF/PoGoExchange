@@ -47,6 +47,21 @@
                 <DataTemplate DataType="vm:SuchZeileViewModel">
                     <views:SuchZeileView />
                 </DataTemplate>
+                <DataTemplate DataType="vm:HabeNeuViewModel">
+                    <views:HabeNeuView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:HabeZeileViewModel">
+                    <views:HabeZeileView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:UeberNeuViewModel">
+                    <views:UeberNeuView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:UeberZeileViewModel">
+                    <views:UeberZeileView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:EntwickelnViewModel">
+                    <views:EntwickelnView />
+                </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>
     </DockPanel>

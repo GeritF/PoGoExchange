@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             xmlns:svc="using:PoGoExchange.Services"
+             x:Class="PoGoExchange.Views.EntwickelnView"
+             x:DataType="vm:EntwickelnViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+      <TextBlock Text="{Binding Kopf}" FontSize="18" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding AnzahlHinweis}"
+                 IsVisible="{Binding HatAnzahlHinweis}"
+                 TextWrapping="Wrap" />
+
+      <TextBlock Text="Zielform w&#xE4;hlen" FontWeight="Bold" Margin="0,12,0,0" />
+      <TextBlock Text="Suche (Name oder Dex-Nummer):" />
+      <TextBox Text="{Binding Suchtext}" />
+      <TextBlock Text="{Binding MehrHinweis}"
+                 IsVisible="{Binding HatMehrHinweis}"
+                 Foreground="DarkOrange"
+                 TextWrapping="Wrap" />
+      <ListBox ItemsSource="{Binding Ziele}"
+               SelectedItem="{Binding Auswahl}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="svc:FormZiel">
+            <TextBlock Text="{Binding Anzeige}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <TextBlock Text="{Binding AuswahlText}" FontWeight="Bold" TextWrapping="Wrap" />
+
+      <StackPanel IsVisible="{Binding HatBetroffene}" Spacing="4" Margin="0,12,0,0">
+        <TextBlock Text="Diese Zeilen in &quot;Suche ich&quot; mit hochziehen:"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap" />
+        <ItemsControl ItemsSource="{Binding Betroffene}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:BetroffeneZeile">
+              <CheckBox IsChecked="{Binding Ausgewaehlt}">
+                <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+              </CheckBox>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <Button Content="Entwickeln" Command="{Binding EntwickelnCommand}" Margin="0,12,0,0" />
+      <TextBlock Text="{Binding Meldung}"
+                 IsVisible="{Binding HatMeldung}"
+                 Foreground="Red"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

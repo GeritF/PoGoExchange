@@ -185,6 +185,25 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
     LoeschHinweisSichtbar = true;
   }
 
+  // Oeffnet "Erhalten", vorbelegt mit den Anforderungen der Zeile.
+  // Bei "Form beliebig" werden nur die Formen dieses Pokemon angeboten.
+  [RelayCommand]
+  private void Erhalten()
+  {
+    var vorlage = HabeBearbeitung.VorlageAusSuche(_eintrag);
+    Guid? form = _eintrag.FormBeliebig ? null : _eintrag.FormGuid;
+    _navigation.Oeffnen(new HabeNeuViewModel(
+      _bestand, ErhaltenGespeichert, vorlage, _eintrag.PokemonGuid, form, "Erhalten"));
+  }
+
+  private void ErhaltenGespeichert(HabeAnlegeErgebnis ergebnis)
+  {
+    _navigation.Zurueck();
+    _geaendert("Erhalten");
+    Auffrischen();
+    Meldung = "Erhalten. " + Fortschritt;
+  }
+
   private void Aendern(SuchZeile zeile)
   {
     _eintrag = SuchBearbeitung.AnforderungenAendern(

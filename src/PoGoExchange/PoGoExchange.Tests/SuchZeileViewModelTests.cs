@@ -147,4 +147,27 @@ public class SuchZeileViewModelTests : IDisposable
     var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
     Assert.Equal(2, Assert.Single(neu.Suche).Anzahl);
   }
+
+  [Fact]
+  public void Erhalten_OeffnetVorbelegteSeite_SpeichernErhoehtFortschritt()
+  {
+    var (bestand, pokemon, form) = Vorbereiten();
+    var eintrag = Zeile(pokemon, form, 2, glueck: true);
+    bestand.Suche.Add(eintrag);
+    var navigation = new Navigation();
+    var vm = new SuchZeileViewModel(navigation, bestand, eintrag, _ => { });
+    navigation.Oeffnen(vm);
+
+    vm.ErhaltenCommand.Execute(null);
+
+    var seite = Assert.IsType<HabeNeuViewModel>(navigation.AktuelleSeite);
+    Assert.True(seite.Merkmale.Glueck);
+    Assert.Equal(form, seite.Ziel?.FormGuid);
+
+    seite.SpeichernCommand.Execute(null);
+
+    Assert.Same(vm, navigation.AktuelleSeite);
+    Assert.Equal("Fortschritt: 1/2", vm.Fortschritt);
+    Assert.Contains("Erhalten", vm.Meldung);
+  }
 }

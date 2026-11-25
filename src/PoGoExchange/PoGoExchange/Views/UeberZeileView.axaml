@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             xmlns:views="using:PoGoExchange.Views"
+             x:Class="PoGoExchange.Views.UeberZeileView"
+             x:DataType="vm:UeberZeileViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+      <TextBlock Text="{Binding Kopf}" FontSize="18" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding Meldung}"
+                 IsVisible="{Binding HatMeldung}"
+                 Foreground="Green"
+                 TextWrapping="Wrap" />
+
+      <TextBlock Text="Merkmale" FontWeight="Bold" Margin="0,12,0,0" />
+      <views:ExemplarView DataContext="{Binding Merkmale}" />
+      <Button Content="Merkmale &#xFC;bernehmen"
+              Command="{Binding MerkmaleUebernehmenCommand}" />
+
+      <StackPanel IsVisible="{Binding KonfliktSichtbar}" Spacing="4">
+        <TextBlock Text="Diesen Eintrag gibt es bereits. Zusammenf&#xFC;hren?"
+                   TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Ja" Command="{Binding KonfliktJaCommand}" />
+          <Button Content="Nein" Command="{Binding KonfliktNeinCommand}" />
+        </StackPanel>
+      </StackPanel>
+
+      <Button Content="L&#xF6;schen"
+              Command="{Binding LoeschenCommand}"
+              Margin="0,12,0,0" />
+      <StackPanel IsVisible="{Binding LoeschRueckfrageSichtbar}" Spacing="4">
+        <TextBlock Text="Diesen Eintrag wirklich l&#xF6;schen?"
+                   Foreground="Red"
+                   TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Ja, l&#xF6;schen" Command="{Binding LoeschenJaCommand}" />
+          <Button Content="Nein" Command="{Binding LoeschenNeinCommand}" />
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -7,7 +7,7 @@ using PoGoExchange.Models;
 namespace PoGoExchange.Services;
 
 // Eine Zeile fuer die Anzeige einer persoenlichen Liste.
-// Eintrag ist bei "Suche ich" der Datensatz der Zeile, sonst null.
+// Eintrag ist der Datensatz der Zeile ("Suche ich", "Habe ich"), sonst null.
 public sealed record AnzeigeZeile(
   string Region,
   int DexNr,
@@ -15,7 +15,7 @@ public sealed record AnzeigeZeile(
   string Zusatz,
   bool Erledigt,
   bool Fehlerhaft,
-  SucheEintrag? Eintrag = null,
+  ListenEintrag? Eintrag = null,
   int Anzahl = 1)
 {
   // Anzahl wird ab 2 vorangestellt, z.B. "3x #4 Glumanda"
@@ -92,6 +92,7 @@ public static class ListenAnzeige
         Klammer(Bedingungen(eintrag.Glueck, eintrag.Hundert, false)),
         false,
         false,
+        Eintrag: eintrag,
         Anzahl: eintrag.Anzahl));
     }
 
@@ -118,7 +119,8 @@ public static class ListenAnzeige
         EintragText.Erzeugen(pokemon, form, eintrag),
         "",
         false,
-        false));
+        false,
+        Eintrag: eintrag));
     }
 
     return Gruppieren(katalog, zeilen);
@@ -167,7 +169,7 @@ public static class ListenAnzeige
   }
 
   // Ergibt z.B. " [Glueck, 1:1] (1/3)"
-  private static string SuchZusatz(SuchZeile zeile)
+  internal static string SuchZusatz(SuchZeile zeile)
   {
     var klammer = Klammer(Bedingungen(
       zeile.Muster.Glueck, zeile.Muster.Hundert, zeile.Muster.EinsZuEins));

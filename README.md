@@ -56,11 +56,17 @@ In allen Listen gilt:
 - In "Habe ich" steht vor Zeilen mit mehreren gleichen Exemplaren die
   Anzahl, z.B. `3x #4 Glumanda - Shiny [Glueck]`.
 
+In allen drei Listen gibt es ausserdem:
+
+- oben den Button "+ Neu" und darunter eine Rueckmeldezeile, z.B. "1 von 3
+  bereits erledigt", "Zeile geloescht" oder "Entwickelt zu #6 Glurak"
+- das Oeffnen einer Zeile durch Antippen
+
+Ist die Datei einer Liste gesperrt (siehe "Pruefung beim Laden"), fehlen
+dort "+ Neu" und das Oeffnen; die Hinweisleiste nennt den Grund.
+
 In "Suche ich" zusaetzlich:
 
-- Oben gibt es den Button "+ Neu" und darunter eine Rueckmeldezeile, z.B.
-  "1 von 3 bereits erledigt" oder "Zeile geloescht".
-- Antippen einer Zeile oeffnet sie zum Bearbeiten.
 - Jede Zeile zeigt ihre Bedingungen in eckigen Klammern (Glueck, 100er, 1:1)
   und den Fortschritt, z.B. `#4 Glumanda - Shiny [Glueck, 1:1] (1/3)`.
 - Vollstaendig erledigte Zeilen sind ausgeblendet. Der Button "Erledigte
@@ -149,12 +155,9 @@ Regeln:
 
 - Gluecks-Pokemon wurden bereits getauscht und koennen nicht erneut
   getauscht werden. In "Habe ich ueber" gibt es daher keinen Glueck-Haken.
-- Mit "Erhalten" wird ein erfolgreicher Tausch eingetragen: In "Habe ich"
-  kommt ein Exemplar hinzu (eine passende Zeile steigt um 1, sonst entsteht
-  eine neue Zeile), vorbelegt mit den Anforderungen der Zeile
-  (z.B. Shiny und Glueck). Was die Zeile offen laesst, kann ergaenzt werden.
-  War die Suche "Form beliebig", muss die tatsaechliche Form angegeben werden.
-  Die Zeile in "Suche ich" bleibt unveraendert, ihr Zaehler steigt.
+- Mit "Erhalten" wird ein erfolgreicher Tausch eingetragen (siehe
+  "Erhalten"). Die Zeile in "Suche ich" bleibt unveraendert, ihr Zaehler
+  steigt.
 - Wird eine Zeile in "Habe ich" geaendert oder geloescht, werden die Zaehler
   einfach neu berechnet. Beim Entwickeln bietet das Programm zusaetzlich an,
   die Suche anzupassen (siehe "Pokemon entwickeln").
@@ -215,6 +218,49 @@ Antippen einer Zeile oeffnet sie:
   die Zeile zu loeschen". So ist eindeutig, dass die ganze Zeile entfernt
   wird und nicht nur ein Stueck.
 
+## Erhalten
+
+Auf der Seite "Zeile bearbeiten" in "Suche ich" traegt der Button "Erhalten"
+einen erfolgreichen Tausch ein. Er oeffnet die Seite "Erhalten":
+
+- Die Merkmale sind aus den Anforderungen der Zeile vorbelegt (z.B. Shiny,
+  Glueck, 100er, Kostuem). Was die Zeile offen laesst (z.B. Geschlecht
+  "egal"), steht auf "unbekannt" und kann ergaenzt werden.
+- Hat die Zeile eine bestimmte Form, ist diese bereits ausgewaehlt; das
+  Suchfeld entfaellt.
+- Bei "Form beliebig" stehen nur die Formen dieses Pokemon zur Auswahl; die
+  tatsaechliche Form muss gewaehlt werden.
+- Nach dem Speichern steigt in "Habe ich" die passende Zeile um die Anzahl
+  oder es entsteht eine neue Zeile. Man landet wieder auf der Zeilenseite und
+  sieht den neuen Stand, z.B. "Erhalten. Fortschritt: 2/3".
+
+## Exemplar zu "Habe ich" hinzufuegen
+
+Die Seite "Neues Exemplar" (Button "+ Neu" in "Habe ich") ist fuer Exemplare
+gedacht, die man schon vor dem Erfassen hatte oder ausserhalb eines
+gesuchten Tauschs bekommt:
+
+1. **Merkmale** oben. Sie beschreiben das Exemplar, deshalb lauten die
+   Auswahlwerte anders als bei Anforderungen: Geschlecht "unbekannt /
+   maennlich / weiblich", Dynamax "keins / Dynamax / Gigadynamax"; ein
+   leerer Kostuem- oder Hintergrundtext bedeutet "nicht beschrieben".
+2. **Anzahl** gleicher Exemplare (voreingestellt 1).
+3. **Pokemon und Form** ueber Suchfeld und Liste (hoechstens 100 Eintraege,
+   archivierte Formen sind nicht waehlbar). "Form beliebig" gibt es hier
+   nicht.
+
+Gibt es dieselbe Zeile schon, wird ihre Anzahl erhoeht, z.B. "Diese Zeile
+gab es bereits: 2x, jetzt 3x".
+
+## "Habe ich ueber" bearbeiten
+
+- **"+ Neu"** wie bei "Habe ich", aber ohne Glueck, 100er und Anzahl. Gibt es
+  denselben Eintrag schon, wird nichts doppelt angelegt ("Diesen Eintrag gibt
+  es bereits").
+- **Antippen** oeffnet "Eintrag bearbeiten": Merkmale aendern (waere der
+  Eintrag danach gleich einem anderen, fragt das Programm, ob beide
+  zusammengefuehrt werden sollen) und **Loeschen** nach Rueckfrage.
+
 ## Sammel-Suche
 
 Mit einer Sammel-Suche werden viele Sucheintraege mit denselben
@@ -244,20 +290,28 @@ die Form, nicht nur das Pokemon: Aus Alola-Vulpix wird Alola-Vulnona.
 
 Ablauf:
 
-1. In "Habe ich" das Exemplar auswaehlen und "Entwickeln" waehlen.
-2. Die Zielform auswaehlen, z.B. Glurak.
+1. In "Habe ich" die Zeile oeffnen und "Entwickeln" waehlen. Hat die Zeile
+   mehrere Exemplare, weist die Seite darauf hin, dass genau eines
+   entwickelt wird.
+2. Die Zielform ueber Suchfeld und Liste auswaehlen, z.B. Glurak. Die
+   aktuelle Form steht nicht zur Auswahl.
 3. Es wird immer genau ein Exemplar entwickelt: Die Zeile in "Habe ich"
    sinkt um 1 (beim letzten Exemplar wird sie entfernt), und eine Zeile mit
    denselben Merkmalen (Shiny, Glueck, 100er, Hintergrund usw.) fuer die neue
    Form steigt um 1 oder wird neu angelegt. Die Merkmale koennen danach
    angepasst werden.
-4. Das Programm zeigt die Zeilen aus "Suche ich", deren Anforderungen das
-   Exemplar vor der Entwicklung erfuellt hat. Alle sind angehakt.
+4. Sobald eine Zielform gewaehlt ist, zeigt die Seite die Zeilen aus "Suche
+   ich", deren Anforderungen das Exemplar vor der Entwicklung erfuellt hat,
+   mit Bedingungen und Zaehler. Alle sind angehakt.
 5. Fuer jede angehakte Zeile wird die Suche "mit hochgezogen": Die Anzahl der
    Zeile sinkt um 1 (bei 0 ist die Zeile geloescht), und eine Zeile mit
    denselben Anforderungen fuer die neue Form steigt um 1 oder wird mit
    Anzahl 1 neu angelegt. Bei "Form beliebig" wechselt nur das Pokemon, die
    Zeile bleibt "Form beliebig".
+6. Beide Listen werden gespeichert, und man landet wieder in der Liste "Habe
+   ich" (die Zeile kann beim letzten Exemplar verschwunden sein). Die
+   Rueckmeldung lautet z.B. "Entwickelt zu #6 Glurak. Suche angepasst: 1
+   Zeile(n)".
 
 **Beispiel 1: Einfache Entwicklung**
 
@@ -303,9 +357,14 @@ umgestellt. Es erscheint keine Auswahl.
 
 ## Zeilen in "Habe ich" aendern oder loeschen
 
+Antippen einer Zeile in "Habe ich" oeffnet "Exemplar bearbeiten":
+
 - **Merkmale aendern** gilt fuer die ganze Zeile. Soll nur eines von drei
   Exemplaren geaendert werden (z.B. eines ist ein 100er), wird die Anzahl um 1
   verringert und eine neue Zeile mit den geaenderten Merkmalen angelegt.
+- Ergeben die geaenderten Merkmale eine Zeile, die es schon gibt, fragt das
+  Programm nach, z.B. "Diese Zeile: 2x, gefundene Zeile: 3x, zusammen: 5x.
+  Zusammenfuehren?".
 - **Anzahl aendern** und **Loeschen** funktionieren wie in "Suche ich":
   Anzahl 0 entfernt die Zeile nach Rueckfrage.
 - Die Zaehler in "Suche ich" werden einfach neu berechnet; Vorschlaege sind
@@ -313,8 +372,7 @@ umgestellt. Es erscheint keine Auswahl.
   es fuer "Glumanda - Shiny [Glueck]" nicht mehr, fuer "Glumanda - Shiny"
   weiterhin.
 
-In "Habe ich ueber" gibt es keine Anzahl. Dort loescht der Button "Loeschen"
-den Eintrag nach einer Rueckfrage.
+- **Entwickeln** siehe "Pokemon entwickeln".
 
 ## Tauschliste erstellen
 
@@ -1211,7 +1269,16 @@ zugeordnet werden koennen.
   und Zaehler), `Services/SuchBearbeitung.cs` (Ziele, Anlegen, Aendern,
   Anzahl) und `Services/Entwicklung.cs` (Entwickeln und Hochziehen). Die Zeilen von
   "Habe ich" (Schluessel fuer Gruppierung und Zusammenfuehren) liefert
-  `Services/HabeZeilen.cs`. Die
+  `Services/HabeZeilen.cs`. Anlegen und Aendern in "Habe ich" und "Habe ich
+  ueber" uebernehmen `Services/HabeBearbeitung.cs` und
+  `Services/UeberBearbeitung.cs`.
+- Die Eingabebloecke fuer Merkmale gibt es zweimal, weil sie Verschiedenes
+  bedeuten: `AnforderungenView` fuer "Suche ich" ("egal", "beliebig") und
+  `ExemplarView` fuer "Habe ich" und "Habe ich ueber" ("unbekannt", "keins",
+  "nicht beschrieben"). Beide werden von mehreren Seiten wiederverwendet.
+- Seiten mit Pokemon-Auswahl halten die gewaehlte Form getrennt von der
+  Markierung in der Liste. So bleibt die Auswahl erhalten, wenn das Suchfeld
+  sie voruebergehend ausblendet. Die
   Aufbereitung fuer die Anzeige uebernimmt `Services/ListenAnzeige.cs`.
 - Die Oberflaeche verwendet eine eigene, testbare Navigation
   (`ViewModels/Navigation.cs`) mit einem Seitenstapel. Seiten werden in

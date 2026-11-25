@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             xmlns:svc="using:PoGoExchange.Services"
+             xmlns:views="using:PoGoExchange.Views"
+             x:Class="PoGoExchange.Views.HabeNeuView"
+             x:DataType="vm:HabeNeuViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+      <TextBlock Text="Merkmale" FontWeight="Bold" />
+      <views:ExemplarView DataContext="{Binding Merkmale}" />
+
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="Anzahl:" VerticalAlignment="Center" Width="100" />
+        <NumericUpDown Value="{Binding Anzahl}"
+                       Minimum="1" Increment="1" FormatString="0"
+                       MinWidth="150" />
+      </StackPanel>
+
+      <TextBlock Text="Pokemon und Form w&#xE4;hlen" FontWeight="Bold" Margin="0,12,0,0" />
+      <TextBlock Text="Suche (Name oder Dex-Nummer):"
+                 IsVisible="{Binding SuchfeldSichtbar}" />
+      <TextBox Text="{Binding Suchtext}"
+               IsVisible="{Binding SuchfeldSichtbar}" />
+      <TextBlock Text="{Binding MehrHinweis}"
+                 IsVisible="{Binding HatMehrHinweis}"
+                 Foreground="DarkOrange"
+                 TextWrapping="Wrap" />
+
+      <ListBox ItemsSource="{Binding Ziele}"
+               SelectedItem="{Binding Auswahl}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="svc:FormZiel">
+            <TextBlock Text="{Binding Anzeige}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <TextBlock Text="{Binding AuswahlText}" FontWeight="Bold" Margin="0,12,0,0"
+                 TextWrapping="Wrap" />
+      <Button Content="Speichern" Command="{Binding SpeichernCommand}" />
+      <TextBlock Text="{Binding Meldung}"
+                 IsVisible="{Binding HatMeldung}"
+                 Foreground="Red"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
