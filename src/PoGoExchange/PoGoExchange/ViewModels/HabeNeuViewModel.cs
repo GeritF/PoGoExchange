@@ -21,6 +21,7 @@ public sealed partial class HabeNeuViewModel : SeiteViewModel
   private readonly Guid? _nurPokemon;
   private readonly Guid? _nurForm;
   private readonly string _titel;
+  private readonly Navigation? _navigation;
   private bool _aktualisiertGerade;
 
   public HabeNeuViewModel(
@@ -29,8 +30,10 @@ public sealed partial class HabeNeuViewModel : SeiteViewModel
     HabeEintrag? vorlage = null,
     Guid? nurPokemon = null,
     Guid? nurForm = null,
-    string titel = "Neues Exemplar")
+    string titel = "Neues Exemplar",
+    Navigation? navigation = null)
   {
+    _navigation = navigation;
     _bestand = bestand;
     _gespeichert = gespeichert;
     _nurPokemon = nurPokemon;
@@ -54,6 +57,9 @@ public sealed partial class HabeNeuViewModel : SeiteViewModel
 
   // Das Suchfeld wird nur gebraucht, wenn alle Pokemon zur Auswahl stehen
   public bool SuchfeldSichtbar => _nurPokemon == null;
+
+  // Link "Form fehlt?" nur, wenn die Form nicht fest vorgegeben ist
+  public bool FormAnlegenSichtbar => _navigation != null && _nurForm == null;
 
   public ExemplarViewModel Merkmale { get; } = new();
 
@@ -133,6 +139,36 @@ public sealed partial class HabeNeuViewModel : SeiteViewModel
     }
 
     _gespeichert(ergebnis);
+  }
+
+  [RelayCommand]
+  private void FormAnlegen()
+  {
+    _navigation?.Oeffnen(
+      new EigeneFormViewModel(_navigation, _bestand, FormAngelegt, null, _nurPokemon));
+  }
+
+  // Zurueck von "Neue eigene Form": Liste neu aufbauen und die neue Form waehlen
+  private void FormAngelegt(PokemonForm? form, string rueckmeldung)
+  {
+    _navigation?.Zurueck();
+    if (form == null)
+    {
+      return;
+    }
+
+    var pokemon = _bestand.Katalog.PokemonZuGuid(form.PokemonGuid);
+    if (_nurPokemon == null && pokemon != null)
+    {
+      Suchtext = pokemon.DexNr.ToString();
+    }
+
+    ZieleAktualisieren();
+    var ziel = Ziele.FirstOrDefault(z => z.FormGuid == form.Guid);
+    if (ziel != null)
+    {
+      Auswahl = ziel;
+    }
   }
 
   private void ZieleAktualisieren()

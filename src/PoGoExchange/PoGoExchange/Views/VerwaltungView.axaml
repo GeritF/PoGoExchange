@@ -12,6 +12,9 @@
             <Button Content="Sicherungen"
                     Command="{Binding SicherungenOeffnenCommand}"
                     IsVisible="{Binding HatSicherungen}" />
+            <Button Content="Eigene Formen"
+                    Command="{Binding EigeneFormenOeffnenCommand}"
+                    IsVisible="{Binding HatEigeneFormen}" />
             <SelectableTextBlock Text="{Binding Status}" TextWrapping="Wrap" />
         </StackPanel>
     </ScrollViewer>

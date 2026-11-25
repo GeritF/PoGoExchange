@@ -193,7 +193,8 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
     var vorlage = HabeBearbeitung.VorlageAusSuche(_eintrag);
     Guid? form = _eintrag.FormBeliebig ? null : _eintrag.FormGuid;
     _navigation.Oeffnen(new HabeNeuViewModel(
-      _bestand, ErhaltenGespeichert, vorlage, _eintrag.PokemonGuid, form, "Erhalten"));
+      _bestand, ErhaltenGespeichert, vorlage, _eintrag.PokemonGuid, form, "Erhalten",
+      _navigation));
   }
 
   private void ErhaltenGespeichert(HabeAnlegeErgebnis ergebnis)

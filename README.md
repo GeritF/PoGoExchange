@@ -42,7 +42,8 @@ Die Hauptseite fuehrt ueber Kacheln zu den Bereichen:
   einfuegen und abgleichen
 - **Verwaltung**: Datenordner, Anzahl der Zeilen (bei "Habe ich" auch der
   Exemplare), Zeitpunkt der letzten Aenderung und Lademeldungen, mit einem
-  Button zum Kopieren in die Zwischenablage; dazu der Button "Sicherungen"
+  Button zum Kopieren in die Zwischenablage; dazu die Buttons "Sicherungen"
+  und "Eigene Formen"
 - **Beenden**
 
 In allen Listen gilt:
@@ -120,8 +121,12 @@ zufrieden wie mit einem Alola-Vulpix. "Form beliebig" gibt es nur in
 konkrete Form.
 
 Eigene Formen (z.B. eine neue Form, die es in den Nutzdaten noch nicht gibt)
-kann jeder Spieler selbst anlegen. Eine Form, die es fuer dieses Pokemon
-schon gibt, wird dabei abgelehnt.
+kann jeder Spieler selbst anlegen (siehe "Eigene Formen").
+
+Ob es ein Kostuem oder einen Hintergrund auch als Shiny gibt, prueft das
+Programm nicht. Die Shiny-Verfuegbarkeit wird nur pro Form gefuehrt; sie mit
+Kostuemen und Hintergruenden zu verknuepfen, waere kaum zu pflegen. Darauf
+achten die Spieler selbst.
 
 ## Persoenliche Listen
 
@@ -295,6 +300,37 @@ Regeln:
 
 Eine Funktion, um mehrere Zeilen auf einmal wieder zu entfernen, gibt es
 bewusst nicht; dafuer dient die Sicherung vorher.
+
+## Eigene Formen
+
+Unter Verwaltung > Eigene Formen stehen alle selbst angelegten Formen,
+sortiert nach Dex-Nummer, z.B. "#201 Icognito ?". Formen, die ein Update der
+Nutzdaten archiviert hat, tragen den Zusatz "(archiviert)".
+
+- **"+ Neu"**: Pokemon ueber Suchfeld und Liste waehlen, dann Form-Text (leer
+  = Grundform), Region (Auswahl aus den bekannten Regionen, fuer
+  Regionalformen wie Alola) und "Shiny verfuegbar".
+- **Antippen** oeffnet die Form: Form-Text, Region und "Shiny verfuegbar"
+  lassen sich aendern. **Loeschen** geht nach einer Rueckfrage, aber nur,
+  solange keine Liste die Form verwendet; sonst nennt das Programm die
+  Listen.
+- Eine Form, die es fuer dieses Pokemon schon gibt (gleicher Form-Text und
+  gleiche Region, ohne Gross-/Kleinschreibung), wird beim Anlegen und Aendern
+  abgelehnt.
+- Im Form-Text nicht erlaubt sind Anfuehrungszeichen, eckige und runde
+  Klammern sowie " - " (Bindestrich mit Leerzeichen), weil sie die
+  Tauschliste durcheinanderbringen wuerden. Statt "Toll (und gross)" also z.B.
+  "Toll, und gross".
+- Die Region ist eine Auswahl statt freiem Text, weil das Einlesen fremder
+  Listen nur bekannte Regionsnamen erkennt.
+
+Auf "Neues Exemplar", "Neuer Sucheintrag" und "Erhalten" (bei "Form
+beliebig") gibt es den Link **"Form fehlt? Eigene Form anlegen"**. Beim
+Erhalten ist das Pokemon vorgegeben. Danach ist die neue Form gleich
+ausgewaehlt.
+
+Ganz neue Pokemon (eine Dex-Nummer, die in den Nutzdaten fehlt) lassen sich
+nicht anlegen; sie kommen mit einem Update der Nutzdaten.
 
 ## Pokemon entwickeln
 
@@ -717,7 +753,8 @@ Schluessel-Wert-Paare zu den Nutzdaten.
 
 Aufbau wie `formen.csv`. Enthaelt vom Spieler angelegte Formen und Formen,
 die durch ein Update aus den Nutzdaten entfernt wurden, aber noch verwendet
-werden (dann ist `ArchiviertAm` gesetzt).
+werden (dann ist `ArchiviertAm` gesetzt). `Region` ist leer oder einer der
+Namen aus `regionen.csv`.
 
 ### Gemeinsame Verweis-Spalten
 
@@ -1146,7 +1183,9 @@ Form, die ein Spieler noch verwendet, wird sie mit gleicher GUID nach
 nicht neu ausgewaehlt werden.
 
 Eigene Formen koennen nur geloescht werden, solange keine Liste sie
-verwendet.
+verwendet. Spieler archivieren eigene Formen nicht selbst: Wird eine eigene
+Form nicht mehr gebraucht, wird sie geloescht. Archiviert wird nur beim
+Update der Nutzdaten.
 
 ## Loeschen und Erkennen von Aenderungen
 
@@ -1361,7 +1400,11 @@ zugeordnet werden koennen.
   `Services/HabeZeilen.cs`. Anlegen und Aendern in "Habe ich" und "Habe ich
   ueber" uebernehmen `Services/HabeBearbeitung.cs` und
   `Services/UeberBearbeitung.cs`. "+ Mehrere" nutzt `Services/SammelSuche.cs`,
-  Sicherungen `Services/Sicherungen.cs`.
+  Sicherungen `Services/Sicherungen.cs`, eigene Formen
+  `Services/FormVerwaltung.cs`.
+- Nach jeder Aenderung an den eigenen Formen wird der Katalog mit
+  `Datenbestand.KatalogAufbauen` neu aufgebaut. Seiten lesen den Katalog
+  deshalb immer ueber `Datenbestand.Katalog` und merken ihn sich nicht.
 - Nach dem Wiederherstellen laedt `MainViewModel` alle Daten neu und ersetzt
   den Seitenstapel durch eine neue Hauptseite (`Navigation.Ersetzen`).
 - Die Eingabebloecke fuer Merkmale gibt es zweimal, weil sie Verschiedenes

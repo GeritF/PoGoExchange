@@ -293,8 +293,8 @@ public sealed class Datenbestand
       $"Die Datei vor der \u00c4nderung wurde als {Path.GetFileName(sicherung)} gesichert.");
   }
 
-  // Nutzdaten aus dem Programm plus eigene Formen des Spielers
-  private void KatalogAufbauen()
+  // Wird beim Laden und nach jeder Aenderung an den eigenen Formen aufgerufen
+  public void KatalogAufbauen()
   {
     var pokemon = EingebetteteNutzdaten.Lesen<Pokemon, PokemonMap>("pokemon.csv");
     var formen = EingebetteteNutzdaten.Lesen<PokemonForm, PokemonFormMap>("formen.csv");

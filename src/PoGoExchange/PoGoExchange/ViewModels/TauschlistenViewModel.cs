@@ -89,7 +89,7 @@ public sealed class TauschlistenViewModel : SeiteViewModel
 
   private void SucheNeuOeffnen()
   {
-    _navigation.Oeffnen(new SucheNeuViewModel(_bestand!, SucheGespeichert));
+    _navigation.Oeffnen(new SucheNeuViewModel(_bestand!, SucheGespeichert, _navigation));
   }
 
   // Nach dem Anlegen: zurueck zur Liste; gab es die Zeile schon, wird sie geoeffnet
@@ -150,7 +150,8 @@ public sealed class TauschlistenViewModel : SeiteViewModel
 
   private void HabeNeuOeffnen()
   {
-    _navigation.Oeffnen(new HabeNeuViewModel(_bestand!, HabeGespeichert));
+    _navigation.Oeffnen(
+      new HabeNeuViewModel(_bestand!, HabeGespeichert, navigation: _navigation));
   }
 
   private void HabeGespeichert(HabeAnlegeErgebnis ergebnis)

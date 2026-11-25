@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             x:Class="PoGoExchange.Views.EigeneFormenView"
+             x:DataType="vm:EigeneFormenViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+      <TextBlock Text="Formen, die in den mitgelieferten Daten noch fehlen, k&#xF6;nnen hier selbst angelegt werden."
+                 TextWrapping="Wrap" />
+      <Button Content="+ Neu" Command="{Binding NeuCommand}" />
+      <TextBlock Text="{Binding Rueckmeldung}"
+                 IsVisible="{Binding HatRueckmeldung}"
+                 Foreground="Green"
+                 TextWrapping="Wrap" />
+      <TextBlock Text="Noch keine eigenen Formen vorhanden."
+                 IsVisible="{Binding KeineVorhanden}" />
+      <ItemsControl ItemsSource="{Binding Liste}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:EigeneFormEintrag">
+            <Button Command="{Binding OeffnenCommand}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Margin="0,2">
+              <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

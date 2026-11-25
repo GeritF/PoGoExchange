@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-25, 263 Tests gruen.
+Stand: 2026-11-25, 277 Tests gruen.
 
 ## Inhalt
 
@@ -48,7 +48,7 @@ Stand: 2026-11-25, 263 Tests gruen.
 |-------|------------------------------------------|--------------------------------|
 | 1     | Grundlagen, Toolchain, Projektaufbau     | fertig                         |
 | 2     | Fachlogik (Services, Tests)              | fertig                         |
-| 3     | Oberflaeche                              | in Arbeit (siehe Bauschritte)  |
+| 3     | Oberflaeche                              | fertig (siehe Bauschritte)     |
 | 4     | Daten und Plattformen                    | teilweise                      |
 | 5     | Abgleich zwischen Geraeten (WLAN)        | offen                          |
 | 6     | Windows-Build, Verteilung                | offen                          |
@@ -62,7 +62,7 @@ Stand: 2026-11-25, 263 Tests gruen.
 | 3       | "Habe ich" und "Habe ich ueber", Erhalten, Entwickeln       | fertig     |
 | 4       | Import/Export: eigene Tauschliste, fremde Liste abgleichen  | fertig     |
 | 5       | "+ Mehrere" (Sammel-Suche), Sicherungen mit Wiederherstellen | fertig     |
-| 6       | Formverwaltung (eigene Formen, Archivieren)                 | offen      |
+| 6       | Formverwaltung (eigene Formen)                              | fertig     |
 
 ### Bauschritt 4 (umgesetzt)
 
@@ -89,7 +89,10 @@ Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
 - Sicherungen als ZIP mit Aufraeumregeln und Wiederherstellen
   (`Sicherungen`); Reparatur-Kopien `.bak_N` beim Laden (`Datenbestand`)
 
-Noch ohne Oberflaeche: Formverwaltung (eigene Formen anlegen, archivieren).
+- Eigene Formen anlegen, aendern, loeschen (`FormVerwaltung`)
+
+Alle Fachfunktionen haben eine Oberflaeche. Noch nicht gebaut sind
+Exportpaket, Update der Nutzdaten und der Abgleich zwischen Geraeten.
 
 ## 3. Verworfene Entscheidungen
 
@@ -117,6 +120,13 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - **Aufraeumen beim Wiederherstellen ausnehmen.** Wird eine Sicherung vom
   selben Tag wiederhergestellt, verschwindet sie danach (Regel "pro Tag die
   neueste"). Bewusst so gelassen.
+- **Shiny-Verfuegbarkeit fuer Kostueme und Hintergruende.** Wird nur pro Form
+  gefuehrt; eine Verknuepfung waere kaum zu pflegen. Darauf achten die
+  Spieler selbst.
+- **Eigene Formen durch Anwender archivieren.** Unbenutzte eigene Formen
+  werden geloescht; `ArchiviertAm` dient nur dem Update der Nutzdaten.
+- **Freie Texteingabe der Region bei eigenen Formen.** Auswahl aus den
+  bekannten Regionen, weil der Import nur diese erkennt.
 - **Mehrere Exemplare auf einmal entwickeln.** Es wird immer genau eines
   entwickelt.
 - **Merkmale nur fuer einen Teil einer Zeile aendern.** Aenderungen gelten
@@ -270,10 +280,10 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ## 9. ToDo-Liste
 
-### Als Naechstes (Phase 3)
+### Als Naechstes
 
-- Bauschritt 6: Formverwaltung (eigene Formen anlegen und archivieren;
-  Aufruf aus den Seiten mit Formauswahl).
+- Phase 3 ist abgeschlossen. Naechste Phase mit Gerit abstimmen (siehe
+  "Spaeter").
 
 ### Spaeter
 
@@ -301,6 +311,13 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   ueber den Namen). Mindestens alle Zeilen mit Aufzaehlungszeichen, die nicht
   erkannt wurden, in einer einsehbaren Liste zeigen, statt nur "nichts
   erkannt".
+- **Shiny-Verfuegbarkeit offizieller Formen selbst freischalten** (z.B. wenn
+  ein Shiny erscheint, bevor ein Update der Nutzdaten kommt). Bis dahin: die
+  Form einzeln ueber "+ Neu" suchen; "+ Mehrere" ueberspringt sie.
+- **Eigene Pokemon** mit noch nicht vergebener Dex-Nummer anlegen. Bringt ein
+  Update diese Dex-Nummer, ersetzt der offizielle Eintrag den eigenen
+  (Verweise umstellen, eigene Formen nach Form und Region zuordnen), egal ob
+  Name oder andere Angaben abweichen.
 - Gestaltung der Oberflaeche ("schoen machen").
 
 ### Aufraeumen bei Gelegenheit

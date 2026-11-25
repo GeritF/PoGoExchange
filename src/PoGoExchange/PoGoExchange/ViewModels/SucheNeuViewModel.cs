@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PoGoExchange.Models;
 using PoGoExchange.Services;
 
 namespace PoGoExchange.ViewModels;
@@ -16,15 +17,22 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
 
   private readonly Datenbestand _bestand;
   private readonly Action<AnlegeErgebnis> _gespeichert;
+  private readonly Navigation? _navigation;
   private bool _aktualisiertGerade;
 
-  public SucheNeuViewModel(Datenbestand bestand, Action<AnlegeErgebnis> gespeichert)
+  public SucheNeuViewModel(
+    Datenbestand bestand,
+    Action<AnlegeErgebnis> gespeichert,
+    Navigation? navigation = null)
   {
     _bestand = bestand;
     _gespeichert = gespeichert;
+    _navigation = navigation;
     Anforderungen.Geaendert += ZieleAktualisieren;
     ZieleAktualisieren();
   }
+
+  public bool FormAnlegenSichtbar => _navigation != null;
 
   public override string Titel => "Neuer Sucheintrag";
 
@@ -122,6 +130,36 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
     }
 
     _gespeichert(ergebnis);
+  }
+
+  [RelayCommand]
+  private void FormAnlegen()
+  {
+    _navigation?.Oeffnen(new EigeneFormViewModel(_navigation, _bestand, FormAngelegt));
+  }
+
+  // Zurueck von "Neue eigene Form": Abschnitte neu aufbauen und die neue Form waehlen
+  private void FormAngelegt(PokemonForm? form, string rueckmeldung)
+  {
+    _navigation?.Zurueck();
+    if (form == null)
+    {
+      return;
+    }
+
+    var pokemon = _bestand.Katalog.PokemonZuGuid(form.PokemonGuid);
+    if (pokemon != null)
+    {
+      Suchtext = pokemon.DexNr.ToString();
+    }
+
+    ZieleAktualisieren();
+    var ziel = Verfuegbar.Concat(HastDuSchon).Concat(NichtVerfuegbar)
+      .FirstOrDefault(z => z.FormGuid == form.Guid);
+    if (ziel != null)
+    {
+      Waehlen(ziel);
+    }
   }
 
   // Auswahl in einem Abschnitt hebt die Auswahl in den anderen auf

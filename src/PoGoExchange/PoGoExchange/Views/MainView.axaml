@@ -74,6 +74,12 @@
                 <DataTemplate DataType="vm:SicherungenViewModel">
                     <views:SicherungenView />
                 </DataTemplate>
+                <DataTemplate DataType="vm:EigeneFormenViewModel">
+                    <views:EigeneFormenView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:EigeneFormViewModel">
+                    <views:EigeneFormView />
+                </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>
     </DockPanel>

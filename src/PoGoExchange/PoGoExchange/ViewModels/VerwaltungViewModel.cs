@@ -39,6 +39,17 @@ public sealed partial class VerwaltungViewModel : SeiteViewModel
     }
   }
 
+  public bool HatEigeneFormen => _bestand != null && _navigation != null;
+
+  [RelayCommand]
+  private void EigeneFormenOeffnen()
+  {
+    if (HatEigeneFormen)
+    {
+      _navigation!.Oeffnen(new EigeneFormenViewModel(_navigation, _bestand!));
+    }
+  }
+
   public override string Titel => "Verwaltung";
 
   // Vorlaeufig: Datenordner, Anzahl der Eintraege und Lademeldungen
