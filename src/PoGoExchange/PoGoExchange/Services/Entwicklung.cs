@@ -5,18 +5,48 @@ using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
+// Ergebnis einer Entwicklung: ein Exemplar im Zustand vorher und die Zielzeile
+public sealed record EntwicklungsErgebnis(HabeEintrag Vorher, HabeEintrag Nachher);
+
 // Entwickeln eines Exemplars in "Habe ich" und Hochziehen betroffener
 // Zeilen in "Suche ich". Welche Zeilen hochgezogen werden, waehlt der Anwender.
 public static class Entwicklung
 {
-  // Stellt das Exemplar auf die neue Form um (und damit ggf. auf ein neues Pokemon).
-  // Liefert den Zustand vor der Entwicklung fuer BetroffeneZeilen.
-  public static HabeEintrag Entwickeln(HabeEintrag exemplar, PokemonForm neueForm, DateTime jetzt)
+  // Entwickelt genau ein Exemplar aus der Zeile. Die Zeile sinkt um 1; beim
+  // letzten Exemplar wird sie entfernt. Eine Zeile mit denselben Merkmalen fuer
+  // die neue Form steigt um 1 oder wird mit Anzahl 1 angelegt.
+  public static EntwicklungsErgebnis Entwickeln(
+    List<HabeEintrag> habe,
+    HabeEintrag zeile,
+    PokemonForm neueForm)
   {
-    var vorher = exemplar.Kopie();
-    exemplar.PokemonGuid = neueForm.PokemonGuid;
-    exemplar.FormGuid = neueForm.Guid;
-    return vorher;
+    var vorher = zeile.Kopie();
+    vorher.Anzahl = 1;
+
+    var ziel = zeile.Kopie();
+    ziel.Guid = Guid.NewGuid();
+    ziel.PokemonGuid = neueForm.PokemonGuid;
+    ziel.FormGuid = neueForm.Guid;
+    ziel.Anzahl = 1;
+
+    if (zeile.Anzahl > 1)
+    {
+      zeile.Anzahl -= 1;
+    }
+    else
+    {
+      habe.Remove(zeile);
+    }
+
+    var vorhanden = HabeZeilen.Aktive(habe, ziel).FirstOrDefault();
+    if (vorhanden != null)
+    {
+      vorhanden.Anzahl += 1;
+      return new EntwicklungsErgebnis(vorher, vorhanden);
+    }
+
+    habe.Add(ziel);
+    return new EntwicklungsErgebnis(vorher, ziel);
   }
 
   // Zeilen, deren Anforderungen das Exemplar vor der Entwicklung erfuellt hat
@@ -33,7 +63,7 @@ public static class Entwicklung
       .ToList();
   }
 
-  // Die Anzahl der Zeile sinkt um 1 (bei 0 ist sie geloescht). Eine Zeile mit
+  // Die Anzahl der Zeile sinkt um 1 (bei 0 wird sie entfernt). Eine Zeile mit
   // denselben Anforderungen fuer die neue Form steigt um 1 oder wird angelegt.
   // Bei "Form beliebig" wechselt nur das Pokemon.
   // Liefert den Datensatz der Zielzeile.

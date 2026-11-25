@@ -35,6 +35,16 @@
                 Command="{Binding AnzahlUebernehmenCommand}" />
       </StackPanel>
 
+      <StackPanel IsVisible="{Binding LoeschRueckfrageSichtbar}" Spacing="4">
+        <TextBlock Text="Anzahl 0 entfernt die Zeile vollst&#xE4;ndig. Wirklich l&#xF6;schen?"
+                   Foreground="Red"
+                   TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Ja, l&#xF6;schen" Command="{Binding LoeschenJaCommand}" />
+          <Button Content="Nein" Command="{Binding LoeschenNeinCommand}" />
+        </StackPanel>
+      </StackPanel>
+
       <Button Content="L&#xF6;schen"
               Command="{Binding LoeschenCommand}"
               Margin="0,12,0,0" />

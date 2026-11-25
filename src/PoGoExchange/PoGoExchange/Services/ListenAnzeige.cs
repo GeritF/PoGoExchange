@@ -15,9 +15,13 @@ public sealed record AnzeigeZeile(
   string Zusatz,
   bool Erledigt,
   bool Fehlerhaft,
-  SucheEintrag? Eintrag = null)
+  SucheEintrag? Eintrag = null,
+  int Anzahl = 1)
 {
-  public string Anzeige => Fehlerhaft ? Text : $"#{DexNr} {Text}{Zusatz}";
+  // Anzahl wird ab 2 vorangestellt, z.B. "3x #4 Glumanda"
+  public string Anzeige => Fehlerhaft
+    ? Text
+    : (Anzahl > 1 ? $"{Anzahl}x " : "") + $"#{DexNr} {Text}{Zusatz}";
 }
 
 public sealed record AnzeigeGruppe(string Region, IReadOnlyList<AnzeigeZeile> Zeilen);
@@ -87,7 +91,8 @@ public static class ListenAnzeige
         EintragText.Erzeugen(pokemon, form, eintrag),
         Klammer(Bedingungen(eintrag.Glueck, eintrag.Hundert, false)),
         false,
-        false));
+        false,
+        Anzahl: eintrag.Anzahl));
     }
 
     return Gruppieren(katalog, zeilen);
@@ -136,7 +141,7 @@ public static class ListenAnzeige
     return pokemon.Name.Contains(text, StringComparison.OrdinalIgnoreCase);
   }
 
-  // Nicht geloeschte, gueltige Eintraege; ungueltige werden als fehlerhafte Zeilen gesammelt
+  // Gueltige Eintraege; ungueltige werden als fehlerhafte Zeilen gesammelt
   private static List<T> Pruefen<T>(
     Katalog katalog,
     IEnumerable<T> eintraege,

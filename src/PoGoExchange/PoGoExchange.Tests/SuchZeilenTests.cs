@@ -23,7 +23,7 @@ public class SuchZeilenTests
     };
   }
 
-  private static HabeEintrag Habe(bool hundert = false)
+  private static HabeEintrag Habe(bool hundert = false, int anzahl = 1)
   {
     return new HabeEintrag
     {
@@ -31,7 +31,8 @@ public class SuchZeilenTests
       PokemonGuid = Glumanda,
       FormGuid = GlumandaForm,
       Shiny = true,
-      Hundert = hundert
+      Hundert = hundert,
+      Anzahl = anzahl
     };
   }
 
@@ -120,5 +121,13 @@ public class SuchZeilenTests
     var zeile = SuchZeilen.Bilden(new[] { beliebig }, new[] { Habe(), andereForm }).Single();
 
     Assert.Equal("(2/2)", zeile.Zaehler);
+  }
+
+  [Fact]
+  public void HabeZeileMitAnzahl_ZaehltAlleExemplare()
+  {
+    var zeile = SuchZeilen.Bilden(new[] { Suche(5) }, new[] { Habe(anzahl: 3) }).Single();
+
+    Assert.Equal("(3/5)", zeile.Zaehler);
   }
 }

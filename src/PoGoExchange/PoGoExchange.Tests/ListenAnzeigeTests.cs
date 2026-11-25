@@ -169,4 +169,21 @@ public class ListenAnzeigeTests
     Assert.True(zeile.Fehlerhaft);
     Assert.Contains("Form fehlt", zeile.Anzeige);
   }
+
+  [Fact]
+  public void Habe_ZeigtAnzahlAbZwei()
+  {
+    var exemplar = new HabeEintrag
+    {
+      Guid = Guid.NewGuid(),
+      PokemonGuid = _glumanda.Guid,
+      FormGuid = _glumandaForm.Guid,
+      Shiny = true,
+      Anzahl = 3
+    };
+
+    var zeile = ListenAnzeige.Habe(_katalog, new[] { exemplar }, "").Single().Zeilen.Single();
+
+    Assert.Equal("3x #4 Glumanda - Shiny", zeile.Anzeige);
+  }
 }

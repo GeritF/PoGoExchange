@@ -16,13 +16,14 @@ public static class Dateinamen
   public const string Suche = "suche_ich.csv";
   public const string Ueber = "habe_ich_ueber.csv";
   public const string EigeneFormen = "eigene_formen.csv";
+  public const string AbgleichInfo = "abgleich_info.csv";
 }
 
 public static class Datenordner
 {
   // Linux: ~/.local/share/PoGoExchange
   // Windows: %LOCALAPPDATA%\PoGoExchange
-  // Android: privater Bereich der App (Vermutung, beim ersten Test pruefen)
+  // Android: /data/user/0/com.GeritF.PoGoExchange/files/PoGoExchange (gemessen)
   public static string Standard()
   {
     var basis = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -34,10 +35,15 @@ public static class Datenordner
 // Fehlende Dateien werden mit Kopfzeile angelegt. Fehlende oder unbekannte
 // Spalten werden angeglichen, die alte Datei vorher als .bak_N gesichert.
 // Dateien mit ungueltigen Werten werden gesperrt und nicht ueberschrieben.
+// Jedes erfolgreiche Speichern vermerkt die letzte Aenderung in abgleich_info.csv.
 public sealed class Datenbestand
 {
+  // Schluessel in abgleich_info.csv
+  internal const string SchluesselLetzteAenderung = "LetzteAenderung";
+
   private readonly HashSet<string> _gesperrt = new(StringComparer.OrdinalIgnoreCase);
   private readonly List<LadeMeldung> _meldungen = new();
+  private List<SchluesselWert> _abgleichInfo = new();
 
   private Datenbestand(string ordner)
   {
@@ -52,6 +58,30 @@ public sealed class Datenbestand
   public List<UeberEintrag> Ueber { get; private set; } = new();
   public IReadOnlyList<LadeMeldung> Meldungen => _meldungen;
 
+  // Zeitpunkt der letzten Aenderung auf diesem Geraet (fuer den Abgleich),
+  // oder null, wenn noch nichts gespeichert wurde
+  public DateTime? LetzteAenderung
+  {
+    get
+    {
+      var wert = _abgleichInfo
+        .FirstOrDefault(e => e.Schluessel == SchluesselLetzteAenderung)?.Wert;
+      if (string.IsNullOrEmpty(wert))
+      {
+        return null;
+      }
+
+      try
+      {
+        return ZeitstempelKonverter.Lesen(wert);
+      }
+      catch (FormatException)
+      {
+        return null;
+      }
+    }
+  }
+
   public bool IstGesperrt(string datei)
   {
     return _gesperrt.Contains(datei);
@@ -65,9 +95,14 @@ public sealed class Datenbestand
     bestand.EigeneFormen = bestand.DateiLaden<PokemonForm, PokemonFormMap>(
       Dateinamen.EigeneFormen, _ => false);
     bestand.Habe = bestand.ListeLaden<HabeEintrag, HabeEintragMap>(Dateinamen.Habe, jetzt);
+    bestand.Zusammenfuehren<HabeEintrag, HabeEintragMap>(
+      Dateinamen.Habe, bestand.Habe, e => HabeZeilen.Schluessel(e));
     bestand.Suche = bestand.ListeLaden<SucheEintrag, SucheEintragMap>(Dateinamen.Suche, jetzt);
-    bestand.SucheZusammenfuehren(jetzt);
+    bestand.Zusammenfuehren<SucheEintrag, SucheEintragMap>(
+      Dateinamen.Suche, bestand.Suche, e => SuchZeilen.Schluessel(e));
     bestand.Ueber = bestand.ListeLaden<UeberEintrag, UeberEintragMap>(Dateinamen.Ueber, jetzt);
+    bestand._abgleichInfo = bestand.DateiLaden<SchluesselWert, SchluesselWertMap>(
+      Dateinamen.AbgleichInfo, _ => false);
 
     bestand.KatalogAufbauen();
     bestand.KonsistenzMelden();
@@ -216,17 +251,22 @@ public sealed class Datenbestand
     }
   }
 
-  // Fuehrt Datensaetze mit gleicher Zeile (Pokemon, Form, Anforderungen) zusammen.
-  // Die Anzahlen werden addiert, die uebrigen Datensaetze als geloescht markiert.
-  private void SucheZusammenfuehren(DateTime jetzt)
+  // Fuehrt Datensaetze derselben Zeile (gleicher Schluessel) zusammen.
+  // Die Anzahlen werden addiert, die uebrigen Datensaetze entfernt.
+  private void Zusammenfuehren<T, TMap>(
+    string datei,
+    List<T> liste,
+    Func<T, object> schluessel)
+    where T : ListenEintrag, IMitAnzahl
+    where TMap : ClassMap<T>
   {
-    if (_gesperrt.Contains(Dateinamen.Suche))
+    if (_gesperrt.Contains(datei))
     {
       return;
     }
 
-    var gruppen = Suche
-      .GroupBy(SuchZeilen.Schluessel)
+    var gruppen = liste
+      .GroupBy(schluessel)
       .Where(g => g.Count() > 1)
       .ToList();
     if (gruppen.Count == 0)
@@ -240,15 +280,15 @@ public sealed class Datenbestand
       foreach (var weiterer in gruppe.Skip(1))
       {
         behalten.Anzahl += weiterer.Anzahl;
-        Suche.Remove(weiterer);
+        liste.Remove(weiterer);
       }
     }
 
-    var pfad = Path.Combine(Ordner, Dateinamen.Suche);
+    var pfad = Path.Combine(Ordner, datei);
     var sicherung = SicherungsKopie(pfad);
-    CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(pfad, Suche);
+    CsvSpeicher.Schreiben<T, TMap>(pfad, liste);
     Hinweis(
-      Dateinamen.Suche,
+      datei,
       $"Doppelte Zeilen zusammengef\u00fchrt: {gruppen.Count}. " +
       $"Die Datei vor der \u00c4nderung wurde als {Path.GetFileName(sicherung)} gesichert.");
   }
@@ -302,11 +342,41 @@ public sealed class Datenbestand
     try
     {
       CsvSpeicher.Schreiben<T, TMap>(Path.Combine(Ordner, datei), daten);
+      AenderungVermerken();
       return null;
     }
     catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
     {
       return $"{datei} konnte nicht gespeichert werden: {ex.Message}";
+    }
+  }
+
+  // Setzt "LetzteAenderung" in abgleich_info.csv auf jetzt. Schlaegt das
+  // Schreiben fehl, bleibt die eigentliche Aenderung trotzdem gespeichert;
+  // nur die Empfehlung beim Abgleich kann dann ungenau sein.
+  private void AenderungVermerken()
+  {
+    var eintrag = _abgleichInfo.FirstOrDefault(e => e.Schluessel == SchluesselLetzteAenderung);
+    if (eintrag == null)
+    {
+      eintrag = new SchluesselWert { Schluessel = SchluesselLetzteAenderung };
+      _abgleichInfo.Add(eintrag);
+    }
+
+    eintrag.Wert = ZeitstempelKonverter.Schreiben(DateTime.UtcNow);
+    if (_gesperrt.Contains(Dateinamen.AbgleichInfo))
+    {
+      return;
+    }
+
+    try
+    {
+      CsvSpeicher.Schreiben<SchluesselWert, SchluesselWertMap>(
+        Path.Combine(Ordner, Dateinamen.AbgleichInfo), _abgleichInfo);
+    }
+    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+    {
+      // Bewusst ignoriert, siehe Kommentar oben
     }
   }
 

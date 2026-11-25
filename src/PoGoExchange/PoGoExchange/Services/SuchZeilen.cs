@@ -35,7 +35,9 @@ public static class SuchZeilen
       {
         var muster = g.First();
         var ziel = g.Sum(e => e.Anzahl);
-        var passend = exemplare.Count(h => Anforderung.Erfuellt(h, muster));
+        var passend = exemplare
+          .Where(h => Anforderung.Erfuellt(h, muster))
+          .Sum(h => h.Anzahl);
         return new SuchZeile
         {
           Muster = muster,

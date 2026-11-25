@@ -62,6 +62,7 @@ public sealed class HabeEintragMap : ListenEintragMap<HabeEintrag>
     MapMerkmale();
     Map(m => m.Glueck).Name("Glueck").TypeConverter<WahrheitswertKonverter>();
     Map(m => m.Hundert).Name("Hundert").TypeConverter<WahrheitswertKonverter>();
+    Map(m => m.Anzahl).Name("Anzahl").TypeConverter<AnzahlKonverter>();
   }
 }
 

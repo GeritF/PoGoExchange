@@ -49,10 +49,15 @@ public class DatenbestandTests : IDisposable
     return (pokemon.Guid, form.Guid);
   }
 
-  // Habe-Zeile mit allen Spalten: Shiny wie angegeben, sonst Standardwerte
-  private static string HabeZeile(Guid guid, Guid pokemon, Guid form, string shiny = "1")
+  // Habe-Zeile mit allen Spalten: Shiny und Anzahl wie angegeben, sonst Standardwerte
+  private static string HabeZeile(
+    Guid guid,
+    Guid pokemon,
+    Guid form,
+    string shiny = "1",
+    string anzahl = "1")
   {
-    return $"{guid};{pokemon};{form};;{shiny};;0;;0;;0;0";
+    return $"{guid};{pokemon};{form};;{shiny};;0;;0;;0;0;{anzahl}";
   }
 
   [Fact]
@@ -313,5 +318,40 @@ public class DatenbestandTests : IDisposable
     Assert.Contains(bestand.Meldungen, m => m.IstFehler && m.Text.Contains("Komma"));
     Assert.Equal(original, File.ReadAllText(Pfad(Dateinamen.Habe), Encoding.UTF8));
     Assert.False(File.Exists(Pfad(Dateinamen.Habe) + ".bak_1"));
+  }
+
+  [Fact]
+  public void DoppelteHabeZeilen_WerdenZusammengefuehrt()
+  {
+    var (pokemon, form) = Glumanda();
+    DateiSchreiben(
+      Dateinamen.Habe,
+      Kopf<HabeEintrag, HabeEintragMap>() + "\r\n" +
+      HabeZeile(Guid.NewGuid(), pokemon, form, anzahl: "1") + "\r\n" +
+      HabeZeile(Guid.NewGuid(), pokemon, form, anzahl: "2") + "\r\n");
+
+    var bestand = Datenbestand.Laden(_ordner, Jetzt);
+
+    Assert.Equal(3, Assert.Single(bestand.Habe).Anzahl);
+    var meldung = Assert.Single(bestand.Meldungen);
+    Assert.Contains("zusammengef\u00fchrt", meldung.Text);
+  }
+
+  [Fact]
+  public void Speichern_VermerktLetzteAenderung()
+  {
+    var bestand = Datenbestand.Laden(_ordner, Jetzt);
+    Assert.Null(bestand.LetzteAenderung);
+    var vorher = DateTime.UtcNow.AddSeconds(-1);
+
+    Assert.Null(bestand.HabeSpeichern());
+
+    // Gemessen: nach dem Neuladen steht ein Zeitstempel ab dem Speichern in der Datei
+    var neu = Datenbestand.Laden(_ordner, Jetzt);
+    Assert.NotNull(neu.LetzteAenderung);
+    Assert.True(
+      neu.LetzteAenderung >= vorher,
+      $"LetzteAenderung {neu.LetzteAenderung:o} liegt vor {vorher:o}");
+    Assert.True(File.Exists(Pfad(Dateinamen.AbgleichInfo)));
   }
 }

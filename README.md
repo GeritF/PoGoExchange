@@ -40,8 +40,9 @@ Die Hauptseite fuehrt ueber Kacheln zu den Bereichen:
   "Suche ich", "Habe ich" und "Habe ich ueber"
 - **Import/Export**: eigene Tauschliste erzeugen, fremde Listen abgleichen
   (folgt in einem spaeteren Bauschritt)
-- **Verwaltung**: Datenordner, Anzahl der Eintraege und Lademeldungen, mit
-  einem Button zum Kopieren in die Zwischenablage
+- **Verwaltung**: Datenordner, Anzahl der Zeilen (bei "Habe ich" auch der
+  Exemplare), Zeitpunkt der letzten Aenderung und Lademeldungen, mit einem
+  Button zum Kopieren in die Zwischenablage
 - **Beenden**
 
 In allen Listen gilt:
@@ -52,9 +53,14 @@ In allen Listen gilt:
 - Eintraege, die nicht zu den Nutzdaten passen (z.B. unbekanntes Pokemon),
   stehen in einer eigenen Gruppe "Fehlerhafte Eintraege" am Ende.
 - Gab es beim Laden Meldungen, weist eine Hinweisleiste darauf hin.
+- In "Habe ich" steht vor Zeilen mit mehreren gleichen Exemplaren die
+  Anzahl, z.B. `3x #4 Glumanda - Shiny [Glueck]`.
 
 In "Suche ich" zusaetzlich:
 
+- Oben gibt es den Button "+ Neu" und darunter eine Rueckmeldezeile, z.B.
+  "1 von 3 bereits erledigt" oder "Zeile geloescht".
+- Antippen einer Zeile oeffnet sie zum Bearbeiten.
 - Jede Zeile zeigt ihre Bedingungen in eckigen Klammern (Glueck, 100er, 1:1)
   und den Fortschritt, z.B. `#4 Glumanda - Shiny [Glueck, 1:1] (1/3)`.
 - Vollstaendig erledigte Zeilen sind ausgeblendet. Der Button "Erledigte
@@ -115,20 +121,23 @@ schon gibt, wird dabei abgelehnt.
 Jeder Spieler fuehrt drei Listen:
 
 - **Habe ich** ist die "Fertig"-Liste: Exemplare, die man hat (auch bereits
-  getauschte), mit allen Merkmalen. Sie zeigt den Fortschritt der Suche und
-  ist keine vollstaendige Inventur aller Pokemon.
+  getauschte), mit allen Merkmalen. Gleiche Exemplare stehen in einer Zeile
+  mit Anzahl, z.B. "3x Glumanda Shiny [Glueck]". Die Liste zeigt den
+  Fortschritt der Suche und ist keine vollstaendige Inventur aller Pokemon.
 - **Suche ich** enthaelt Zeilen mit einer Anzahl, z.B. "3x Glumanda Shiny
   [Glueck]". Jede Zeile ist ein eigenstaendiges Ziel. Zusaetzlich gibt es
   "1:1 moeglich": Man wuerde dasselbe Pokemon im Tausch zurueckgeben.
 - **Habe ich ueber** enthaelt tauschbare Pokemon (noch nicht getauscht, kein
   Crypto usw.), die man abgeben kann, mit ihren Merkmalen (ohne Glueck und
   100er). Diese Liste wird getrennt von "Habe ich" gepflegt; es gibt keine
-  Verknuepfung zwischen beiden.
+  Verknuepfung zwischen beiden. Sie hat keine Anzahl (siehe "Warum 'Habe ich
+  ueber' keine Anzahl hat").
 
 Fortschritt in "Suche ich":
 
 - Der Fortschritt wird nicht gespeichert, sondern aus "Habe ich" berechnet:
-  Anzahl der passenden Exemplare, hoechstens die gesuchte Anzahl. Bei 7
+  Summe der Anzahlen aller passenden Zeilen, hoechstens die gesuchte Anzahl.
+  Die gesuchte Anzahl selbst aendert sich dadurch nicht. Bei 7
   passenden Exemplaren und 5 gesuchten zeigt die Zeile `(5/5)`.
 - Ein Exemplar zaehlt in **jeder** Zeile, deren Anforderungen es erfuellt.
   Beispiel: Gesucht werden "5x Glumanda Shiny" und "1x Glumanda Shiny
@@ -141,13 +150,15 @@ Regeln:
 - Gluecks-Pokemon wurden bereits getauscht und koennen nicht erneut
   getauscht werden. In "Habe ich ueber" gibt es daher keinen Glueck-Haken.
 - Mit "Erhalten" wird ein erfolgreicher Tausch eingetragen: In "Habe ich"
-  entsteht ein neues Exemplar, vorbelegt mit den Anforderungen der Zeile
+  kommt ein Exemplar hinzu (eine passende Zeile steigt um 1, sonst entsteht
+  eine neue Zeile), vorbelegt mit den Anforderungen der Zeile
   (z.B. Shiny und Glueck). Was die Zeile offen laesst, kann ergaenzt werden.
   War die Suche "Form beliebig", muss die tatsaechliche Form angegeben werden.
   Die Zeile in "Suche ich" bleibt unveraendert, ihr Zaehler steigt.
-- Wird ein Exemplar in "Habe ich" geaendert oder geloescht, werden die Zaehler
+- Wird eine Zeile in "Habe ich" geaendert oder geloescht, werden die Zaehler
   einfach neu berechnet. Beim Entwickeln bietet das Programm zusaetzlich an,
   die Suche anzupassen (siehe "Pokemon entwickeln").
+- Geloeschte Zeilen werden sofort aus der Datei entfernt.
 
 ## Pokemon zu "Suche ich" hinzufuegen
 
@@ -168,8 +179,11 @@ Teile gegliedert:
      verfuegbar, sobald es fuer mindestens eine Form verfuegbar ist.
 
 Alle drei Abschnitte sind auswaehlbar. Sie aktualisieren sich, sobald die
-Anforderungen geaendert werden. "Form beliebig" wird nur bei Pokemon mit
-mehreren Formen angeboten; archivierte Formen sind nicht waehlbar.
+Anforderungen geaendert werden; die gewaehlte Form bleibt dabei gewaehlt.
+"Form beliebig" wird nur bei Pokemon mit mehreren Formen angeboten;
+archivierte Formen sind nicht waehlbar. Je Abschnitt werden hoechstens 100
+Ziele angezeigt, damit die Seite auch auf dem Handy fluessig bleibt. Gibt es
+mehr, weist ein Hinweis auf das Suchfeld hin.
 
 Nach dem Speichern zeigt das Programm, wie viele davon bereits erledigt sind,
 z.B. "1 von 3 bereits erledigt". Gibt es dieselbe Zeile schon, wird ihre
@@ -191,10 +205,15 @@ Antippen einer Zeile oeffnet sie:
   gefundene Zeile: 1/3, zusammen: 3/7. Zusammenfuehren?". Bei "Ja" werden
   beide Zeilen zusammengefuehrt (die Anzahlen addiert) und die zusammengefuehrte
   Zeile geoeffnet; bei "Nein" bleibt man in der Bearbeitung.
-- **Anzahl aendern** ueberschreibt die Anzahl ohne Rueckfrage.
+- **Anzahl aendern** ueberschreibt die Anzahl ohne Rueckfrage, solange sie
+  mindestens 1 ist.
+- **Anzahl 0** entfernt die Zeile, aber erst nach der Rueckfrage "Anzahl 0
+  entfernt die Zeile vollstaendig. Wirklich loeschen?". Ein versehentlicher
+  Klick auf "Pfeil runter" loescht so nichts. Bei "Nein" springt das
+  Eingabefeld auf die gespeicherte Anzahl zurueck.
 - **Loeschen**: Der Button zeigt nur den Hinweis "Setze die Anzahl auf 0, um
-  die Zeile zu loeschen". Anzahl 0 loescht die Zeile. So ist eindeutig, dass
-  die ganze Zeile entfernt wird und nicht nur ein Stueck.
+  die Zeile zu loeschen". So ist eindeutig, dass die ganze Zeile entfernt
+  wird und nicht nur ein Stueck.
 
 ## Sammel-Suche
 
@@ -227,8 +246,11 @@ Ablauf:
 
 1. In "Habe ich" das Exemplar auswaehlen und "Entwickeln" waehlen.
 2. Die Zielform auswaehlen, z.B. Glurak.
-3. Das Exemplar bekommt die neue Form. Alle Merkmale (Shiny, Glueck, 100er,
-   Hintergrund usw.) bleiben erhalten und koennen danach angepasst werden.
+3. Es wird immer genau ein Exemplar entwickelt: Die Zeile in "Habe ich"
+   sinkt um 1 (beim letzten Exemplar wird sie entfernt), und eine Zeile mit
+   denselben Merkmalen (Shiny, Glueck, 100er, Hintergrund usw.) fuer die neue
+   Form steigt um 1 oder wird neu angelegt. Die Merkmale koennen danach
+   angepasst werden.
 4. Das Programm zeigt die Zeilen aus "Suche ich", deren Anforderungen das
    Exemplar vor der Entwicklung erfuellt hat. Alle sind angehakt.
 5. Fuer jede angehakte Zeile wird die Suche "mit hochgezogen": Die Anzahl der
@@ -279,12 +301,20 @@ deren Anzahl erhoeht: "Glurak - Shiny (1/2)". Es entsteht keine zweite Zeile.
 Erfuellt das Exemplar keine Zeile in "Suche ich", wird nur das Exemplar
 umgestellt. Es erscheint keine Auswahl.
 
-## Exemplare aendern oder loeschen
+## Zeilen in "Habe ich" aendern oder loeschen
 
-Wird ein Exemplar in "Habe ich" geaendert oder geloescht, berechnet das
-Programm die Zaehler in "Suche ich" einfach neu. Vorschlaege sind nicht
-noetig. Beispiel: Wird beim Glumanda der Glueck-Haken entfernt, zaehlt es fuer
-"Glumanda - Shiny [Glueck]" nicht mehr, fuer "Glumanda - Shiny" weiterhin.
+- **Merkmale aendern** gilt fuer die ganze Zeile. Soll nur eines von drei
+  Exemplaren geaendert werden (z.B. eines ist ein 100er), wird die Anzahl um 1
+  verringert und eine neue Zeile mit den geaenderten Merkmalen angelegt.
+- **Anzahl aendern** und **Loeschen** funktionieren wie in "Suche ich":
+  Anzahl 0 entfernt die Zeile nach Rueckfrage.
+- Die Zaehler in "Suche ich" werden einfach neu berechnet; Vorschlaege sind
+  nicht noetig. Beispiel: Wird beim Glumanda der Glueck-Haken entfernt, zaehlt
+  es fuer "Glumanda - Shiny [Glueck]" nicht mehr, fuer "Glumanda - Shiny"
+  weiterhin.
+
+In "Habe ich ueber" gibt es keine Anzahl. Dort loescht der Button "Loeschen"
+den Eintrag nach einer Rueckfrage.
 
 ## Tauschliste erstellen
 
@@ -380,9 +410,6 @@ Wichtig:
 - Wurde seit dem letzten Abgleich auf **beiden** Geraeten etwas geaendert,
   warnt das Programm. Die Aenderungen auf der ueberschriebenen Seite gehen
   verloren.
-- Geloeschte Eintraege werden 30 Tage aufbewahrt, bevor sie endgueltig
-  entfernt werden. Wer laenger als 30 Tage keinen Abgleich macht, sollte die
-  Richtung bewusst pruefen.
 - Waehrend des WLAN-Abgleichs bleibt der Bildschirm eingeschaltet. Das
   Fenster sollte bis zum Ende geoeffnet bleiben.
 
@@ -421,7 +448,10 @@ das Programm geschlossen ist. Dabei ist zu beachten:
   LibreOffice Zeitstempel als Datum erkennen und beim Speichern in einem
   anderen Format zurueckschreiben.
 - Beim Speichern das Format "Text CSV" mit Zeichensatz **UTF-8** und
-  **Semikolon** als Trennzeichen waehlen.
+  **Semikolon** als Trennzeichen waehlen. Das ist der haeufigste Fehler: Wird
+  mit Komma gespeichert, erkennt das Programm keine einzige Spalte. Es sperrt
+  die Datei dann und meldet den Fehler, statt sie zu veraendern. Nach dem
+  Korrigieren (z.B. erneut mit Semikolon speichern) laedt sie wieder.
 - Eigene Spalten (z.B. "Notiz") werden vom Programm nicht uebernommen
   (siehe unten).
 
@@ -434,11 +464,14 @@ gefundene Probleme als Meldung an:
   (z.B. nach einem Versionswechsel oder einer eigenen Spalte). Die Datei wird
   vorher gesichert, z.B. als `habe_ich.csv.bak_1`. Die Meldung nennt den
   Namen der Sicherung.
-- **Fehlende Kennungen** (GUID) werden neu erzeugt, **fehlende Zeitstempel**
-  auf den Zeitpunkt des Ladens gesetzt.
-- **Doppelte Zeilen** in `suche_ich.csv` (gleiches Pokemon, gleiche Form,
-  gleiche Anforderungen) werden zu einer Zeile zusammengefuehrt, die Anzahlen
-  addiert. Auch hier wird die Datei vorher gesichert.
+- **Keine einzige bekannte Spalte** (meist Komma statt Semikolon): Die Datei
+  wird gesperrt und nicht veraendert, die Meldung weist auf das Trennzeichen
+  hin.
+- **Fehlende Kennungen** (GUID) werden neu erzeugt.
+- **Doppelte Zeilen** in `habe_ich.csv` und `suche_ich.csv` (gleiches
+  Pokemon, gleiche Form, gleiche Merkmale bzw. Anforderungen) werden zu einer
+  Zeile zusammengefuehrt, die Anzahlen addiert. Auch hier wird die Datei
+  vorher gesichert.
 - **Ungueltige Werte** (z.B. `x` in einer Ja/Nein-Spalte) werden mit
   Zeilennummer gemeldet. Die betroffene Datei wird dann **gesperrt**: Die
   lesbaren Eintraege werden angezeigt, die Datei wird aber nicht veraendert,
@@ -611,8 +644,10 @@ Speichern getrimmt.
 | (Merkmale)    | Gemeinsame Merkmal-Spalten (siehe oben)      |
 | Glueck        | `0` / `1`                                    |
 | Hundert       | `0` / `1` (100er, 15/15/15)                  |
-| GeaendertAm   | Zeitstempel der letzten Aenderung            |
-| GeloeschtAm   | Leer oder Zeitstempel der Loeschung          |
+| Anzahl        | Anzahl gleicher Exemplare, ab 1; leer = 1    |
+
+Gleiche Exemplare (gleiches Pokemon, gleiche Form, gleiche Merkmale) stehen
+in genau einem Datensatz.
 
 ### suche_ich.csv
 
@@ -626,8 +661,6 @@ Speichern getrimmt.
 | Hundert       | `1` = muss 100er sein, `0` = egal            |
 | EinsZuEins    | `0` / `1` (1:1-Tausch moeglich)              |
 | Anzahl        | Gesuchte Anzahl, ganze Zahl ab 1; leer = 1   |
-| GeaendertAm   | Zeitstempel der letzten Aenderung            |
-| GeloeschtAm   | Leer oder Zeitstempel der Loeschung          |
 
 Pro Zeile in "Suche ich" gibt es genau einen Datensatz. Der Fortschritt
 wird nicht gespeichert, sondern aus `habe_ich.csv` berechnet.
@@ -640,8 +673,9 @@ wird nicht gespeichert, sondern aus `habe_ich.csv` berechnet.
 | PokemonGuid   | Verweis auf ein Pokemon (siehe oben)         |
 | FormGuid      | Verweis auf eine Form (siehe oben)           |
 | (Merkmale)    | Gemeinsame Merkmal-Spalten (siehe oben)      |
-| GeaendertAm   | Zeitstempel der letzten Aenderung            |
-| GeloeschtAm   | Leer oder Zeitstempel der Loeschung          |
+
+Geloeschte Eintraege werden in allen drei Listen sofort aus der Datei
+entfernt. Eine Anzahl von 0 kommt in den Dateien nicht vor.
 
 ### abgleich_info.csv
 
@@ -649,8 +683,13 @@ Schluessel-Wert-Paare fuer den Abgleich zwischen Geraeten.
 
 | Schluessel      | Inhalt                                     |
 |-----------------|--------------------------------------------|
-| Geraetename     | Anzeigename dieses Geraets                 |
-| LetzterAbgleich | Zeitstempel des letzten Abgleichs          |
+| LetzteAenderung | Zeitstempel des letzten Speicherns         |
+| Geraetename     | Anzeigename dieses Geraets (folgt)         |
+| LetzterAbgleich | Zeitstempel des letzten Abgleichs (folgt)  |
+
+`LetzteAenderung` wird bei jedem erfolgreichen Speichern einer Liste oder der
+eigenen Formen gesetzt, auch beim Loeschen. Fehlt die Datei, wird sie beim
+Start leer mit Kopfzeile angelegt.
 
 ## Exportpaket (ZIP)
 
@@ -858,7 +897,13 @@ Hand gewaehlt.
 ## Warum "Habe ich ueber" keine Anzahl hat
 
 Die Tauschliste soll zeigen, was grundsaetzlich abgegeben werden kann. Die
-genaue Menge ist fuer den einzelnen Tausch irrelevant.
+genaue Menge ist fuer den einzelnen Tausch irrelevant. Ausserdem bleibt ein
+Eintrag nach einem Tausch oft einfach stehen, weil man meist noch weitere
+Exemplare uebrig hat; bekommt man ein weiteres dazu, muss nichts gepflegt
+werden. Eine Anzahl wuerde nur zusaetzlichen Pflegeaufwand bedeuten.
+
+"Habe ich" und "Suche ich" haben dagegen eine Anzahl: In "Suche ich" ist sie
+das Ziel, in "Habe ich" der Fortschritt.
 
 ## Eindeutigkeit von Formen
 
@@ -971,12 +1016,24 @@ nicht neu ausgewaehlt werden.
 Eigene Formen koennen nur geloescht werden, solange keine Liste sie
 verwendet.
 
-## Loeschen mit Aufbewahrungsfrist
+## Loeschen und Erkennen von Aenderungen
 
-Eintraege in den eigenen Listen werden beim Loeschen nur mit `GeloeschtAm`
-markiert und nach 30 Tagen endgueltig entfernt. Dadurch hat auch eine
-Loeschung einen Zeitstempel, und die Empfehlung beim Abgleich ("juengste
-Aenderung") beruecksichtigt sie.
+Geloeschte Eintraege werden sofort aus der Datei entfernt. Die Dateien
+enthalten keine Zeitstempel pro Zeile.
+
+Fuer den Abgleich zwischen Geraeten muss trotzdem erkennbar sein, welches
+Geraet zuletzt geaendert wurde, auch wenn die letzte Aenderung ein Loeschen
+war. Dafuer gibt es genau einen Zeitstempel pro Geraet: `LetzteAenderung` in
+`abgleich_info.csv`, gesetzt bei jedem erfolgreichen Speichern.
+
+Eine fruehere Planung sah `GeaendertAm` und `GeloeschtAm` pro Zeile und eine
+Aufbewahrungsfrist von 30 Tagen fuer geloeschte Eintraege vor. Da der Abgleich
+immer vollstaendig ist, reicht ein Zeitstempel pro Geraet aus; Zeitstempel
+pro Zeile waeren reiner Ballast.
+
+Schlaegt das Schreiben von `abgleich_info.csv` fehl, bleibt die eigentliche
+Aenderung trotzdem gespeichert; nur die Empfehlung beim Abgleich kann dann
+ungenau sein.
 
 ## Sicherungen
 
@@ -999,9 +1056,9 @@ Ein Abgleich uebertraegt immer das vollstaendige Exportpaket, einschliesslich
 der Nutzdaten. Ein teilweiser Abgleich wuerde bei unterschiedlichen
 Nutzdaten-Versionen zu Verweisen auf unbekannte GUIDs fuehren.
 
-Empfehlung der Richtung: Jede Seite ermittelt den juengsten Zeitstempel aus
-`GeaendertAm` und `GeloeschtAm` ihrer Listen. Die Seite mit dem juengeren
-Wert wird als Quelle empfohlen. Liegen auf beiden Seiten Aenderungen nach
+Empfehlung der Richtung: Jede Seite liefert ihren Wert `LetzteAenderung` aus
+`abgleich_info.csv`. Die Seite mit dem juengeren Wert wird als Quelle
+empfohlen. Liegen auf beiden Seiten Aenderungen nach
 `LetzterAbgleich`, wird zusaetzlich gewarnt.
 
 ### Ports
@@ -1076,18 +1133,23 @@ aeltere Dateien funktionieren:
    bleiben leer und erhalten damit ihren Standardwert.
 3. Jeden Datensatz einzeln umwandeln. Fehlerhafte Datensaetze werden mit
    Zeilennummer gemeldet (Leerzeilen werden dabei nicht mitgezaehlt).
-4. Nur `suche_ich.csv`: Datensaetze derselben Zeile zusammenfuehren, die
-   Anzahlen addieren. Die ueberzaehligen Datensaetze werden als geloescht
-   markiert.
+4. Nur `habe_ich.csv` und `suche_ich.csv`: Datensaetze derselben Zeile
+   zusammenfuehren, die Anzahlen addieren und die ueberzaehligen Datensaetze
+   entfernen.
 
 Ergebnis:
 
 - Gibt es fehlerhafte Datensaetze, wird die Datei gesperrt und nicht
   geschrieben, bis der Fehler behoben ist. Wuerde das Programm sie
   speichern, gingen die fehlerhaften Zeilen verloren.
-- Fehlten Spalten, gab es unbekannte Spalten, mussten Kennungen bzw.
-  Zeitstempel ergaenzt oder doppelte Zeilen zusammengefuehrt werden, wird die Datei zuerst als `<datei>.bak_<N>`
-  gesichert (naechste freie Nummer) und dann im aktuellen Format neu
+- Wurde in der Kopfzeile keine einzige bekannte Spalte gefunden, wird die
+  Datei gesperrt und nicht veraendert. Andernfalls wuerde das Programm alle
+  Spalten als "fehlend" ergaenzen und den Inhalt als "unbekannte Spalte"
+  verwerfen; die Daten waeren damit unbrauchbar (beobachtet bei einer Datei,
+  die mit Komma statt Semikolon gespeichert wurde).
+- Fehlten Spalten, gab es unbekannte Spalten, mussten Kennungen ergaenzt oder
+  doppelte Zeilen zusammengefuehrt werden, wird die Datei zuerst als
+  `<datei>.bak_<N>` gesichert (naechste freie Nummer) und dann im aktuellen Format neu
   geschrieben. Diese Sicherungen zaehlen nicht zu den regulaeren Sicherungen
   und werden nicht automatisch geloescht.
 - Fehlt eine Datei, wird sie leer mit Kopfzeile angelegt.
@@ -1147,7 +1209,9 @@ zugeordnet werden koennen.
   nicht im Repository, damit jeder Anwender mit leeren Listen beginnt.
 - Die Fachlogik fuer "Suche ich" liegt in `Services/SuchZeilen.cs` (Zeilen
   und Zaehler), `Services/SuchBearbeitung.cs` (Ziele, Anlegen, Aendern,
-  Anzahl) und `Services/Entwicklung.cs` (Entwickeln und Hochziehen). Die
+  Anzahl) und `Services/Entwicklung.cs` (Entwickeln und Hochziehen). Die Zeilen von
+  "Habe ich" (Schluessel fuer Gruppierung und Zusammenfuehren) liefert
+  `Services/HabeZeilen.cs`. Die
   Aufbereitung fuer die Anzeige uebernimmt `Services/ListenAnzeige.cs`.
 - Die Oberflaeche verwendet eine eigene, testbare Navigation
   (`ViewModels/Navigation.cs`) mit einem Seitenstapel. Seiten werden in

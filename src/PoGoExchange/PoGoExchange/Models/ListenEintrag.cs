@@ -25,11 +25,18 @@ public abstract class ListenEintrag
   public string HintergrundText { get; set; } = "";
 }
 
-// Eintrag in "Habe ich" (habe_ich.csv)
-public sealed class HabeEintrag : ListenEintrag
+// Eintraege mit Anzahl ("Habe ich", "Suche ich")
+public interface IMitAnzahl
+{
+  int Anzahl { get; set; }
+}
+
+// Zeile in "Habe ich" (habe_ich.csv): gleiche Exemplare mit Anzahl
+public sealed class HabeEintrag : ListenEintrag, IMitAnzahl
 {
   public bool Glueck { get; set; }
   public bool Hundert { get; set; }
+  public int Anzahl { get; set; } = 1;
 
   // Flache Kopie, z.B. um den Zustand vor einer Aenderung festzuhalten
   public HabeEintrag Kopie()
@@ -40,7 +47,7 @@ public sealed class HabeEintrag : ListenEintrag
 
 // Zeile in "Suche ich" (suche_ich.csv): eine Zeile mit Anzahl.
 // Der Fortschritt wird aus "Habe ich" berechnet und nicht gespeichert.
-public sealed class SucheEintrag : ListenEintrag
+public sealed class SucheEintrag : ListenEintrag, IMitAnzahl
 {
   public bool Glueck { get; set; }
   public bool Hundert { get; set; }

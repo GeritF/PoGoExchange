@@ -61,6 +61,9 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
   [ObservableProperty]
   private bool _loeschHinweisSichtbar;
 
+  [ObservableProperty]
+  private bool _loeschRueckfrageSichtbar;
+
   [RelayCommand]
   private void AnforderungenUebernehmen()
   {
@@ -112,14 +115,21 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
     KonfliktSichtbar = false;
   }
 
-  // Ueberschreibt die Anzahl ohne Rueckfrage; 0 loescht die Zeile
+  // Ueberschreibt die Anzahl ohne Rueckfrage; 0 entfernt die Zeile erst nach Rueckfrage
   [RelayCommand]
   private void AnzahlUebernehmen()
   {
+    LoeschRueckfrageSichtbar = false;
     var anzahl = (int)(Anzahl ?? -1);
     if (anzahl < 0)
     {
       Meldung = "Die Anzahl darf nicht negativ sein.";
+      return;
+    }
+
+    if (anzahl == 0)
+    {
+      LoeschRueckfrageSichtbar = true;
       return;
     }
 
@@ -131,20 +141,41 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
     }
 
     SuchBearbeitung.AnzahlSetzen(_bestand.Suche, zeile, anzahl, DateTime.UtcNow);
-    if (anzahl == 0)
-    {
-      if (Speichern("Zeile gel\u00f6scht"))
-      {
-        _navigation.Zurueck();
-      }
-
-      return;
-    }
-
     if (Speichern("Gespeichert"))
     {
       Auffrischen();
       Meldung = "Gespeichert";
+    }
+  }
+
+  // Rueckfrage bei Anzahl 0 mit "Ja" bestaetigt: Zeile entfernen, zurueck zur Liste
+  [RelayCommand]
+  private void LoeschenJa()
+  {
+    LoeschRueckfrageSichtbar = false;
+    var zeile = AktuelleZeile();
+    if (zeile == null)
+    {
+      Meldung = "Die Zeile ist nicht mehr vorhanden.";
+      return;
+    }
+
+    SuchBearbeitung.AnzahlSetzen(_bestand.Suche, zeile, 0, DateTime.UtcNow);
+    if (Speichern("Zeile gel\u00f6scht"))
+    {
+      _navigation.Zurueck();
+    }
+  }
+
+  // Rueckfrage abgelehnt: Anzahl im Eingabefeld auf den gespeicherten Wert zuruecksetzen
+  [RelayCommand]
+  private void LoeschenNein()
+  {
+    LoeschRueckfrageSichtbar = false;
+    var zeile = AktuelleZeile();
+    if (zeile != null)
+    {
+      Anzahl = zeile.Ziel;
     }
   }
 

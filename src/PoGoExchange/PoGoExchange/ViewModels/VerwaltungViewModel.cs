@@ -62,11 +62,16 @@ public sealed partial class VerwaltungViewModel : SeiteViewModel
       return text.ToString();
     }
 
+    // Einfach nur, damit die Zeilen nicht so lang sind:
+    var iAnzahl = bestand.Habe.Sum(e => e.Anzahl);
+    var sAenderung = bestand.LetzteAenderung?.ToString("yyyy-MM-dd HH:mm:ss") ?? "noch keine";
+
     text.AppendLine($"Pokemon in den Nutzdaten: {bestand.Katalog.AllePokemon().Count()}");
     text.AppendLine($"Eigene Formen: {bestand.EigeneFormen.Count}");
-    text.AppendLine($"Habe ich: {bestand.Habe.Count}");
+    text.AppendLine($"Habe ich: {bestand.Habe.Count} Zeilen, {iAnzahl} Exemplare");
     text.AppendLine($"Suche ich: {bestand.Suche.Count} Zeilen");
     text.AppendLine($"Habe ich \u00fcber: {bestand.Ueber.Count}");
+    text.AppendLine($"Letzte \u00c4nderung: {sAenderung} (UTC)");
 
     if (bestand.Meldungen.Count == 0)
     {

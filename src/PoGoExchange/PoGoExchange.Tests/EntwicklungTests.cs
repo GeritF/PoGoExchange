@@ -19,7 +19,7 @@ public class EntwicklungTests
     Guid = Guid.NewGuid(), PokemonGuid = Guid.NewGuid()
   };
 
-  private static HabeEintrag Habe(PokemonForm form, bool hundert = false)
+  private static HabeEintrag Habe(PokemonForm form, int anzahl = 1, bool hundert = false)
   {
     return new HabeEintrag
     {
@@ -27,7 +27,8 @@ public class EntwicklungTests
       PokemonGuid = form.PokemonGuid,
       FormGuid = form.Guid,
       Shiny = true,
-      Hundert = hundert
+      Hundert = hundert,
+      Anzahl = anzahl
     };
   }
 
@@ -55,14 +56,22 @@ public class EntwicklungTests
       .Zaehler;
   }
 
+  private static List<SuchZeile> Betroffen(
+    EntwicklungsErgebnis ergebnis,
+    List<SucheEintrag> suche,
+    List<HabeEintrag> habe)
+  {
+    return Entwicklung.BetroffeneZeilen(ergebnis.Vorher, ergebnis.Nachher, suche, habe);
+  }
+
   [Fact]
   public void Beispiel_DreiGlumanda_EinesWirdGlurak_ZeileWirdHochgezogen()
   {
-    var habe = new List<HabeEintrag> { Habe(Glumanda), Habe(Glumanda), Habe(Glumanda) };
+    var habe = new List<HabeEintrag> { Habe(Glumanda, anzahl: 3) };
     var suche = new List<SucheEintrag> { Suche(Glumanda, anzahl: 3) };
 
-    var vorher = Entwicklung.Entwickeln(habe[0], Glurak, Jetzt);
-    var zeile = Assert.Single(Entwicklung.BetroffeneZeilen(vorher, habe[0], suche, habe));
+    var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
+    var zeile = Assert.Single(Betroffen(ergebnis, suche, habe));
     Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
 
     Assert.Equal("(2/2)", Zaehler(suche, habe, Glumanda));
@@ -72,10 +81,10 @@ public class EntwicklungTests
   [Fact]
   public void OhneHochziehen_SinktNurDerZaehler()
   {
-    var habe = new List<HabeEintrag> { Habe(Glumanda), Habe(Glumanda), Habe(Glumanda) };
+    var habe = new List<HabeEintrag> { Habe(Glumanda, anzahl: 3) };
     var suche = new List<SucheEintrag> { Suche(Glumanda, anzahl: 3) };
 
-    Entwicklung.Entwickeln(habe[0], Glurak, Jetzt);
+    Entwicklung.Entwickeln(habe, habe[0], Glurak);
 
     Assert.Equal("(2/3)", Zaehler(suche, habe, Glumanda));
     Assert.Single(suche);
@@ -84,39 +93,33 @@ public class EntwicklungTests
   [Fact]
   public void Exemplar100er_BetrifftBeideZeilen_NormalesNurEine()
   {
-    var habe = new List<HabeEintrag> { Habe(Glumanda, hundert: true), Habe(Glumanda) };
-    var suche = new List<SucheEintrag>
-    {
-      Suche(Glumanda, anzahl: 2),
-      Suche(Glumanda, hundert: true)
-    };
+    List<HabeEintrag> HabeListe() =>
+      new() { Habe(Glumanda, hundert: true), Habe(Glumanda) };
+    List<SucheEintrag> SucheListe() =>
+      new() { Suche(Glumanda, anzahl: 2), Suche(Glumanda, hundert: true) };
 
-    var vorher100er = habe[0].Kopie();
-    var nachher100er = habe[0].Kopie();
-    nachher100er.PokemonGuid = Glurak.PokemonGuid;
-    nachher100er.FormGuid = Glurak.Guid;
-    var vorherNormal = habe[1].Kopie();
-    var nachherNormal = habe[1].Kopie();
-    nachherNormal.PokemonGuid = Glurak.PokemonGuid;
-    nachherNormal.FormGuid = Glurak.Guid;
+    var habeA = HabeListe();
+    var sucheA = SucheListe();
+    var ergebnis100er = Entwicklung.Entwickeln(habeA, habeA[0], Glurak);
 
-    var betroffen100er = Entwicklung.BetroffeneZeilen(vorher100er, nachher100er, suche, habe);
-    var betroffenNormal = Entwicklung.BetroffeneZeilen(vorherNormal, nachherNormal, suche, habe);
+    var habeB = HabeListe();
+    var sucheB = SucheListe();
+    var ergebnisNormal = Entwicklung.Entwickeln(habeB, habeB[1], Glurak);
 
-    Assert.Equal(2, betroffen100er.Count);
-    var zeile = Assert.Single(betroffenNormal);
+    Assert.Equal(2, Betroffen(ergebnis100er, sucheA, habeA).Count);
+    var zeile = Assert.Single(Betroffen(ergebnisNormal, sucheB, habeB));
     Assert.False(zeile.Muster.Hundert);
   }
 
   [Fact]
-  public void Hochziehen_InVorhandeneZeile_ErhoehtDortDieAnzahl()
+  public void Hochziehen_InVorhandeneSuchzeile_ErhoehtDortDieAnzahl()
   {
     var habe = new List<HabeEintrag> { Habe(Glumanda) };
     var glurakZeile = Suche(Glurak);
     var suche = new List<SucheEintrag> { Suche(Glumanda, anzahl: 2), glurakZeile };
 
-    var vorher = Entwicklung.Entwickeln(habe[0], Glurak, Jetzt);
-    var zeile = Assert.Single(Entwicklung.BetroffeneZeilen(vorher, habe[0], suche, habe));
+    var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
+    var zeile = Assert.Single(Betroffen(ergebnis, suche, habe));
     var ziel = Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
 
     Assert.Same(glurakZeile, ziel);
@@ -125,14 +128,14 @@ public class EntwicklungTests
   }
 
   [Fact]
-  public void Hochziehen_LetzteEinheit_LoeschtAlteZeile()
+  public void Hochziehen_LetzteEinheit_EntferntAlteSuchzeile()
   {
     var habe = new List<HabeEintrag> { Habe(Glumanda) };
     var alt = Suche(Glumanda);
     var suche = new List<SucheEintrag> { alt };
 
-    var vorher = Entwicklung.Entwickeln(habe[0], Glurak, Jetzt);
-    var zeile = Assert.Single(Entwicklung.BetroffeneZeilen(vorher, habe[0], suche, habe));
+    var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
+    var zeile = Assert.Single(Betroffen(ergebnis, suche, habe));
     Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
 
     Assert.DoesNotContain(alt, suche);
@@ -149,8 +152,8 @@ public class EntwicklungTests
     beliebig.FormGuid = Guid.Empty;
     var suche = new List<SucheEintrag> { beliebig };
 
-    var vorher = Entwicklung.Entwickeln(habe[0], Glurak, Jetzt);
-    var zeile = Assert.Single(Entwicklung.BetroffeneZeilen(vorher, habe[0], suche, habe));
+    var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
+    var zeile = Assert.Single(Betroffen(ergebnis, suche, habe));
     var ziel = Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
 
     Assert.Equal(Glurak.PokemonGuid, ziel.PokemonGuid);
@@ -163,20 +166,49 @@ public class EntwicklungTests
     var habe = new List<HabeEintrag> { Habe(Glumanda) };
     var suche = new List<SucheEintrag> { Suche(Glumanda, hundert: true) };
 
-    var vorher = Entwicklung.Entwickeln(habe[0], Glurak, Jetzt);
+    var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
 
-    Assert.Empty(Entwicklung.BetroffeneZeilen(vorher, habe[0], suche, habe));
+    Assert.Empty(Betroffen(ergebnis, suche, habe));
   }
 
   [Fact]
-  public void Entwickeln_StelltPokemonUndFormUm()
+  public void Entwickeln_NimmtEinExemplarHeraus_UndLegtZielzeileAn()
   {
-    var exemplar = Habe(Glumanda);
+    var habe = new List<HabeEintrag> { Habe(Glumanda, anzahl: 2, hundert: true) };
 
-    var vorher = Entwicklung.Entwickeln(exemplar, Glurak, Jetzt);
+    var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
 
-    Assert.Equal(Glurak.PokemonGuid, exemplar.PokemonGuid);
-    Assert.Equal(Glurak.Guid, exemplar.FormGuid);
-    Assert.Equal(Glumanda.Guid, vorher.FormGuid);
+    Assert.Equal(1, habe[0].Anzahl);
+    Assert.Equal(2, habe.Count);
+    Assert.Equal(Glurak.Guid, ergebnis.Nachher.FormGuid);
+    Assert.Equal(Glurak.PokemonGuid, ergebnis.Nachher.PokemonGuid);
+    Assert.Equal(1, ergebnis.Nachher.Anzahl);
+    Assert.True(ergebnis.Nachher.Hundert);
+    Assert.Equal(Glumanda.Guid, ergebnis.Vorher.FormGuid);
+  }
+
+  [Fact]
+  public void Entwickeln_LetztesExemplar_EntferntZeile()
+  {
+    var glumanda = Habe(Glumanda);
+    var habe = new List<HabeEintrag> { glumanda };
+
+    Entwicklung.Entwickeln(habe, glumanda, Glurak);
+
+    Assert.DoesNotContain(glumanda, habe);
+    Assert.Equal(Glurak.Guid, Assert.Single(habe).FormGuid);
+  }
+
+  [Fact]
+  public void Entwickeln_InVorhandeneHabeZeile_ErhoehtDort()
+  {
+    var glurak = Habe(Glurak);
+    var habe = new List<HabeEintrag> { Habe(Glumanda), glurak };
+
+    var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
+
+    Assert.Same(glurak, ergebnis.Nachher);
+    Assert.Equal(2, glurak.Anzahl);
+    Assert.Single(habe);
   }
 }
