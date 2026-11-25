@@ -42,7 +42,7 @@ Die Hauptseite fuehrt ueber Kacheln zu den Bereichen:
   einfuegen und abgleichen
 - **Verwaltung**: Datenordner, Anzahl der Zeilen (bei "Habe ich" auch der
   Exemplare), Zeitpunkt der letzten Aenderung und Lademeldungen, mit einem
-  Button zum Kopieren in die Zwischenablage
+  Button zum Kopieren in die Zwischenablage; dazu der Button "Sicherungen"
 - **Beenden**
 
 In allen Listen gilt:
@@ -67,6 +67,7 @@ dort "+ Neu" und das Oeffnen; die Hinweisleiste nennt den Grund.
 
 In "Suche ich" zusaetzlich:
 
+- Neben "+ Neu" gibt es "+ Mehrere" (siehe "Mehrere auf einmal suchen").
 - Jede Zeile zeigt ihre Bedingungen in eckigen Klammern (Glueck, 100er, 1:1)
   und den Fortschritt, z.B. `#4 Glumanda - Shiny [Glueck, 1:1] (1/3)`.
 - Vollstaendig erledigte Zeilen sind ausgeblendet. Der Button "Erledigte
@@ -261,26 +262,39 @@ gab es bereits: 2x, jetzt 3x".
   Eintrag danach gleich einem anderen, fragt das Programm, ob beide
   zusammengefuehrt werden sollen) und **Loeschen** nach Rueckfrage.
 
-## Sammel-Suche
+## Mehrere auf einmal suchen ("+ Mehrere")
 
-Mit einer Sammel-Suche werden viele Sucheintraege mit denselben
-Anforderungen auf einmal angelegt, z.B. "Von jedem ein 100er". Ein Schalter
-legt fest, wie:
+Mit "+ Mehrere" werden viele Suchzeilen mit denselben Anforderungen auf
+einmal angelegt, z.B. "Von jedem Kanto-Pokemon ein Shiny" oder "Von jedem ein
+100er". Die Seite bietet:
 
-- **Einer pro Form** (voreingestellt): Vulpix bekommt zwei Eintraege (Kanto
-  und Alola), Flabebe einen pro Farbe.
-- **Einer pro Pokemon**: jeweils ein Eintrag mit "Form beliebig".
+- **Region**: "Alle Regionen" oder eine bestimmte Region (nach Dex-Nummer).
+- **Zeilen**: "Eine Zeile pro Form" (voreingestellt; Vulpix bekommt zwei
+  Zeilen, Kanto und Alola, Flabebe eine pro Farbe) oder "Eine Zeile pro
+  Pokemon (Form beliebig)". Archivierte Formen werden nicht beruecksichtigt.
+- **Anforderungen** wie bei "Neuer Sucheintrag".
+- Eine **Vorschau**, die sich bei jeder Aenderung neu berechnet, z.B. "Neue
+  Zeilen: 5 . uebersprungen (gibt es schon): 0 . Shiny nicht verfuegbar: 1 .
+  davon bereits erledigt: 0".
+- Den Haken **"Vorher Sicherung anlegen"** (voreingestellt an).
 
-Eintraege, fuer die es in "Habe ich" bereits ein passendes Exemplar gibt,
-zaehlen sofort als erledigt; das Programm meldet, wie viele das sind. Gibt
-es dieselbe Zeile (gleiches
-Pokemon, gleiche Form, gleiche Anforderungen) in "Suche ich" bereits, wird
-sie nicht noch einmal angelegt. Wer "Von jedem ein 100er" versehentlich
-zweimal startet, bekommt so keine doppelten Eintraege. Das Programm meldet,
-wie viele Eintraege uebersprungen wurden.
+Regeln:
 
-Da eine Sammel-Suche sehr viele Eintraege erzeugt, schlaegt das Programm
-vorher vor, eine Sicherung anzulegen.
+- Gibt es dieselbe Zeile (gleiches Pokemon, gleiche Form, gleiche
+  Anforderungen) bereits, wird sie uebersprungen. Wer "+ Mehrere" versehentlich
+  zweimal startet, bekommt keine doppelten Zeilen.
+- Ist Shiny gefordert, werden Formen ohne verfuegbares Shiny uebersprungen
+  (bei "Form beliebig": wenn es fuer keine Form verfuegbar ist). So landen
+  keine Shinys in der Tauschliste, die es im Spiel noch nicht gibt. Wird
+  dieselbe Suche spaeter erneut gestartet, kommen inzwischen verfuegbare
+  Shinys hinzu.
+- Neue Zeilen, fuer die es in "Habe ich" schon ein passendes Exemplar gibt,
+  zaehlen sofort als erledigt.
+- Gibt es nichts Neues, wird nichts angelegt und auch keine Sicherung
+  erstellt.
+
+Eine Funktion, um mehrere Zeilen auf einmal wieder zu entfernen, gibt es
+bewusst nicht; dafuer dient die Sicherung vorher.
 
 ## Pokemon entwickeln
 
@@ -572,12 +586,20 @@ gefundene Probleme als Meldung an:
 
 ## Sicherungen
 
-Sicherungen entstehen:
+Sicherungen enthalten die persoenlichen Listen, die eigenen Formen und
+`abgleich_info.csv`. Sie entstehen:
 
-- automatisch vor jedem Update der Nutzdaten,
-- manuell ueber die Funktion "Sicherung erstellen" (das Programm schlaegt
-  dies auch vor Massenaenderungen wie einer Sammel-Suche vor),
-- vor einem Abgleich, wenn der Haken "Vorher Backup anlegen" gesetzt ist.
+- manuell mit "Jetzt sichern" unter Verwaltung > Sicherungen,
+- vor "+ Mehrere", wenn der Haken "Vorher Sicherung anlegen" gesetzt ist,
+- automatisch vor jedem Wiederherstellen (mit dem aktuellen Stand),
+- spaeter automatisch vor jedem Update der Nutzdaten und auf Wunsch vor einem
+  Abgleich zwischen Geraeten.
+
+Unter Verwaltung > Sicherungen stehen alle Sicherungen mit Datum und Uhrzeit,
+die neueste zuerst. "Wiederherstellen" ersetzt nach einer Rueckfrage die
+persoenlichen Dateien durch den Stand der Sicherung, laedt alle Daten neu und
+zeigt die Hauptseite. Weil vorher der aktuelle Stand gesichert wird, laesst
+sich auch eine Wiederherstellung rueckgaengig machen.
 
 Damit die Datenmenge begrenzt bleibt, raeumt das Programm alte Sicherungen
 nach drei Regeln auf:
@@ -593,6 +615,15 @@ erstellt, sind am 31.12.2026 um 20:00 Uhr noch vorhanden:
 - 30.11.2026, 29.11.2026, 28.11.2026, jeweils 23:30 Uhr
 - 31.10.2026, 30.10.2026, 29.10.2026, jeweils 23:30 Uhr
 - 30.09.2026 23:30 Uhr
+
+Folge der Regel 1: Wird eine Sicherung vom selben Tag wiederhergestellt,
+ist sie danach verschwunden, weil die neuere Sicherung des aktuellen Stands
+sie als "neueste des Tages" ersetzt. Das ist bewusst so; der wiederhergestellte
+Stand ist ja jetzt der aktuelle.
+
+Auf dem Handy liegen die Sicherungen im privaten Bereich der App. Sie
+schuetzen vor Fehlbedienung, nicht vor dem Verlust des Geraets; dafuer ist
+spaeter das Exportpaket gedacht.
 
 ---
 
@@ -786,7 +817,9 @@ Start leer mit Kopfzeile angelegt.
 
 Fuer Abgleich und Datei-Export werden alle oben genannten Dateien
 (Nutzdaten und eigene Daten) in eine ZIP-Datei gepackt. Der WLAN-Abgleich
-uebertraegt dasselbe Paket. Sicherungen verwenden dasselbe Format.
+uebertraegt dasselbe Paket. (Noch nicht umgesetzt.) Sicherungen sind
+ebenfalls ZIP-Dateien, enthalten aber nur die persoenlichen Dateien (siehe
+"Sicherungen" in Abschnitt 3).
 
 ## Eintragstext
 
@@ -1136,18 +1169,33 @@ ungenau sein.
 
 ## Sicherungen
 
-Sicherungen werden als Exportpaket (ZIP) mit Zeitstempel im Namen abgelegt.
-Die Aufraeumregeln werden nach jeder neuen Sicherung in dieser Reihenfolge
-angewendet:
+Sicherungen liegen im Unterordner `sicherungen` des Datenordners, z.B.
+`sicherungen/sicherung_2026-11-25_14-30-05.zip`. Der Zeitpunkt im Namen ist
+in UTC und sekundengenau. Enthalten sind `habe_ich.csv`, `suche_ich.csv`,
+`habe_ich_ueber.csv`, `eigene_formen.csv` und `abgleich_info.csv`, soweit
+vorhanden; die Nutzdaten nicht, weil sie mit dem Programm kommen.
 
-1. Pro Kalendertag nur die neueste Sicherung behalten.
-2. Pro Kalendermonat nur die Sicherungen der neuesten 3 Tage behalten.
-3. Insgesamt nur die 10 neuesten Sicherungen behalten.
+- **Zeitpunkt vom Aufrufer:** Wer eine Sicherung ausloest (Button, "+ Mehrere",
+  Wiederherstellen), ermittelt den Zeitpunkt vorher und uebergibt ihn. Gibt es
+  fuer diesen Zeitpunkt bereits eine Sicherung, passiert nichts, ohne Meldung.
+  Ein zweiter Klick in derselben Sekunde wirkt so, als waere der Button nicht
+  getroffen worden; eine Sicherung aus derselben Sekunde enthaelt ohnehin
+  denselben Stand.
+- **Aufraeumen** nach jeder neuen Sicherung in dieser Reihenfolge: pro
+  Kalendertag die neueste, pro Kalendermonat die neuesten 3 Tage, insgesamt
+  die 10 neuesten. Tage und Monate werden in UTC bestimmt.
+- **Wiederherstellen:** Zuerst wird die gewaehlte Sicherung eingelesen, dann
+  der aktuelle Stand gesichert (ohne Aufraeumen), dann werden die Dateien
+  ersetzt und erst zum Schluss aufgeraeumt. So kann das Aufraeumen die
+  gewaehlte Sicherung nicht vorher entfernen. Dateien, die in der Sicherung
+  fehlen, werden entfernt und beim Laden leer neu angelegt. Danach wird
+  `LetzteAenderung` gesetzt, weil eine Wiederherstellung eine Aenderung auf
+  diesem Geraet ist.
+- Geschrieben wird jeweils ueber eine temporaere Datei, wie bei den
+  CSV-Dateien.
 
 Vor einem Abgleich wird standardmaessig keine Sicherung erstellt, da
-haeufige Abgleiche sonst viele Sicherungen erzeugen wuerden. Vor
-Massenaenderungen (z.B. Sammel-Suche) schlaegt das Programm eine manuelle
-Sicherung vor.
+haeufige Abgleiche sonst viele Sicherungen erzeugen wuerden.
 
 ## Abgleich zwischen Geraeten
 
@@ -1312,7 +1360,10 @@ zugeordnet werden koennen.
   "Habe ich" (Schluessel fuer Gruppierung und Zusammenfuehren) liefert
   `Services/HabeZeilen.cs`. Anlegen und Aendern in "Habe ich" und "Habe ich
   ueber" uebernehmen `Services/HabeBearbeitung.cs` und
-  `Services/UeberBearbeitung.cs`.
+  `Services/UeberBearbeitung.cs`. "+ Mehrere" nutzt `Services/SammelSuche.cs`,
+  Sicherungen `Services/Sicherungen.cs`.
+- Nach dem Wiederherstellen laedt `MainViewModel` alle Daten neu und ersetzt
+  den Seitenstapel durch eine neue Hauptseite (`Navigation.Ersetzen`).
 - Die Eingabebloecke fuer Merkmale gibt es zweimal, weil sie Verschiedenes
   bedeuten: `AnforderungenView` fuer "Suche ich" ("egal", "beliebig") und
   `ExemplarView` fuer "Habe ich" und "Habe ich ueber" ("unbekannt", "keins",

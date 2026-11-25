@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-25, 246 Tests gruen.
+Stand: 2026-11-25, 263 Tests gruen.
 
 ## Inhalt
 
@@ -61,7 +61,8 @@ Stand: 2026-11-25, 246 Tests gruen.
 | 2       | "Suche ich": Neu, Bearbeiten, Anzahl, Loeschen              | fertig     |
 | 3       | "Habe ich" und "Habe ich ueber", Erhalten, Entwickeln       | fertig     |
 | 4       | Import/Export: eigene Tauschliste, fremde Liste abgleichen  | fertig     |
-| 5       | Sammel-Suche, manuelle Sicherung                            | offen      |
+| 5       | "+ Mehrere" (Sammel-Suche), Sicherungen mit Wiederherstellen | fertig     |
+| 6       | Formverwaltung (eigene Formen, Archivieren)                 | offen      |
 
 ### Bauschritt 4 (umgesetzt)
 
@@ -84,11 +85,11 @@ Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
   (`Entwicklung`)
 - Tauschliste erzeugen (`Tauschliste`) und einlesen (`TauschlistenImport`),
   Abgleich (`Abgleich`, `AngebotsVergleich`)
-- Sammel-Suche (`SammelSuche`), Sicherungen mit Aufraeumregeln
-  (`Datenbestand`)
+- "+ Mehrere" (`SammelSuche`, mit Region und Shiny-Verfuegbarkeit)
+- Sicherungen als ZIP mit Aufraeumregeln und Wiederherstellen
+  (`Sicherungen`); Reparatur-Kopien `.bak_N` beim Laden (`Datenbestand`)
 
-Noch ohne Oberflaeche: Sammel-Suche und manuelle Sicherung (Bauschritt 5),
-Formverwaltung (eigene Formen).
+Noch ohne Oberflaeche: Formverwaltung (eigene Formen anlegen, archivieren).
 
 ## 3. Verworfene Entscheidungen
 
@@ -110,6 +111,12 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   einem Tausch meist stehen.
 - **Entwicklungsketten in den Nutzdaten.** Pflegeaufwand zu hoch; Zielform
   wird von Hand gewaehlt.
+- **Mehrere Zeilen auf einmal entfernen** (z.B. "+ Mehrere" zuruecknehmen).
+  Nicht vorgesehen, auch nicht in der ToDo-Liste; erst wenn Anwender danach
+  fragen. Bis dahin dient die Sicherung vorher.
+- **Aufraeumen beim Wiederherstellen ausnehmen.** Wird eine Sicherung vom
+  selben Tag wiederhergestellt, verschwindet sie danach (Regel "pro Tag die
+  neueste"). Bewusst so gelassen.
 - **Mehrere Exemplare auf einmal entwickeln.** Es wird immer genau eines
   entwickelt.
 - **Merkmale nur fuer einen Teil einer Zeile aendern.** Aenderungen gelten
@@ -156,6 +163,9 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   Suchfeld die Auswahl nicht loescht.
 - Loeschen ueber Anzahl 0 immer mit Rueckfrage; in "Habe ich ueber" ein
   Loeschen-Button mit Rueckfrage.
+- Sicherungen: Der Ausloeser ermittelt den Zeitpunkt (`Sicherungen.Zeitpunkt`)
+  und uebergibt ihn; existiert dafuer schon eine Sicherung, passiert still
+  nichts.
 
 ### Daten (CSV)
 
@@ -262,9 +272,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes (Phase 3)
 
-- Bauschritt 5: Oberflaeche fuer Sammel-Suche und manuelle Sicherung.
-- Formverwaltung: eigene Formen anlegen und archivieren; Aufruf aus den
-  Seiten mit Formauswahl.
+- Bauschritt 6: Formverwaltung (eigene Formen anlegen und archivieren;
+  Aufruf aus den Seiten mit Formauswahl).
 
 ### Spaeter
 
