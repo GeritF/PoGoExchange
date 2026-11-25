@@ -354,7 +354,8 @@ public sealed class Datenbestand
   // Setzt "LetzteAenderung" in abgleich_info.csv auf jetzt. Schlaegt das
   // Schreiben fehl, bleibt die eigentliche Aenderung trotzdem gespeichert;
   // nur die Empfehlung beim Abgleich kann dann ungenau sein.
-  private void AenderungVermerken()
+  // Wird auch nach dem Wiederherstellen einer Sicherung aufgerufen.
+  public void AenderungVermerken()
   {
     var eintrag = _abgleichInfo.FirstOrDefault(e => e.Schluessel == SchluesselLetzteAenderung);
     if (eintrag == null)

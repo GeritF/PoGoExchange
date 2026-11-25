@@ -19,6 +19,14 @@ public sealed class Navigation : ObservableObject
     Geaendert();
   }
 
+  // Leert den Stapel und zeigt nur noch die angegebene Seite (z.B. nach dem Neuladen)
+  public void Ersetzen(SeiteViewModel seite)
+  {
+    _stapel.Clear();
+    _stapel.Push(seite);
+    Geaendert();
+  }
+
   // Liefert false, wenn bereits die unterste Seite angezeigt wird
   public bool Zurueck()
   {

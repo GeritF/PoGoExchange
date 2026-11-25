@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using CommunityToolkit.Mvvm.Input;
 using PoGoExchange.Services;
@@ -10,17 +11,20 @@ public sealed partial class HauptseiteViewModel : SeiteViewModel
   private readonly Datenbestand? _bestand;
   private readonly string _ordner;
   private readonly string _ladefehler;
+  private readonly Func<Datenbestand?>? _neuLaden;
 
   public HauptseiteViewModel(
     Navigation navigation,
     Datenbestand? bestand,
     string ordner,
-    string ladefehler)
+    string ladefehler,
+    Func<Datenbestand?>? neuLaden = null)
   {
     _navigation = navigation;
     _bestand = bestand;
     _ordner = ordner;
     _ladefehler = ladefehler;
+    _neuLaden = neuLaden;
     Meldungshinweis = MeldungsText(bestand, ladefehler);
   }
 
@@ -45,7 +49,8 @@ public sealed partial class HauptseiteViewModel : SeiteViewModel
   [RelayCommand]
   private void VerwaltungOeffnen()
   {
-    _navigation.Oeffnen(new VerwaltungViewModel(_bestand, _ordner, _ladefehler));
+    _navigation.Oeffnen(
+      new VerwaltungViewModel(_bestand, _ordner, _ladefehler, _navigation, _neuLaden));
   }
 
   [RelayCommand]

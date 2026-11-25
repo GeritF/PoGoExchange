@@ -52,7 +52,8 @@ public class SammelSucheTests
       Guid = Guid.NewGuid(),
       PokemonGuid = p.Guid,
       Form = form,
-      Region = region
+      Region = region,
+      ShinyVerfuegbar = true
     };
   }
 

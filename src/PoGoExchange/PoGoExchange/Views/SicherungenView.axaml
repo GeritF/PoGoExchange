@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             x:Class="PoGoExchange.Views.SicherungenView"
+             x:DataType="vm:SicherungenViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+      <TextBlock Text="Sicherungen enthalten die pers&#xF6;nlichen Listen und eigenen Formen. Alte Sicherungen werden automatisch aufger&#xE4;umt."
+                 TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="Jetzt sichern" Command="{Binding JetztSichernCommand}" />
+        <TextBlock Text="{Binding Meldung}"
+                   IsVisible="{Binding HatMeldung}"
+                   VerticalAlignment="Center"
+                   TextWrapping="Wrap" />
+      </StackPanel>
+
+      <StackPanel IsVisible="{Binding RueckfrageSichtbar}" Spacing="4">
+        <TextBlock Text="{Binding RueckfrageText}" Foreground="Red" TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Ja, wiederherstellen" Command="{Binding WiederherstellenJaCommand}" />
+          <Button Content="Nein" Command="{Binding WiederherstellenNeinCommand}" />
+        </StackPanel>
+      </StackPanel>
+
+      <TextBlock Text="Vorhandene Sicherungen" FontWeight="Bold" Margin="0,12,0,0" />
+      <TextBlock Text="Noch keine Sicherungen vorhanden."
+                 IsVisible="{Binding KeineVorhanden}" />
+      <ItemsControl ItemsSource="{Binding Liste}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:SicherungEintrag">
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2">
+              <TextBlock Text="{Binding Text}" VerticalAlignment="Center" MinWidth="160" />
+              <Button Content="Wiederherstellen" Command="{Binding WiederherstellenCommand}" />
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

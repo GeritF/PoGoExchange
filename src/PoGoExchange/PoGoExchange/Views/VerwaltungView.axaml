@@ -9,6 +9,9 @@
                 <Button Content="Kopieren" Command="{Binding KopierenCommand}" />
                 <TextBlock Text="{Binding Rueckmeldung}" VerticalAlignment="Center" />
             </StackPanel>
+            <Button Content="Sicherungen"
+                    Command="{Binding SicherungenOeffnenCommand}"
+                    IsVisible="{Binding HatSicherungen}" />
             <SelectableTextBlock Text="{Binding Status}" TextWrapping="Wrap" />
         </StackPanel>
     </ScrollViewer>

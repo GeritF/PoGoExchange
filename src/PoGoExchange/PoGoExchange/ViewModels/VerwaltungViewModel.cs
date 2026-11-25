@@ -10,9 +10,33 @@ namespace PoGoExchange.ViewModels;
 
 public sealed partial class VerwaltungViewModel : SeiteViewModel
 {
-  public VerwaltungViewModel(Datenbestand? bestand, string ordner, string ladefehler)
+  private readonly Datenbestand? _bestand;
+  private readonly Navigation? _navigation;
+  private readonly Func<Datenbestand?>? _neuLaden;
+
+  public VerwaltungViewModel(
+    Datenbestand? bestand,
+    string ordner,
+    string ladefehler,
+    Navigation? navigation = null,
+    Func<Datenbestand?>? neuLaden = null)
   {
+    _bestand = bestand;
+    _navigation = navigation;
+    _neuLaden = neuLaden;
     Status = StatusText(bestand, ordner, ladefehler);
+  }
+
+  // Sicherungen gibt es nur mit geladenen Daten
+  public bool HatSicherungen => _bestand != null && _navigation != null && _neuLaden != null;
+
+  [RelayCommand]
+  private void SicherungenOeffnen()
+  {
+    if (HatSicherungen)
+    {
+      _navigation!.Oeffnen(new SicherungenViewModel(_bestand!, _neuLaden!));
+    }
   }
 
   public override string Titel => "Verwaltung";

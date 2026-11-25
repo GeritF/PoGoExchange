@@ -18,23 +18,27 @@ public sealed partial class ListenTabViewModel : ViewModelBase
   private readonly Func<string, bool, List<AnzeigeGruppe>> _aufbauen;
   private readonly Action? _neu;
   private readonly Action<AnzeigeZeile>? _oeffnen;
+  private readonly Action? _mehrere;
 
   public ListenTabViewModel(
     bool hatErledigtUmschalter,
     Func<string, bool, List<AnzeigeGruppe>> aufbauen,
     Action? neu = null,
-    Action<AnzeigeZeile>? oeffnen = null)
+    Action<AnzeigeZeile>? oeffnen = null,
+    Action? mehrere = null)
   {
     HatErledigtUmschalter = hatErledigtUmschalter;
     _aufbauen = aufbauen;
     _neu = neu;
     _oeffnen = oeffnen;
+    _mehrere = mehrere;
     Aktualisieren();
   }
 
   public bool HatErledigtUmschalter { get; }
 
   public bool HatNeu => _neu != null;
+  public bool HatMehrere => _mehrere != null;
 
   // Ueberschriften (RegionKopf) und Zeilen (AnzeigeZeile) gemischt
   public ObservableCollection<object> Zeilen { get; } = new();
@@ -95,6 +99,12 @@ public sealed partial class ListenTabViewModel : ViewModelBase
   private void Neu()
   {
     _neu?.Invoke();
+  }
+
+  [RelayCommand]
+  private void Mehrere()
+  {
+    _mehrere?.Invoke();
   }
 
   // Einblenden nur nach Rueckfrage, Ausblenden sofort

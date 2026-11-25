@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             xmlns:views="using:PoGoExchange.Views"
+             x:Class="PoGoExchange.Views.MehrereSuchenView"
+             x:DataType="vm:MehrereSuchenViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+      <TextBlock Text="F&#xFC;r alle Pokemon einer Region (oder aller Regionen) eine Suchzeile mit denselben Anforderungen anlegen. Zeilen, die es schon gibt, werden &#xFC;bersprungen."
+                 TextWrapping="Wrap" />
+
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="Region:" VerticalAlignment="Center" Width="100" />
+        <ComboBox ItemsSource="{Binding Regionen}"
+                  SelectedIndex="{Binding RegionIndex}"
+                  MinWidth="150" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="Zeilen:" VerticalAlignment="Center" Width="100" />
+        <ComboBox ItemsSource="{Binding ModusAuswahl}"
+                  SelectedIndex="{Binding ModusIndex}"
+                  MinWidth="150" />
+      </StackPanel>
+
+      <TextBlock Text="Anforderungen" FontWeight="Bold" Margin="0,12,0,0" />
+      <views:AnforderungenView DataContext="{Binding Anforderungen}" />
+
+      <TextBlock Text="Vorschau" FontWeight="Bold" Margin="0,12,0,0" />
+      <TextBlock Text="{Binding Vorschau}" TextWrapping="Wrap" />
+
+      <CheckBox Content="Vorher Sicherung anlegen" IsChecked="{Binding SicherungVorher}" />
+      <Button Content="Anlegen" Command="{Binding AnlegenCommand}" />
+      <TextBlock Text="{Binding Meldung}"
+                 IsVisible="{Binding HatMeldung}"
+                 Foreground="Red"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

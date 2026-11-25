@@ -55,4 +55,17 @@ public class NavigationTests
     Assert.Contains(nameof(Navigation.AktuelleSeite), gemeldet);
     Assert.Contains(nameof(Navigation.KannZurueck), gemeldet);
   }
+
+  [Fact]
+  public void Ersetzen_LeertStapel_UndZeigtNurDieNeueSeite()
+  {
+    var navigation = new Navigation();
+    navigation.Oeffnen(new TestSeite("Haupt"));
+    navigation.Oeffnen(new TestSeite("Unter"));
+
+    navigation.Ersetzen(new TestSeite("Neu"));
+
+    Assert.Equal("Neu", navigation.AktuelleSeite?.Titel);
+    Assert.False(navigation.KannZurueck);
+  }
 }

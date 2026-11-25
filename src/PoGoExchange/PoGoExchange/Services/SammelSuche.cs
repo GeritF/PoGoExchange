@@ -23,20 +23,28 @@ public sealed class SammelErgebnis
 
   // Neue Zeilen, fuer die es bereits ein passendes Exemplar in "Habe ich" gibt
   public required int SofortErledigt { get; init; }
+
+  // Ziele, fuer die Shiny gefordert, aber (noch) nicht verfuegbar ist
+  public int NichtVerfuegbar { get; init; }
 }
 
 // Legt viele Sucheintraege mit denselben Anforderungen auf einmal an,
-// z.B. "Von jedem ein 100er". Die uebergebenen Listen werden nicht
-// veraendert; die neuen Eintraege werden nur zurueckgegeben.
+// z.B. "Von jedem ein 100er" (in der Oberflaeche: "+ Mehrere").
+// Die uebergebenen Listen werden nicht veraendert; die neuen Eintraege
+// werden nur zurueckgegeben.
 public static class SammelSuche
 {
+  // region schraenkt auf eine Region ein (siehe Katalog.RegionZuDex), null = alle.
+  // Ist Shiny gefordert, werden Ziele ohne verfuegbares Shiny uebersprungen;
+  // ein spaeterer erneuter Aufruf ergaenzt neu verfuegbare.
   public static SammelErgebnis Anlegen(
     Katalog katalog,
     SucheEintrag vorlage,
     SammelModus modus,
     IEnumerable<SucheEintrag> suche,
     IEnumerable<HabeEintrag> habe,
-    DateTime jetzt)
+    DateTime jetzt,
+    string? region = null)
   {
     var exemplare = habe.ToList();
     var vorhandeneZeilen = suche
@@ -46,9 +54,16 @@ public static class SammelSuche
     var neu = new List<SucheEintrag>();
     var uebersprungen = 0;
     var sofortErledigt = 0;
-    foreach (var (pokemonGuid, formGuid) in Ziele(katalog, modus))
+    var nichtVerfuegbar = 0;
+    foreach (var (pokemonGuid, formGuid, shinyVerfuegbar) in Ziele(katalog, modus, region))
     {
-      var eintrag = NeuerEintrag(vorlage, pokemonGuid, formGuid, jetzt);
+      if (vorlage.Shiny && !shinyVerfuegbar)
+      {
+        nichtVerfuegbar++;
+        continue;
+      }
+
+      var eintrag = NeuerEintrag(vorlage, pokemonGuid, formGuid);
       if (!vorhandeneZeilen.Add(SuchZeilen.Schluessel(eintrag)))
       {
         uebersprungen++;
@@ -67,36 +82,44 @@ public static class SammelSuche
     {
       NeueEintraege = neu,
       Uebersprungen = uebersprungen,
-      SofortErledigt = sofortErledigt
+      SofortErledigt = sofortErledigt,
+      NichtVerfuegbar = nichtVerfuegbar
     };
   }
 
-  private static IEnumerable<(Guid PokemonGuid, Guid FormGuid)> Ziele(
+  // Bei "Form beliebig" gilt Shiny als verfuegbar, wenn es fuer mindestens
+  // eine nicht archivierte Form verfuegbar ist
+  private static IEnumerable<(Guid PokemonGuid, Guid FormGuid, bool ShinyVerfuegbar)> Ziele(
     Katalog katalog,
-    SammelModus modus)
+    SammelModus modus,
+    string? region)
   {
     foreach (var pokemon in katalog.AllePokemon())
     {
-      if (modus == SammelModus.ProPokemon)
+      if (region != null && katalog.RegionZuDex(pokemon.DexNr) != region)
       {
-        yield return (pokemon.Guid, Guid.Empty);
         continue;
       }
 
-      var formen = katalog.FormenZuPokemon(pokemon.Guid).Where(f => f.ArchiviertAm == null);
+      var formen = katalog.FormenZuPokemon(pokemon.Guid)
+        .Where(f => f.ArchiviertAm == null)
+        .ToList();
+      if (modus == SammelModus.ProPokemon)
+      {
+        yield return (pokemon.Guid, Guid.Empty, formen.Any(f => f.ShinyVerfuegbar));
+        continue;
+      }
+
       foreach (var form in formen)
       {
-        yield return (pokemon.Guid, form.Guid);
+        yield return (pokemon.Guid, form.Guid, form.ShinyVerfuegbar);
       }
     }
   }
 
-  // Uebernimmt alle Anforderungen der Vorlage; Pokemon und Form werden gesetzt
-  private static SucheEintrag NeuerEintrag(
-    SucheEintrag vorlage,
-    Guid pokemonGuid,
-    Guid formGuid,
-    DateTime jetzt)
+  // Uebernimmt alle Anforderungen der Vorlage; Pokemon und Form werden gesetzt.
+  // Freie Texte werden dabei getrimmt.
+  private static SucheEintrag NeuerEintrag(SucheEintrag vorlage, Guid pokemonGuid, Guid formGuid)
   {
     return new SucheEintrag
     {
@@ -107,9 +130,9 @@ public static class SammelSuche
       Shiny = vorlage.Shiny,
       Dynamax = vorlage.Dynamax,
       KostuemAktiv = vorlage.KostuemAktiv,
-      KostuemText = vorlage.KostuemText,
+      KostuemText = TextBereinigung.Bereinigen(vorlage.KostuemText),
       HintergrundAktiv = vorlage.HintergrundAktiv,
-      HintergrundText = vorlage.HintergrundText,
+      HintergrundText = TextBereinigung.Bereinigen(vorlage.HintergrundText),
       Glueck = vorlage.Glueck,
       Hundert = vorlage.Hundert,
       EinsZuEins = vorlage.EinsZuEins

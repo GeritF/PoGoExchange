@@ -53,7 +53,8 @@ public sealed class TauschlistenViewModel : SeiteViewModel
           : ListenAnzeige.Suche(
             bestand.Katalog, bestand.Suche, bestand.Habe, mitErledigten, filter),
       sucheBearbeitbar ? SucheNeuOeffnen : null,
-      sucheBearbeitbar ? SucheZeileOeffnen : null);
+      sucheBearbeitbar ? SucheZeileOeffnen : null,
+      sucheBearbeitbar ? MehrereOeffnen : null);
 
     Habe = new ListenTabViewModel(
       false,
@@ -109,6 +110,21 @@ public sealed class TauschlistenViewModel : SeiteViewModel
     Suche.Rueckmeldung = text;
     _navigation.Oeffnen(
       new SuchZeileViewModel(_navigation, _bestand!, ergebnis.Eintrag, SucheGeaendert, text));
+  }
+
+  private void MehrereOeffnen()
+  {
+    _navigation.Oeffnen(new MehrereSuchenViewModel(_bestand!, MehrereGespeichert));
+  }
+
+  private void MehrereGespeichert(SammelErgebnis ergebnis)
+  {
+    _navigation.Zurueck();
+    Suche.Aktualisieren();
+    Suche.Rueckmeldung =
+      $"Neue Zeilen: {ergebnis.NeueEintraege.Count}, " +
+      $"\u00fcbersprungen: {ergebnis.Uebersprungen}, " +
+      $"davon bereits erledigt: {ergebnis.SofortErledigt}";
   }
 
   private void SucheZeileOeffnen(AnzeigeZeile zeile)

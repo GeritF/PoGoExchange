@@ -68,6 +68,12 @@
                 <DataTemplate DataType="vm:AbgleichErgebnisViewModel">
                     <views:AbgleichErgebnisView />
                 </DataTemplate>
+                <DataTemplate DataType="vm:MehrereSuchenViewModel">
+                    <views:MehrereSuchenView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:SicherungenViewModel">
+                    <views:SicherungenView />
+                </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>
     </DockPanel>
