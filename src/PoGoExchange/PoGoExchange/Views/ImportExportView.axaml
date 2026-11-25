@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             x:Class="PoGoExchange.Views.ImportExportView"
+             x:DataType="vm:ImportExportViewModel">
+  <TabControl>
+    <TabItem Header="Meine Tauschliste">
+      <ScrollViewer>
+        <StackPanel Margin="8" Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Kopieren"
+                    Command="{Binding KopierenCommand}"
+                    IsEnabled="{Binding !ListeLeer}" />
+            <TextBlock Text="{Binding ExportRueckmeldung}"
+                       IsVisible="{Binding HatExportRueckmeldung}"
+                       Foreground="Green"
+                       VerticalAlignment="Center" />
+          </StackPanel>
+          <TextBlock Text="{Binding ListeLeerText}"
+                     IsVisible="{Binding ListeLeer}"
+                     TextWrapping="Wrap" />
+          <SelectableTextBlock Text="{Binding EigeneListe}" TextWrapping="Wrap" />
+          <StackPanel IsVisible="{Binding HatExportFehler}" Spacing="4">
+            <TextBlock Text="Nicht exportiert:" FontWeight="Bold" Foreground="Red" />
+            <ItemsControl ItemsSource="{Binding ExportFehler}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <TextBlock Text="{Binding}" Foreground="Red" TextWrapping="Wrap" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+
+    <TabItem Header="Fremde Liste abgleichen">
+      <DockPanel Margin="8">
+        <StackPanel DockPanel.Dock="Top" Spacing="4">
+          <TextBlock Text="Tauschliste des anderen Spielers einf&#xFC;gen:"
+                     TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Einf&#xFC;gen" Command="{Binding EinfuegenCommand}" />
+            <Button Content="Abgleichen" Command="{Binding AbgleichenCommand}" />
+          </StackPanel>
+          <TextBlock Text="{Binding AbgleichMeldung}"
+                     IsVisible="{Binding HatAbgleichMeldung}"
+                     Foreground="Red"
+                     TextWrapping="Wrap" />
+        </StackPanel>
+        <TextBox Text="{Binding FremderText}"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 MinHeight="200"
+                 Margin="0,8,0,0" />
+      </DockPanel>
+    </TabItem>
+  </TabControl>
+</UserControl>

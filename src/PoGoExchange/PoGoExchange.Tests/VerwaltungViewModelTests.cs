@@ -3,6 +3,7 @@ using PoGoExchange.ViewModels;
 
 namespace PoGoExchange.Tests;
 
+[Collection("Zwischenablage")]
 public class VerwaltungViewModelTests
 {
   [Fact]

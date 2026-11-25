@@ -62,6 +62,12 @@
                 <DataTemplate DataType="vm:EntwickelnViewModel">
                     <views:EntwickelnView />
                 </DataTemplate>
+                <DataTemplate DataType="vm:ImportExportViewModel">
+                    <views:ImportExportView />
+                </DataTemplate>
+                <DataTemplate DataType="vm:AbgleichErgebnisViewModel">
+                    <views:AbgleichErgebnisView />
+                </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>
     </DockPanel>

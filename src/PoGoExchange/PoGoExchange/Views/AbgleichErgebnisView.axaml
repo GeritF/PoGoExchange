@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             x:Class="PoGoExchange.Views.AbgleichErgebnisView"
+             x:DataType="vm:AbgleichErgebnisViewModel">
+  <UserControl.Styles>
+    <!-- Treffer mit "pruefen" bekommen einen orangen Rand links -->
+    <Style Selector="Border.treffer">
+      <Setter Property="BorderThickness" Value="3,0,0,0" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Padding" Value="8,4" />
+    </Style>
+    <Style Selector="Border.treffer.pruefen">
+      <Setter Property="BorderBrush" Value="DarkOrange" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="8" Spacing="12">
+      <TextBlock Text="Keine passenden Eintr&#xE4;ge gefunden."
+                 IsVisible="{Binding KeineTreffer}" />
+
+      <ItemsControl ItemsSource="{Binding Abschnitte}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:TrefferAbschnitt">
+            <StackPanel Spacing="4" Margin="0,0,0,12">
+              <TextBlock Text="{Binding Titel}" FontWeight="Bold" FontSize="16" />
+              <ItemsControl ItemsSource="{Binding Treffer}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:TrefferAnzeige">
+                    <Border Classes="treffer" Classes.pruefen="{Binding IstPruefen}"
+                            Margin="0,2">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Er, StringFormat='Er:  {0}'}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Ich, StringFormat='Ich: {0}'}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Zusatz}"
+                                   IsVisible="{Binding HatZusatz}"
+                                   Foreground="DarkOrange"
+                                   TextWrapping="Wrap" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Expander Header="{Binding FehlerTitel}" IsVisible="{Binding HatFehler}">
+        <ItemsControl ItemsSource="{Binding Fehler}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Expander>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

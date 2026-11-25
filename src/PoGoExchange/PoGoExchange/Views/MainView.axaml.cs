@@ -26,6 +26,9 @@ public partial class MainView : UserControl
       AppActions.InZwischenablageKopieren = zwischenablage == null
         ? null
         : text => zwischenablage.SetTextAsync(text);
+      AppActions.AusZwischenablageLesen = zwischenablage == null
+        ? null
+        : () => zwischenablage.TryGetTextAsync();
     }
   }
 

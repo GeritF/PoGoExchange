@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-25, 235 Tests gruen.
+Stand: 2026-11-25, 246 Tests gruen.
 
 ## Inhalt
 
@@ -60,26 +60,17 @@ Stand: 2026-11-25, 235 Tests gruen.
 | 1       | Geruest: Hauptseite, Navigation, Listen, Verwaltung         | fertig     |
 | 2       | "Suche ich": Neu, Bearbeiten, Anzahl, Loeschen              | fertig     |
 | 3       | "Habe ich" und "Habe ich ueber", Erhalten, Entwickeln       | fertig     |
-| 4       | Import/Export: eigene Tauschliste, fremde Liste abgleichen  | entworfen  |
+| 4       | Import/Export: eigene Tauschliste, fremde Liste abgleichen  | fertig     |
 | 5       | Sammel-Suche, manuelle Sicherung                            | offen      |
 
-### Bauschritt 4 (beschlossener Entwurf, noch nicht gebaut)
+### Bauschritt 4 (umgesetzt)
 
-- Seite "Import/Export" ersetzt den Platzhalter der Hauptseite, mit zwei
-  Registerkarten:
-  - "Meine Tauschliste": beim Oeffnen erzeugen, als Text anzeigen, Button
-    "Kopieren"; Exportfehler (Liste und Grund) darunter.
-  - "Fremde Liste abgleichen": grosses Textfeld, Button "Einfuegen" (aus der
-    Zwischenablage), Button "Abgleichen".
-- Ergebnisseite "Abgleich": Abschnitte "1:1 passt exakt (n)", "Er hat, was
-  ich suche (n)", "Er sucht, was ich uebrig habe (n)"; je Treffer
-  "Er: <seine Originalzeile>", "Ich: <mein Eintrag>" und bei Bedarf
-  "pruefen: <Hinweise>" bzw. "1:1 gewuenscht". "Pruefen"-Treffer optisch
-  abgesetzt. Leere Abschnitte ausblenden. Einklappbar: "Nicht erkannte
-  Zeilen (n)" mit Zeilennummer, Text, Grund.
-- Die fremde Liste wird nicht gespeichert (sie veraltet schnell).
-- Nicht in diesem Schritt: Teilen, Kopf-/Fusstext, Aktionen im Ergebnis
-  (siehe ToDo-Liste).
+- Seite "Import/Export" mit den Registerkarten "Meine Tauschliste"
+  (erzeugen, anzeigen, kopieren) und "Fremde Liste abgleichen" (einfuegen,
+  abgleichen); Ergebnisseite "Abgleich" mit "Er:/Ich:"-Darstellung.
+- Tauschlisten-Format: "1:1" und "fehlt" nach Region, "Abzugeben:" ohne
+  Region gesammelt am Ende hinter einer Trennlinie.
+- Die fremde Liste wird nicht gespeichert.
 
 ### Was die Fachlogik bereits kann
 
@@ -96,8 +87,8 @@ Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
 - Sammel-Suche (`SammelSuche`), Sicherungen mit Aufraeumregeln
   (`Datenbestand`)
 
-Noch ohne Oberflaeche: Tauschliste/Abgleich (Bauschritt 4), Sammel-Suche und
-manuelle Sicherung (Bauschritt 5), Formverwaltung (eigene Formen).
+Noch ohne Oberflaeche: Sammel-Suche und manuelle Sicherung (Bauschritt 5),
+Formverwaltung (eigene Formen).
 
 ## 3. Verworfene Entscheidungen
 
@@ -179,6 +170,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   vorgegebenen Ergebnistext ohne Messung.
 - Tests mit Dateien nutzen einen eigenen temporaeren Ordner und raeumen ihn
   in `Dispose` auf.
+- Tests, die statische Werte in `AppActions` veraendern, gehoeren in die
+  Sammlung `[Collection("Zwischenablage")]`, damit sie nicht parallel laufen.
 - Testlauf ueber `test/Test_XUnit.sh` (Auswertung pro Klasse).
 
 ## 5. Arbeitsweise (Anweisungen fuer die KI)
@@ -212,8 +205,9 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ## 6. Stolpersteine und Erfahrungen
 
-- **Avalonia 12, Zwischenablage:** `SetTextAsync` ist eine
-  Erweiterungsmethode; noetig ist `using Avalonia.Input.Platform;`.
+- **Avalonia 12, Zwischenablage:** `SetTextAsync` und `TryGetTextAsync`
+  (statt `GetTextAsync`) sind Erweiterungsmethoden; noetig ist
+  `using Avalonia.Input.Platform;`.
 - **`InitializeComponent` fehlt:** Dateiname, `x:Class` und Klassenname
   passen nicht zusammen (z.B. Tippfehler oder Gross-/Kleinschreibung).
 - **CSV mit Komma gespeichert** (z.B. LibreOffice): Wird jetzt gesperrt
@@ -268,7 +262,6 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes (Phase 3)
 
-- Bauschritt 4 umsetzen (siehe Abschnitt 2).
 - Bauschritt 5: Oberflaeche fuer Sammel-Suche und manuelle Sicherung.
 - Formverwaltung: eigene Formen anlegen und archivieren; Aufruf aus den
   Seiten mit Formauswahl.
@@ -293,6 +286,12 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   WhatsApp).
 - **Button "Erhalten" direkt in der Liste "Suche ich"** an jeder Zeile.
 - **Button "Erhalten" im Abgleich-Ergebnis** bei "Er hat, was ich suche".
+- **Fremde Listen ohne Dex-Nummer erkennen:** Spieler ohne die App
+  schreiben Listen ohne `#Nummer`, mit abweichenden Leerzeichen oder anderen
+  Trennern. Vorher festlegen, welche Zeilen erkannt werden sollen (z.B.
+  ueber den Namen). Mindestens alle Zeilen mit Aufzaehlungszeichen, die nicht
+  erkannt wurden, in einer einsehbaren Liste zeigen, statt nur "nichts
+  erkannt".
 - Gestaltung der Oberflaeche ("schoen machen").
 
 ### Aufraeumen bei Gelegenheit

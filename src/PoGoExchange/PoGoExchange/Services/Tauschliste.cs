@@ -23,6 +23,9 @@ public static class Tauschliste
   internal const string TextGlueck = "Gl\u00fcck";
   internal const string TextHundert = "100er";
 
+  // Trennlinie vor "Abzugeben"; wird beim Einlesen wie anderer Text ignoriert
+  internal const string Trennlinie = "--------------------";
+
   private static readonly string[] Abschnitte =
   {
     AbschnittEinsZuEins,
@@ -30,7 +33,8 @@ public static class Tauschliste
     AbschnittAbzugeben
   };
 
-  // Gliederung: Region (siehe Katalog), dann Abschnitt, dann Dex-Nummer und Text.
+  // Gliederung: "1:1" und "fehlt" nach Region (siehe Katalog), "Abzugeben"
+  // ohne Region gesammelt am Ende; jeweils nach Dex-Nummer und Text sortiert.
   // Leere Abschnitte und Regionen entfallen. Ungueltige Eintraege (siehe
   // Konsistenz) erscheinen nicht im Text, sondern in der Fehlerliste.
   // "Habe ich" wird fuer die Zaehler gebraucht.
@@ -93,7 +97,6 @@ public static class Tauschliste
   }
 
   // Nur Zeilen mit mindestens einem offenen Eintrag
-  // Nur Zeilen mit mindestens einem offenen Eintrag
   private static IEnumerable<ExportZeile> SuchZeilenFuerExport(
     Katalog katalog,
     IEnumerable<SucheEintrag> suche,
@@ -145,15 +148,10 @@ public static class Tauschliste
     var ausgabe = new StringBuilder();
     foreach (var region in katalog.RegionenInReihenfolge())
     {
-      foreach (var abschnitt in Abschnitte)
+      foreach (var abschnitt in new[] { AbschnittEinsZuEins, AbschnittFehlt })
       {
-        var liste = zeilen
-          .Where(z => z.Region == region && z.Abschnitt == abschnitt)
-          .OrderBy(z => z.DexNr)
-          .ThenBy(z => z.Text, StringComparer.OrdinalIgnoreCase)
-          .ThenBy(z => z.Zusatz, StringComparer.Ordinal)
-          .ToList();
-
+        var liste = Sortiert(
+          zeilen.Where(z => z.Region == region && z.Abschnitt == abschnitt));
         if (liste.Count == 0)
         {
           continue;
@@ -165,16 +163,42 @@ public static class Tauschliste
         }
 
         ausgabe.Append(region).Append(' ').Append(abschnitt).Append(":\n");
-        foreach (var z in liste)
-        {
-          ausgabe
-            .Append("- #").Append(z.DexNr).Append(' ')
-            .Append(z.Text).Append(z.Zusatz).Append('\n');
-        }
+        ZeilenAnhaengen(ausgabe, liste);
       }
     }
 
+    var abzugeben = Sortiert(zeilen.Where(z => z.Abschnitt == AbschnittAbzugeben));
+    if (abzugeben.Count > 0)
+    {
+      if (ausgabe.Length > 0)
+      {
+        ausgabe.Append('\n').Append(Trennlinie).Append("\n\n");
+      }
+
+      ausgabe.Append("Abzugeben:\n");
+      ZeilenAnhaengen(ausgabe, abzugeben);
+    }
+
     return ausgabe.ToString();
+  }
+
+  private static List<ExportZeile> Sortiert(IEnumerable<ExportZeile> zeilen)
+  {
+    return zeilen
+      .OrderBy(z => z.DexNr)
+      .ThenBy(z => z.Text, StringComparer.OrdinalIgnoreCase)
+      .ThenBy(z => z.Zusatz, StringComparer.Ordinal)
+      .ToList();
+  }
+
+  private static void ZeilenAnhaengen(StringBuilder ausgabe, List<ExportZeile> liste)
+  {
+    foreach (var z in liste)
+    {
+      ausgabe
+        .Append("- #").Append(z.DexNr).Append(' ')
+        .Append(z.Text).Append(z.Zusatz).Append('\n');
+    }
   }
 
   // Ergibt z.B. " [Glueck, 100er] (1/3)"; nicht gesetzte Teile entfallen

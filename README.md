@@ -38,8 +38,8 @@ Die Hauptseite fuehrt ueber Kacheln zu den Bereichen:
 
 - **Tauschlisten**: die drei persoenlichen Listen als Registerkarten
   "Suche ich", "Habe ich" und "Habe ich ueber"
-- **Import/Export**: eigene Tauschliste erzeugen, fremde Listen abgleichen
-  (folgt in einem spaeteren Bauschritt)
+- **Import/Export**: eigene Tauschliste erzeugen und kopieren, fremde Listen
+  einfuegen und abgleichen
 - **Verwaltung**: Datenordner, Anzahl der Zeilen (bei "Habe ich" auch der
   Exemplare), Zeitpunkt der letzten Aenderung und Lademeldungen, mit einem
   Button zum Kopieren in die Zwischenablage
@@ -376,9 +376,16 @@ Antippen einer Zeile in "Habe ich" oeffnet "Exemplar bearbeiten":
 
 ## Tauschliste erstellen
 
-Das Programm erzeugt eine Tauschliste als Text, gruppiert nach Region und
-sortiert nach Dex-Nummer. Die Liste ist fuer Menschen lesbar und kann von
-anderen Spielern in ihr Programm eingelesen werden:
+Unter "Import/Export", Registerkarte "Meine Tauschliste", erzeugt das
+Programm beim Oeffnen eine Tauschliste als Text. Der Button "Kopieren" legt
+sie in die Zwischenablage, z.B. zum Einfuegen in einen Messenger. Ist die
+Liste leer, ist der Button gesperrt und ein Hinweis erklaert den Grund.
+
+Gesuchte Pokemon ("1:1" und "fehlt") sind nach Region gegliedert. Was man
+abgeben kann, steht gesammelt am Ende unter einer Trennlinie, ohne
+Gliederung nach Region. Innerhalb jedes Abschnitts wird nach Dex-Nummer
+sortiert. Die Liste ist fuer Menschen lesbar und kann von anderen Spielern in
+ihr Programm eingelesen werden:
 
 ```
 Kanto 1:1:
@@ -390,8 +397,14 @@ Kanto fehlt:
 - #4 Glumanda - Shiny [100er]
 - #150 Mewtu - Shiny
 
-Kanto abzugeben:
+Johto fehlt:
+- #155 Feurigel - Shiny
+
+--------------------
+
+Abzugeben:
 - #2 Bisaknosp - Shiny
+- #158 Karnimani
 ```
 
 Die Angabe "(1/3)" bedeutet: 1 passendes Exemplar in "Habe ich", 3 gesucht.
@@ -402,8 +415,9 @@ Glueck und Werte erst durch den Tausch entstehen.
 
 Vollstaendig erledigte Suchen erscheinen nicht in der Tauschliste.
 
-Pokemon, deren Dex-Nummer in keiner Region liegt (z.B. Meltan und Melmetal),
-stehen in einer eigenen Gruppe "Unbekannt" am Ende der Liste.
+Gesuchte Pokemon, deren Dex-Nummer in keiner Region liegt (z.B. Meltan und
+Melmetal), stehen in einer eigenen Gruppe "Unbekannt" nach den uebrigen
+Regionen.
 
 Eintraege, die die Konsistenzpruefung nicht bestehen (z.B. wegen
 beschaedigter Daten), erscheinen nicht in der Liste, sondern werden als
@@ -411,8 +425,11 @@ Fehler gemeldet.
 
 ## Tauschlisten anderer Spieler abgleichen
 
-Eine fremde Tauschliste wird eingefuegt und einmalig mit den eigenen Listen
-verglichen. Sie wird nicht gespeichert. Es darf die ganze Nachricht
+Unter "Import/Export", Registerkarte "Fremde Liste abgleichen", wird eine
+fremde Tauschliste in das Textfeld eingefuegt (Button "Einfuegen" aus der
+Zwischenablage oder direkt ins Feld) und mit "Abgleichen" einmalig mit den
+eigenen Listen verglichen. Sie wird nicht gespeichert, weil sie beim
+naechsten Tausch oft schon veraltet ist. Es darf die ganze Nachricht
 eingefuegt werden: Text ausserhalb der Liste (z.B. eine Begruessung) wird
 ignoriert.
 
@@ -445,8 +462,24 @@ Sortierung innerhalb jeder Liste:
 2. dann sichere Treffer vor denen mit "pruefen",
 3. dann nach Dex-Nummer.
 
-Zusaetzlich werden Zeilen der fremden Liste angezeigt, die keiner bekannten
-Form zugeordnet werden konnten, jeweils mit Zeilennummer und Grund.
+Die Ergebnisseite zeigt nur Listen mit Treffern, jeweils mit Anzahl in der
+Ueberschrift. Jeder Treffer besteht aus bis zu drei Zeilen:
+
+```
+Er:  - #4 Glumanda - Shiny
+Ich: #4 Glumanda - Shiny [Glueck] (1/3)
+     pruefen: Geschlecht beim Angebot nicht angegeben . 1:1 gewuenscht
+```
+
+"Er" ist seine Zeile genau so, wie sie in seiner Liste stand; so findet man
+sie in seiner Nachricht wieder. "Ich" ist der eigene Eintrag in der
+gewohnten Darstellung. Die dritte Zeile erscheint nur bei "pruefen" oder
+"1:1 gewuenscht"; Treffer mit "pruefen" sind zusaetzlich am Rand markiert.
+
+Zeilen der fremden Liste, die keiner bekannten Form zugeordnet werden
+konnten, stehen am Ende in einem aufklappbaren Bereich "Nicht erkannte
+Zeilen", jeweils mit Zeilennummer, Text und Grund. Erkannt werden derzeit nur
+Zeilen mit Dex-Nummer (`#4 ...`).
 
 ## Abgleich zwischen Geraeten (z.B. Handy und PC)
 
@@ -791,7 +824,9 @@ Glumanda
 <Region> fehlt:
 - #<DexNr> <Eintragstext> [<Zaehlbedingungen>] (<Erledigt>/<Ziel>)
 
-<Region> abzugeben:
+--------------------
+
+Abzugeben:
 - #<DexNr> <Eintragstext>
 ```
 
@@ -807,10 +842,16 @@ Glumanda
   getrennt, und entfaellt, wenn keine gesetzt ist.
 - `(Erledigt/Ziel)` entfaellt bei `(0/1)`.
 - Gleiche Eintraege aus "Habe ich ueber" erscheinen nur einmal.
-- Die Region der Ueberschrift richtet sich nach der Dex-Nummer
+- Die Region einer Ueberschrift richtet sich nach der Dex-Nummer
   (`regionen.csv`), nicht nach der Spalte `Region` der Form.
-- Reihenfolge der Regionen: Regionen mit Bereich nach Dex-Nummer, die
-  Auffang-Region zuletzt. Leere Abschnitte und Regionen entfallen.
+- "1:1" und "fehlt" sind nach Region gegliedert. Reihenfolge der Regionen:
+  Regionen mit Bereich nach Dex-Nummer, die Auffang-Region zuletzt. Leere
+  Abschnitte und Regionen entfallen.
+- "Abzugeben" steht ohne Region am Ende, getrennt durch eine Trennlinie aus
+  20 Bindestrichen. Fehlen "1:1" und "fehlt", entfaellt die Trennlinie.
+- Beim Einlesen gilt das letzte Wort einer Ueberschrift als Abschnitt; eine
+  Region ist nicht noetig. Aeltere Listen mit "<Region> abzugeben:" werden
+  deshalb weiterhin erkannt. Die Trennlinie wird wie anderer Text ignoriert.
 - Innerhalb eines Abschnitts wird nach Dex-Nummer und dann nach
   Eintragstext sortiert.
 - Zeilenende ist immer ein einfacher Zeilenvorschub, unabhaengig vom

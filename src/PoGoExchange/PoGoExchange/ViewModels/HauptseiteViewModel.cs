@@ -39,10 +39,7 @@ public sealed partial class HauptseiteViewModel : SeiteViewModel
   [RelayCommand]
   private void ImportExportOeffnen()
   {
-    _navigation.Oeffnen(new PlatzhalterViewModel(
-      "Import/Export",
-      "Folgt in einem sp\u00e4teren Bauschritt: eigene Tauschliste erzeugen " +
-      "und fremde Listen abgleichen."));
+    _navigation.Oeffnen(new ImportExportViewModel(_navigation, _bestand));
   }
 
   [RelayCommand]

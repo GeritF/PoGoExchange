@@ -248,4 +248,24 @@ public class TauschlistenImportTests
     var fehler = Assert.Single(import.Fehler);
     Assert.Equal(4, fehler.ZeilenNummer);
   }
+
+  [Fact]
+  public void NeuesFormat_AbzugebenOhneRegion_HinterTrennlinie()
+  {
+    var text =
+      "Kanto fehlt:\n" +
+      "- #4 Glumanda\n" +
+      "\n" +
+      "--------------------\n" +
+      "\n" +
+      "Abzugeben:\n" +
+      "- #4 Glumanda\n";
+
+    var ergebnis = TauschlistenImport.Einlesen(_katalog, text);
+
+    Assert.Empty(ergebnis.Fehler);
+    Assert.Equal(
+      new[] { "fehlt", "abzugeben" },
+      ergebnis.Eintraege.Select(e => e.Abschnitt));
+  }
 }

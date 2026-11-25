@@ -134,12 +134,14 @@ public class TauschlisteTests
       "- #4 Glumanda - Shiny [100er]\n" +
       "- #37 Vulpix - Shiny - Alola\n" +
       "\n" +
-      "Kanto abzugeben:\n" +
-      "- #4 Glumanda - Shiny\n" +
-      "- #37 Vulpix\n" +
-      "\n" +
       "Kalos fehlt:\n" +
-      "- #669 Flab\u00e9b\u00e9 Rot (0/2)\n";
+      "- #669 Flab\u00e9b\u00e9 Rot (0/2)\n" +
+      "\n" +
+      "--------------------\n" +
+      "\n" +
+      "Abzugeben:\n" +
+      "- #4 Glumanda - Shiny\n" +
+      "- #37 Vulpix\n";
     Assert.Equal(erwartet, ergebnis.Text);
     Assert.Empty(ergebnis.Fehler);
   }
