@@ -26,6 +26,9 @@ public sealed class SammelErgebnis
 
   // Ziele, fuer die Shiny gefordert, aber (noch) nicht verfuegbar ist
   public int NichtVerfuegbar { get; init; }
+
+  // Ziele von Pokemon, die (laut Nutzdaten) nicht in Pokemon GO erhaeltlich sind
+  public int NichtInGo { get; init; }
 }
 
 // Legt viele Sucheintraege mit denselben Anforderungen auf einmal an,
@@ -35,6 +38,7 @@ public sealed class SammelErgebnis
 public static class SammelSuche
 {
   // region schraenkt auf eine Region ein (siehe Katalog.RegionZuDex), null = alle.
+  // Pokemon mit InGoVerfuegbar = false werden immer uebersprungen.
   // Ist Shiny gefordert, werden Ziele ohne verfuegbares Shiny uebersprungen;
   // ein spaeterer erneuter Aufruf ergaenzt neu verfuegbare.
   public static SammelErgebnis Anlegen(
@@ -55,8 +59,15 @@ public static class SammelSuche
     var uebersprungen = 0;
     var sofortErledigt = 0;
     var nichtVerfuegbar = 0;
-    foreach (var (pokemonGuid, formGuid, shinyVerfuegbar) in Ziele(katalog, modus, region))
+    var nichtInGo = 0;
+    foreach (var (pokemonGuid, formGuid, shinyVerfuegbar, inGo) in Ziele(katalog, modus, region))
     {
+      if (!inGo)
+      {
+        nichtInGo++;
+        continue;
+      }
+
       if (vorlage.Shiny && !shinyVerfuegbar)
       {
         nichtVerfuegbar++;
@@ -83,13 +94,15 @@ public static class SammelSuche
       NeueEintraege = neu,
       Uebersprungen = uebersprungen,
       SofortErledigt = sofortErledigt,
-      NichtVerfuegbar = nichtVerfuegbar
+      NichtVerfuegbar = nichtVerfuegbar,
+      NichtInGo = nichtInGo
     };
   }
 
   // Bei "Form beliebig" gilt Shiny als verfuegbar, wenn es fuer mindestens
   // eine nicht archivierte Form verfuegbar ist
-  private static IEnumerable<(Guid PokemonGuid, Guid FormGuid, bool ShinyVerfuegbar)> Ziele(
+  private static IEnumerable<(Guid PokemonGuid, Guid FormGuid, bool ShinyVerfuegbar, bool InGo)>
+    Ziele(
     Katalog katalog,
     SammelModus modus,
     string? region)
@@ -106,13 +119,14 @@ public static class SammelSuche
         .ToList();
       if (modus == SammelModus.ProPokemon)
       {
-        yield return (pokemon.Guid, Guid.Empty, formen.Any(f => f.ShinyVerfuegbar));
+        yield return (
+          pokemon.Guid, Guid.Empty, formen.Any(f => f.ShinyVerfuegbar), pokemon.InGoVerfuegbar);
         continue;
       }
 
       foreach (var form in formen)
       {
-        yield return (pokemon.Guid, form.Guid, form.ShinyVerfuegbar);
+        yield return (pokemon.Guid, form.Guid, form.ShinyVerfuegbar, pokemon.InGoVerfuegbar);
       }
     }
   }

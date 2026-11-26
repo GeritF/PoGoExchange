@@ -33,7 +33,10 @@ public class SammelSucheRegionTests
 
   private static Pokemon Pkmn(int dex, string name)
   {
-    return new Pokemon { Guid = Guid.NewGuid(), DexNr = dex, Name = name };
+    return new Pokemon
+    {
+      Guid = Guid.NewGuid(), DexNr = dex, Name = name, InGoVerfuegbar = true
+    };
   }
 
   private static PokemonForm Form(Pokemon p, string form = "", bool shiny = true)
@@ -86,5 +89,24 @@ public class SammelSucheRegionTests
 
     Assert.Equal(3, ergebnis.NeueEintraege.Count);
     Assert.All(ergebnis.NeueEintraege, e => Assert.True(e.FormBeliebig));
+  }
+
+  [Fact]
+  public void PokemonNichtInGo_WirdUebersprungen_UndGezaehlt()
+  {
+    var inGo = Pkmn(4, "Glumanda");
+    var nichtInGo = Pkmn(5, "Glutexo");
+    nichtInGo.InGoVerfuegbar = false;
+    var katalog = new Katalog(
+      new[] { inGo, nichtInGo },
+      new[] { Form(inGo), Form(nichtInGo) },
+      Array.Empty<RegionBereich>());
+
+    var ergebnis = SammelSuche.Anlegen(
+      katalog, new SucheEintrag(), SammelModus.ProForm,
+      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>(), Jetzt);
+
+    Assert.Equal(inGo.Guid, Assert.Single(ergebnis.NeueEintraege).PokemonGuid);
+    Assert.Equal(1, ergebnis.NichtInGo);
   }
 }

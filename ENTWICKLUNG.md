@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-26, 304 Tests gruen (mit "aeltere Pakete" und Schutztest).
+Stand: 2026-11-26, 305 Tests gruen.
 
 ## Inhalt
 
@@ -100,8 +100,8 @@ Stand: 2026-11-26, 304 Tests gruen (mit "aeltere Pakete" und Schutztest).
 - Import ersetzt alles: Pruefung (Paket, Version gleich oder aelter,
   Probeladen in temporaerem Ordner), Rueckfrage, Sicherung, Ersetzen,
   Neuladen. "LetzteAenderung" kommt aus dem Paket.
-- Offen: Verhalten beim Ueberschreiben einer vorhandenen Datei auf Android
-  pruefen (Gerit erinnern, falls das Ergebnis noch fehlt).
+- Auf Android wird der Dateiname ohne Endung vorgeschlagen, weil das System
+  `.zip` selbst anhaengt.
 
 ### Was die Fachlogik bereits kann
 
@@ -197,6 +197,9 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   jede Seite erbt von `SeiteViewModel`.
 - Neue Seiten brauchen einen Eintrag in den `DataTemplates` von
   `Views/MainView.axaml`.
+- `PlatzhalterViewModel`/`PlatzhalterView` werden derzeit nicht benutzt,
+  bleiben aber bewusst fuer eine spaetere Seite "Einstellungen". Nicht als
+  toten Code entfernen.
 - Compiled Bindings: jede View hat `x:DataType`.
 - Seiten melden Ergebnisse ueber Rueckruf-Funktionen (`Action<...>`) an die
   aufrufende Seite, die dann ihre Listen aktualisiert und eine Rueckmeldung
@@ -217,6 +220,14 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - Schreiben mit CRLF ueber eine Temp-Datei; Lesen akzeptiert LF und CRLF.
 - Anzahl ist in Dateien nie 0; geloeschte Zeilen werden entfernt.
 
+### Nutzdaten
+
+- Bei jeder Aenderung an `pokemon.csv` oder `formen.csv` den Wert `Version`
+  in `nutzdaten_info.csv` erhoehen (und `Stand` setzen). Der Import von
+  Exportpaketen prueft diese Version; ohne Erhoehung wuerde ein Paket aus
+  einer neueren Programmversion nicht als solches erkannt.
+- GUIDs nie neu erzeugen; vorhandene Zeilen nur aendern.
+
 ### Tests
 
 - Jede neue Logik bekommt Tests. Tests pruefen gemessene Werte, nie fest
@@ -224,14 +235,17 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - Tests mit Dateien nutzen einen eigenen temporaeren Ordner und raeumen ihn
   in `Dispose` auf.
 - Tests, die einen `Datenbestand` laden, nutzen `TestNutzdaten.Laden`, nie
-  die echten Nutzdaten.
+  die echten Nutzdaten. Die Testdaten haben `InGoVerfuegbar=1` fuer alle 11
+  Pokemon; Tests, die Pokemon im Code anlegen und "+ Mehrere" nutzen, muessen
+  `InGoVerfuegbar = true` setzen.
 - Tests, die statische Werte in `AppActions` veraendern, gehoeren in die
   Sammlung `[Collection("Zwischenablage")]`, damit sie nicht parallel laufen.
 - Testlauf ueber `test/Test_XUnit.sh` (Auswertung pro Klasse).
 
 ## 5. Arbeitsweise (Anweisungen fuer die KI)
 
-- **Sprache:** Deutsch. Antworten kurz und vollstaendig.
+- **Sprache:** Deutsch. Antworten kurz und vollstaendig; ausfuehrlich nur auf
+  ausdruecklichen Wunsch.
 - **Erst besprechen, dann bauen:** Vor jedem Bauschritt einen Entwurf mit
   konkreten Fragen vorlegen. Erst nach Gerits Antwort Code liefern.
 - **Kleine Schritte:** Groessere Umbauten in Runden teilen, die jeweils mit
@@ -276,15 +290,24 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   Kopfzeile.
 - **Neue Spalten in Nutzdaten** als `.Optional()` mappen, sonst scheitert das
   Lesen aelterer Dateien (Testdaten) an der fehlenden Kopfzeile.
+- **Sichtbarkeit fuer Tests:** Das Testprojekt sieht nur `public`-Mitglieder
+  (kein `InternalsVisibleTo`). Methoden, die ein Test direkt aufruft, muessen
+  `public` sein; nur intern genutzte bleiben `internal` oder `private`.
+- **Android, Speichern-Dialog:** Android haengt die Dateiendung selbst an
+  ("abc.zip.zip"). Deshalb wird dort der Name ohne `.zip` vorgeschlagen
+  (`OperatingSystem.IsAndroid()` in `MainView.axaml.cs`). Eine vorhandene
+  Datei wird dabei nicht ueberschrieben.
 - **Testdaten nie mit den echten Nutzdaten ueberschreiben.**
   `PoGoExchange.Tests/Testdaten/` enthaelt bewusst die 11 Test-Pokemon; ein
   Schutztest meldet "Testdaten wurden ueberschrieben". Einmalige Skripte (z.B.
   das Kopieren der Testdaten) nicht erneut ausfuehren.
-- **Inkrementeller Build und eingebettete Ressourcen:** Werden Dateien mit
-  erhaltenem, aelterem Zeitstempel ersetzt (`cp -p`, Dateimanager), bettet der
-  inkrementelle Build sie nicht neu ein; Tests laufen dann mit dem alten
-  Inhalt. Abhilfe: `bin`/`obj` loeschen bzw. `dotnet clean`. (Gemessen bei
-  den Testdaten.)
+- **Inkrementeller Build und eingebettete Ressourcen:** Wird eine Datei durch
+  eine mit aelterem Zeitstempel als die fertige DLL ersetzt (`cp -p`,
+  Dateimanager mit erhaltenem Datum), bettet der inkrementelle Build sie nicht
+  neu ein; Tests laufen dann mit dem alten Inhalt. Frisch heruntergeladene
+  Dateien sind unkritisch. `test/Test_XUnit.sh` fuehrt deshalb vor jedem
+  Testlauf `dotnet clean` aus (abschaltbar mit `SAUBER=0`). (Gemessen bei den
+  Testdaten.)
 - **Rider:** Drag-and-Drop zwischen Projekten erzeugt Verweise statt
   Verschiebungen (mit `git mv` verschieben). "Unload Project" blendet nur aus.
 - **Debug-Start auf Android** dauert lange; der Start ueber das App-Symbol
@@ -310,7 +333,10 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   Testdaten (11 Pokemon) in `PoGoExchange.Tests/Testdaten/`. Persoenliche
   Beispieldaten nur im Datenordner, nicht im Repository.
 - Datenpflege der Nutzdaten geschieht in eigenen Chats nach Gerits
-  Arbeitsanweisung `NUTZDATEN_PFLEGE.md` (nicht im Repository). Regeln:
+  Arbeitsanweisung `NUTZDATEN_PFLEGE.md`. Sie und die Prueflisten
+  (`zu_pruefen_ingo.csv`, `zu_pruefen_formen.csv`) liegen lokal im Ordner
+  `Nutzdaten_Pflege/` im Projektverzeichnis, sind aber per `.gitignore`
+  ausgeschlossen (nicht im Repository, nicht im Arbeitsstand-ZIP). Regeln:
   GUIDs nie neu erzeugen, vorhandene Zeilen nur aendern; Shiny nur bei
   sicherem Beleg.
 
@@ -330,6 +356,10 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 | Hochziehen         | Beim Entwickeln eine Suchzeile auf die neue Form mitnehmen   |
 | passt / pruefen    | Ergebnis des Merkmalsvergleichs mit einer fremden Liste      |
 | Nutzdaten          | Pokemon, Formen, Regionen; werden mit dem Programm geliefert |
+| + Mehrere          | Viele Suchzeilen auf einmal anlegen (intern `SammelSuche`)   |
+| Eigene Listen      | Export/Import aller eigenen Daten als Datei (Exportpaket)    |
+| Sicherung          | ZIP der eigenen Daten in `sicherungen/`, mit Aufraeumregeln  |
+| .bak_N             | Kopie einer Datei vor einer Reparatur beim Laden             |
 
 ## 9. ToDo-Liste
 
@@ -342,7 +372,6 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - Update der Nutzdaten fuer offiziell entfernte Formen (archivieren und nach
   `eigene_formen.csv` uebernehmen). Bisher wurde nie eine offizielle Form
   entfernt; erst bauen, wenn der Fall eintritt.
-- "+ Mehrere" ueberspringt Pokemon mit `InGoVerfuegbar=0`.
 - WLAN-Abgleich: ersetzt auf dem Zielgeraet alles (wie der Import), mit
   Rueckfrage "Wirklich ersetzen?"; gleiche Paket- und Versionsregeln.
 - Exportpaket als ZIP (Export und Import aller eigenen Daten).

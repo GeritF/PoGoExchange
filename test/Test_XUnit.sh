@@ -1,7 +1,10 @@
 #!/bin/bash
 # Testlauf mit Auswertung pro Testklasse
 # ALLE_TESTS=1 listet zusaetzlich jeden einzelnen Test mit seinen Testdaten
+# SAUBER=1 fuehrt vorher "dotnet clean" aus, damit ersetzte eingebettete
+# Dateien (z.B. Testdaten mit altem Zeitstempel) sicher neu eingebettet werden
 ALLE_TESTS=0
+SAUBER=1
 
 cd "$(dirname "$0")/../src/PoGoExchange" || exit 1
 log=/tmp/pogo_test.log
@@ -10,6 +13,15 @@ log=/tmp/pogo_test.log
 ascii() {
   perl -CS -pe 's/([^\x00-\x7F])/sprintf("\\u%04x", ord($1))/ge'
 }
+
+if [ "$SAUBER" = "1" ]; then
+  echo "=== Bereinigung ==="
+  if dotnet clean PoGoExchange.Tests -nologo -v q > /tmp/pogo_clean.log 2>&1; then
+    echo "Bereinigung: True"
+  else
+    echo "Bereinigung: False (Details in /tmp/pogo_clean.log)"
+  fi
+fi
 
 echo "=== Testlauf ==="
 if dotnet test PoGoExchange.Tests -nologo --logger "console;verbosity=normal" > "$log" 2>&1; then

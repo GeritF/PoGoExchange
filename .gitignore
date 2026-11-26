@@ -449,3 +449,6 @@ ehthumbs_vista.db
 [Dd]esktop.ini
 $RECYCLE.BIN/
 *.stackdump
+
+# Nutzdaten-Pflege (lokal, nicht im Repository)
+/Nutzdaten_Pflege/

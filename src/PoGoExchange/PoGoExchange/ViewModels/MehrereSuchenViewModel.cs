@@ -141,6 +141,10 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
     {
       teile.Add($"Shiny nicht verf\u00fcgbar: {e.NichtVerfuegbar}");
     }
+    if (e.NichtInGo > 0)
+    {
+      teile.Add($"nicht in GO: {e.NichtInGo}");
+    }
 
     teile.Add($"davon bereits erledigt: {e.SofortErledigt}");
     Vorschau = string.Join(" \u00b7 ", teile);

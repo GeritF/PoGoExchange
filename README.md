@@ -294,6 +294,10 @@ Regeln:
   keine Shinys in der Tauschliste, die es im Spiel noch nicht gibt. Wird
   dieselbe Suche spaeter erneut gestartet, kommen inzwischen verfuegbare
   Shinys hinzu.
+- Pokemon, die es laut Nutzdaten nicht in Pokemon GO gibt
+  (`InGoVerfuegbar` = 0), werden uebersprungen; die Vorschau nennt ihre
+  Anzahl ("nicht in GO"), sobald es welche gibt. Einzeln ueber "+ Neu" lassen
+  sie sich weiterhin suchen.
 - Neue Zeilen, fuer die es in "Habe ich" schon ein passendes Exemplar gibt,
   zaehlen sofort als erledigt.
 - Gibt es nichts Neues, wird nichts angelegt und auch keine Sicherung
@@ -755,8 +759,8 @@ Eine Zeile pro Pokemon-Art.
 | Kategorie      | Leer, `Legendaer`, `Mysterioes`, `Ultrabestie` oder `Paradox` (wird nicht angezeigt) |
 | InGoVerfuegbar | `1` = sicher belegt, dass es in Pokemon GO erhaeltlich ist, sonst `0`; optional    |
 
-`InGoVerfuegbar` wird gelesen, aber noch nicht genutzt (spaeter
-voraussichtlich bei "+ Mehrere"). Fehlt die Spalte, gilt `0`. Die Kategorie ist
+`InGoVerfuegbar` wird bei "+ Mehrere" genutzt: Pokemon mit `0` werden dort
+uebersprungen. Fehlt die Spalte, gilt `0`. Die Kategorie ist
 freier Text; neue Kategorien brauchen keine Programmaenderung.
 
 ### formen.csv

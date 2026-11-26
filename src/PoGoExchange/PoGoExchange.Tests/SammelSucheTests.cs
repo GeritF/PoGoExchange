@@ -42,7 +42,10 @@ public class SammelSucheTests
 
   private static Pokemon Pkmn(int dex, string name)
   {
-    return new Pokemon { Guid = Guid.NewGuid(), DexNr = dex, Name = name };
+    return new Pokemon
+    {
+      Guid = Guid.NewGuid(), DexNr = dex, Name = name, InGoVerfuegbar = true
+    };
   }
 
   private static PokemonForm Form(Pokemon p, string form = "", string region = "")
