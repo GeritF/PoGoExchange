@@ -43,7 +43,7 @@ public sealed partial class HauptseiteViewModel : SeiteViewModel
   [RelayCommand]
   private void ImportExportOeffnen()
   {
-    _navigation.Oeffnen(new ImportExportViewModel(_navigation, _bestand));
+    _navigation.Oeffnen(new ImportExportViewModel(_navigation, _bestand, _neuLaden));
   }
 
   [RelayCommand]

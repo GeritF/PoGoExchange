@@ -39,7 +39,8 @@ Die Hauptseite fuehrt ueber Kacheln zu den Bereichen:
 - **Tauschlisten**: die drei persoenlichen Listen als Registerkarten
   "Suche ich", "Habe ich" und "Habe ich ueber"
 - **Import/Export**: eigene Tauschliste erzeugen und kopieren, fremde Listen
-  einfuegen und abgleichen
+  einfuegen und abgleichen, eigene Listen als Datei exportieren und
+  importieren (Registerkarte "Eigene Listen")
 - **Verwaltung**: Datenordner, Anzahl der Zeilen (bei "Habe ich" auch der
   Exemplare), Zeitpunkt der letzten Aenderung und Lademeldungen, mit einem
   Button zum Kopieren in die Zwischenablage; dazu die Buttons "Sicherungen"
@@ -540,8 +541,9 @@ Es gibt zwei Wege, die eigenen Daten zwischen Geraeten zu uebertragen:
    auf beiden Seiten bestaetigt werden muss. Das Programm empfiehlt die
    Richtung anhand der juengsten Aenderung. Beide Seiten muessen die Richtung
    bestaetigen, sie kann auch geaendert werden.
-2. **Ueber eine Datei**: Export als ZIP-Datei, die auf das andere Geraet
-   kopiert und dort importiert wird.
+2. **Ueber eine Datei** (umgesetzt): unter Import/Export > "Eigene Listen"
+   exportieren, die Datei auf das andere Geraet bringen und dort importieren
+   (siehe "Eigene Listen exportieren und importieren").
 
 Wichtig:
 
@@ -553,6 +555,32 @@ Wichtig:
   verloren.
 - Waehrend des WLAN-Abgleichs bleibt der Bildschirm eingeschaltet. Das
   Fenster sollte bis zum Ende geoeffnet bleiben.
+
+## Eigene Listen exportieren und importieren
+
+Unter Import/Export, Registerkarte "Eigene Listen":
+
+- **"Eigene Listen als Datei exportieren"** speichert "Habe ich", "Suche ich",
+  "Habe ich ueber", die eigenen Formen und `abgleich_info.csv` in einer
+  ZIP-Datei. Die Dateiauswahl des Systems schlaegt einen Namen wie
+  `PoGoExchange_2026-11-26_15-30.zip` vor; Speicherort frei waehlbar, auf dem
+  Handy z.B. "Downloads" oder ein Cloud-Speicher. Damit lassen sich die Daten
+  auf ein anderes Geraet uebertragen und ausserhalb des Geraets sichern.
+- **"Eigene Listen aus Datei importieren"** ersetzt alle eigenen Listen durch
+  die der Datei. Vorher prueft das Programm, ohne etwas zu veraendern:
+  - ob es ein Paket dieses Programms ist,
+  - ob es aus derselben oder einer aelteren Programmversion stammt (Version
+    der Nutzdaten); Pakete aus einer neueren Version werden abgelehnt mit dem
+    Hinweis, zuerst das Programm zu aktualisieren,
+  - ob sich alle Dateien fehlerfrei laden lassen.
+  Danach folgt eine Rueckfrage mit Zusammenfassung (Datum, Anzahl der Zeilen).
+  Bei "Ja" wird der aktuelle Stand gesichert, die Dateien ersetzt und alles
+  neu geladen. Aeltere Pakete durchlaufen dabei die ueblichen Schritte beim
+  Laden, z.B. die Uebernahme eigener Formen, die es inzwischen offiziell gibt.
+- "Letzte Aenderung" wird aus dem Paket uebernommen, damit beide Geraete
+  denselben Stand und denselben Zeitstempel haben.
+
+Die Nutzdaten sind nicht enthalten; sie gehoeren zum Programm.
 
 ## Updates der Nutzdaten
 
@@ -889,11 +917,20 @@ Start leer mit Kopfzeile angelegt.
 
 ## Exportpaket (ZIP)
 
-Fuer Abgleich und Datei-Export werden alle oben genannten Dateien
-(Nutzdaten und eigene Daten) in eine ZIP-Datei gepackt. Der WLAN-Abgleich
-uebertraegt dasselbe Paket. (Noch nicht umgesetzt.) Sicherungen sind
-ebenfalls ZIP-Dateien, enthalten aber nur die persoenlichen Dateien (siehe
-"Sicherungen" in Abschnitt 3).
+Das Exportpaket enthaelt dieselben persoenlichen Dateien wie eine Sicherung
+(`habe_ich.csv`, `suche_ich.csv`, `habe_ich_ueber.csv`, `eigene_formen.csv`,
+`abgleich_info.csv`) und zusaetzlich `paket_info.csv`:
+
+| Schluessel       | Wert                                               |
+|------------------|----------------------------------------------------|
+| Format           | Version des Paketformats, derzeit `1`              |
+| Erstellt         | Zeitpunkt der Erstellung (ISO 8601, UTC)           |
+| NutzdatenVersion | `Version` aus `nutzdaten_info.csv` beim Erstellen  |
+
+Die Nutzdaten sind nicht enthalten. Eingespielt wird nur, wenn die
+`NutzdatenVersion` des Pakets gleich oder aelter ist als die des Programms
+(als Zahl verglichen; nicht als Zahl lesbare Versionen muessen gleich sein).
+Der spaetere WLAN-Abgleich soll dasselbe Paket uebertragen.
 
 ## Eintragstext
 
@@ -1275,9 +1312,11 @@ haeufige Abgleiche sonst viele Sicherungen erzeugen wuerden.
 
 ## Abgleich zwischen Geraeten
 
-Ein Abgleich uebertraegt immer das vollstaendige Exportpaket, einschliesslich
-der Nutzdaten. Ein teilweiser Abgleich wuerde bei unterschiedlichen
-Nutzdaten-Versionen zu Verweisen auf unbekannte GUIDs fuehren.
+Ein Abgleich uebertraegt immer das vollstaendige Exportpaket und ersetzt auf
+dem Zielgeraet alle eigenen Listen, wie der Import einer Datei, mit der
+Rueckfrage "Wirklich ersetzen?". Die Nutzdaten werden nicht uebertragen; wie
+beim Import gilt: Das Paket darf nicht aus einer neueren Programmversion
+stammen, sonst koennten Verweise auf unbekannte Formen entstehen.
 
 Empfehlung der Richtung: Jede Seite liefert ihren Wert `LetzteAenderung` aus
 `abgleich_info.csv`. Die Seite mit dem juengeren Wert wird als Quelle
@@ -1433,7 +1472,10 @@ zugeordnet werden koennen.
   `Datenbestand.Laden` nimmt dafuer optional eigene `Nutzdaten` entgegen.
   `NutzdatenTests` pruefen die echten Daten, aber nur ihre Struktur.
 - Den Abgleich eigener Formen mit offiziellen beim Laden uebernimmt
-  `Services/FormAbgleich.cs`.
+  `Services/FormAbgleich.cs`, Export und Import der eigenen Listen
+  `Services/Exportpaket.cs`. Die Dateiauswahl laeuft ueber `AppActions`
+  (`DateiSpeichern`, `DateiOeffnen`), gesetzt in `MainView.axaml.cs` mit dem
+  `StorageProvider` von Avalonia.
 - Fuer eigene Tests mit Beispieldaten werden die CSV-Dateien einfach in den
   Datenordner kopiert. Beispieldaten fuer persoenliche Listen sind bewusst
   nicht im Repository, damit jeder Anwender mit leeren Listen beginnt.

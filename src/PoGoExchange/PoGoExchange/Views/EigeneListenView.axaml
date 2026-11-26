@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             x:Class="PoGoExchange.Views.EigeneListenView"
+             x:DataType="vm:EigeneListenViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="8" Spacing="8">
+      <TextBlock Text="Alle eigenen Listen (Habe ich, Suche ich, Habe ich &#xFC;ber) und die eigenen Formen als eine Datei speichern, z.B. f&#xFC;r ein anderes Ger&#xE4;t oder als Sicherung au&#xDF;erhalb des Ger&#xE4;ts."
+                 TextWrapping="Wrap" />
+      <Button Content="Eigene Listen als Datei exportieren"
+              Command="{Binding ExportierenCommand}" />
+      <Button Content="Eigene Listen aus Datei importieren"
+              Command="{Binding ImportierenCommand}" />
+      <TextBlock Text="Der Import ersetzt alle eigenen Listen. Dateien aus einer neueren Programmversion werden abgelehnt."
+                 Opacity="0.6"
+                 TextWrapping="Wrap" />
+
+      <StackPanel IsVisible="{Binding RueckfrageSichtbar}" Spacing="4">
+        <TextBlock Text="{Binding RueckfrageText}" Foreground="Red" TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Ja, ersetzen" Command="{Binding ImportJaCommand}" />
+          <Button Content="Nein" Command="{Binding ImportNeinCommand}" />
+        </StackPanel>
+      </StackPanel>
+
+      <TextBlock Text="{Binding Meldung}" IsVisible="{Binding HatMeldung}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -423,4 +423,16 @@ public class DatenbestandTests : IDisposable
     Assert.Contains(bestand.Meldungen, m => m.Text.Contains("erst \u00fcbernommen"));
     Assert.Empty(Sicherungen.Liste(_ordner));
   }
+
+  [Fact]
+  public void Testdaten_SindDieFestenTestPokemon()
+  {
+    var pokemon = TestNutzdaten.Daten.Pokemon.Count;
+    var formen = TestNutzdaten.Daten.Formen.Count;
+
+    Assert.True(
+      pokemon == 11 && formen == 18,
+      $"Testdaten wurden ueberschrieben: {pokemon} Pokemon und {formen} Formen statt " +
+      "11 und 18. Testdaten nie aus Nutzdaten/ kopieren; danach bin/obj loeschen.");
+  }
 }

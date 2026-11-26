@@ -134,25 +134,40 @@ public static class Sicherungen
   // Sicherung fehlen, werden entfernt (beim Laden entstehen sie leer neu).
   public static void Wiederherstellen(string datenordner, SicherungInfo sicherung, DateTime jetzt)
   {
-    var inhalt = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+    Dictionary<string, byte[]> inhalt;
     using (var zip = ZipFile.OpenRead(sicherung.Pfad))
     {
-      foreach (var eintrag in zip.Entries)
-      {
-        if (!Dateien.Contains(eintrag.FullName, StringComparer.OrdinalIgnoreCase))
-        {
-          continue;
-        }
-
-        using var strom = eintrag.Open();
-        using var puffer = new MemoryStream();
-        strom.CopyTo(puffer);
-        inhalt[eintrag.FullName] = puffer.ToArray();
-      }
+      inhalt = Inhalt(zip);
     }
 
     Anlegen(datenordner, jetzt, aufraeumen: false);
+    DateienErsetzen(datenordner, inhalt);
+    Aufraeumen(datenordner);
+  }
 
+  // Die bekannten persoenlichen Dateien aus einem ZIP (andere Eintraege werden ignoriert)
+  internal static Dictionary<string, byte[]> Inhalt(ZipArchive zip)
+  {
+    var inhalt = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+    foreach (var eintrag in zip.Entries)
+    {
+      if (!Dateien.Contains(eintrag.FullName, StringComparer.OrdinalIgnoreCase))
+      {
+        continue;
+      }
+
+      using var strom = eintrag.Open();
+      using var puffer = new MemoryStream();
+      strom.CopyTo(puffer);
+      inhalt[eintrag.FullName] = puffer.ToArray();
+    }
+
+    return inhalt;
+  }
+
+  // Ersetzt die persoenlichen Dateien im Datenordner; fehlende werden entfernt
+  internal static void DateienErsetzen(string datenordner, Dictionary<string, byte[]> inhalt)
+  {
     foreach (var datei in Dateien)
     {
       var pfad = Path.Combine(datenordner, datei);
@@ -167,7 +182,5 @@ public static class Sicherungen
         File.Delete(pfad);
       }
     }
-
-    Aufraeumen(datenordner);
   }
 }

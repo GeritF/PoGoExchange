@@ -16,10 +16,17 @@ public sealed partial class ImportExportViewModel : SeiteViewModel
   private readonly Navigation _navigation;
   private readonly Datenbestand? _bestand;
 
-  public ImportExportViewModel(Navigation navigation, Datenbestand? bestand)
+  public ImportExportViewModel(
+    Navigation navigation,
+    Datenbestand? bestand,
+    Func<Datenbestand?>? neuLaden = null)
   {
     _navigation = navigation;
     _bestand = bestand;
+
+    EigeneListen = bestand != null && neuLaden != null
+      ? new EigeneListenViewModel(bestand, neuLaden)
+      : null;
 
     if (bestand == null)
     {
@@ -39,6 +46,11 @@ public sealed partial class ImportExportViewModel : SeiteViewModel
   }
 
   public override string Titel => "Import/Export";
+
+  // Registerkarte "Eigene Listen"; null ohne geladene Daten
+  public EigeneListenViewModel? EigeneListen { get; }
+
+  public bool HatEigeneListen => EigeneListen != null;
 
   // --- Meine Tauschliste ---
 

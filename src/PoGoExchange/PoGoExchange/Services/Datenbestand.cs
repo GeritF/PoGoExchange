@@ -58,6 +58,8 @@ public sealed class Datenbestand
   public List<SucheEintrag> Suche { get; private set; } = new();
   public List<UeberEintrag> Ueber { get; private set; } = new();
   public IReadOnlyList<LadeMeldung> Meldungen => _meldungen;
+  // Die verwendeten Nutzdaten (mitgelieferte oder in Tests uebergebene)
+  public Nutzdaten Nutzdaten => _nutzdaten ??= EingebetteteNutzdaten.Alle();
 
   // Zeitpunkt der letzten Aenderung auf diesem Geraet (fuer den Abgleich),
   // oder null, wenn noch nichts gespeichert wurde

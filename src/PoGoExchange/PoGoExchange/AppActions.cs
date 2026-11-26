@@ -13,4 +13,11 @@ public static class AppActions
 
   // Text aus der Zwischenablage lesen; wird von der Oberflaeche (MainView) gesetzt
   public static Func<Task<string?>>? AusZwischenablageLesen { get; set; }
+
+  // Datei ueber die Dateiauswahl speichern (Vorschlag fuer den Namen, Inhalt);
+  // liefert false, wenn der Anwender abbricht
+  public static Func<string, byte[], Task<bool>>? DateiSpeichern { get; set; }
+
+  // Datei ueber die Dateiauswahl oeffnen; liefert null, wenn der Anwender abbricht
+  public static Func<Task<byte[]?>>? DateiOeffnen { get; set; }
 }

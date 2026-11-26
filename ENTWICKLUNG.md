@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-26, 289 Tests gruen.
+Stand: 2026-11-26, 304 Tests gruen (mit "aeltere Pakete" und Schutztest).
 
 ## Inhalt
 
@@ -33,6 +33,15 @@ Stand: 2026-11-26, 289 Tests gruen.
 
 2. Im neuen Chat das Archiv hochladen und etwa so beginnen:
 
+   Hinweis: `git archive HEAD` enthaelt nur Committetes. Fuer den aktuellen
+   Arbeitsstand stattdessen:
+
+   ```bash
+   cd ~/DEV/3_PoGoExchange
+   rm -f ~/PoGoExchange_arbeitsstand.zip
+   git ls-files -co --exclude-standard | zip -q ~/PoGoExchange_arbeitsstand.zip -@
+   ```
+
    > Wir entwickeln PoGoExchange weiter. Lies bitte zuerst `ENTWICKLUNG.md`
    > und `README.md` aus dem Archiv und halte dich an die dort beschriebene
    > Arbeitsweise. Danach machen wir mit [naechster Schritt] weiter.
@@ -49,7 +58,7 @@ Stand: 2026-11-26, 289 Tests gruen.
 | 1     | Grundlagen, Toolchain, Projektaufbau     | fertig                         |
 | 2     | Fachlogik (Services, Tests)              | fertig                         |
 | 3     | Oberflaeche                              | fertig (siehe Bauschritte)     |
-| 4     | Daten und Plattformen                    | teilweise (echte Nutzdaten da) |
+| 4     | Daten und Plattformen                    | weitgehend (Nutzdaten, Export) |
 | 5     | Abgleich zwischen Geraeten (WLAN)        | offen                          |
 | 6     | Windows-Build, Verteilung                | offen                          |
 
@@ -84,6 +93,16 @@ Stand: 2026-11-26, 289 Tests gruen.
   (`FormAbgleich`). Mit Gerits Daten erprobt: Icognito "?" und "!" wurden
   umgestellt, Sicherung angelegt.
 
+### Eigene Listen exportieren und importieren (eingebaut)
+
+- Import/Export > Registerkarte "Eigene Listen". Paket = persoenliche Dateien
+  + `paket_info.csv` (Format, Erstellt, NutzdatenVersion), keine Nutzdaten.
+- Import ersetzt alles: Pruefung (Paket, Version gleich oder aelter,
+  Probeladen in temporaerem Ordner), Rueckfrage, Sicherung, Ersetzen,
+  Neuladen. "LetzteAenderung" kommt aus dem Paket.
+- Offen: Verhalten beim Ueberschreiben einer vorhandenen Datei auf Android
+  pruefen (Gerit erinnern, falls das Ergebnis noch fehlt).
+
 ### Was die Fachlogik bereits kann
 
 Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
@@ -103,8 +122,10 @@ Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
 - Eigene Formen anlegen, aendern, loeschen (`FormVerwaltung`) und beim
   Laden mit offiziellen abgleichen (`FormAbgleich`)
 
-Alle Fachfunktionen haben eine Oberflaeche. Noch nicht gebaut sind
-Exportpaket, Update der Nutzdaten und der Abgleich zwischen Geraeten.
+- Exportpaket der eigenen Listen (`Exportpaket`)
+
+Alle Fachfunktionen haben eine Oberflaeche. Noch nicht gebaut sind das
+Update der Nutzdaten fuer entfernte Formen und der Abgleich zwischen Geraeten.
 
 ## 3. Verworfene Entscheidungen
 
@@ -255,6 +276,15 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   Kopfzeile.
 - **Neue Spalten in Nutzdaten** als `.Optional()` mappen, sonst scheitert das
   Lesen aelterer Dateien (Testdaten) an der fehlenden Kopfzeile.
+- **Testdaten nie mit den echten Nutzdaten ueberschreiben.**
+  `PoGoExchange.Tests/Testdaten/` enthaelt bewusst die 11 Test-Pokemon; ein
+  Schutztest meldet "Testdaten wurden ueberschrieben". Einmalige Skripte (z.B.
+  das Kopieren der Testdaten) nicht erneut ausfuehren.
+- **Inkrementeller Build und eingebettete Ressourcen:** Werden Dateien mit
+  erhaltenem, aelterem Zeitstempel ersetzt (`cp -p`, Dateimanager), bettet der
+  inkrementelle Build sie nicht neu ein; Tests laufen dann mit dem alten
+  Inhalt. Abhilfe: `bin`/`obj` loeschen bzw. `dotnet clean`. (Gemessen bei
+  den Testdaten.)
 - **Rider:** Drag-and-Drop zwischen Projekten erzeugt Verweise statt
   Verschiebungen (mit `git mv` verschieben). "Unload Project" blendet nur aus.
 - **Debug-Start auf Android** dauert lange; der Start ueber das App-Symbol
@@ -313,6 +343,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   `eigene_formen.csv` uebernehmen). Bisher wurde nie eine offizielle Form
   entfernt; erst bauen, wenn der Fall eintritt.
 - "+ Mehrere" ueberspringt Pokemon mit `InGoVerfuegbar=0`.
+- WLAN-Abgleich: ersetzt auf dem Zielgeraet alles (wie der Import), mit
+  Rueckfrage "Wirklich ersetzen?"; gleiche Paket- und Versionsregeln.
 - Exportpaket als ZIP (Export und Import aller eigenen Daten).
 - Abgleich zwischen Geraeten per WLAN (Phase 5), vorher Testprogramm fuer
   Ports, Berechtigungen und Broadcast.

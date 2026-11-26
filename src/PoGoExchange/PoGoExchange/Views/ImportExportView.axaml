@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:PoGoExchange.ViewModels"
+             xmlns:views="using:PoGoExchange.Views"
              x:Class="PoGoExchange.Views.ImportExportView"
              x:DataType="vm:ImportExportViewModel">
   <TabControl>
@@ -54,6 +55,10 @@
                  MinHeight="200"
                  Margin="0,8,0,0" />
       </DockPanel>
+    </TabItem>
+
+    <TabItem Header="Eigene Listen" IsVisible="{Binding HatEigeneListen}">
+      <views:EigeneListenView DataContext="{Binding EigeneListen}" />
     </TabItem>
   </TabControl>
 </UserControl>
