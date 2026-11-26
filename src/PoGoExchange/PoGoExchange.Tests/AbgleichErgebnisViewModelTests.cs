@@ -23,7 +23,7 @@ public class AbgleichErgebnisViewModelTests : IDisposable
   // Bestand mit einer Suche nach Glumanda Shiny (optional mit Geschlecht)
   private Datenbestand MitGlumandaSuche(Geschlecht geschlecht = Geschlecht.Unbestimmt)
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var glumanda = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 4);
     var form = bestand.Katalog.FormenZuPokemon(glumanda.Guid).First();
     bestand.Suche.Add(new SucheEintrag

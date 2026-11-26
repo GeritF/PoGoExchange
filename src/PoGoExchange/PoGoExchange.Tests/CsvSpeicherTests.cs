@@ -52,7 +52,7 @@ public class CsvSpeicherTests : IDisposable
     Assert.Equal(new byte[] { 0xEF, 0xBB, 0xBF }, bytes.Take(3).ToArray());
 
     var kopf = File.ReadAllLines(_pfad, Encoding.UTF8)[0];
-    Assert.Equal("Guid;DexNr;Name;Kategorie", kopf);
+    Assert.Equal("Guid;DexNr;Name;Kategorie;InGoVerfuegbar", kopf);
   }
 
   [Fact]
@@ -149,7 +149,7 @@ public class CsvSpeicherTests : IDisposable
     CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, Array.Empty<Pokemon>());
 
     var zeilen = File.ReadAllLines(_pfad, Encoding.UTF8);
-    Assert.Equal(new[] { "Guid;DexNr;Name;Kategorie" }, zeilen);
+    Assert.Equal(new[] { "Guid;DexNr;Name;Kategorie;InGoVerfuegbar" }, zeilen);
   }
 
   [Fact]
@@ -158,7 +158,7 @@ public class CsvSpeicherTests : IDisposable
     var guid = Guid.NewGuid();
     File.WriteAllText(
       _pfad,
-      $"Name;Kategorie;DexNr;Guid\r\nGlumanda;;4;{guid}\r\n",
+      $"Name;InGoVerfuegbar;Kategorie;DexNr;Guid\r\nGlumanda;1;;4;{guid}\r\n",
       new UTF8Encoding(true));
 
     var ergebnis = CsvSpeicher.LesenMitPruefung<Pokemon, PokemonMap>(_pfad);
@@ -170,5 +170,18 @@ public class CsvSpeicherTests : IDisposable
     Assert.Equal(guid, pokemon.Guid);
     Assert.Equal(4, pokemon.DexNr);
     Assert.Equal("Glumanda", pokemon.Name);
+    Assert.True(pokemon.InGoVerfuegbar);
+  }
+
+  [Theory]
+  [InlineData("Guid;DexNr;Name;Kategorie;InGoVerfuegbar\r\n{0};1;Bisasam;;1\r\n", true)]
+  [InlineData("Guid;DexNr;Name;Kategorie\r\n{0};1;Bisasam;\r\n", false)]
+  public void Pokemon_InGoVerfuegbar_WirdGelesen_SpalteIstOptional(string vorlage, bool erwartet)
+  {
+    var text = string.Format(vorlage, Guid.NewGuid());
+
+    var pokemon = CsvSpeicher.Lesen<Pokemon, PokemonMap>(new StringReader(text)).Single();
+
+    Assert.Equal(erwartet, pokemon.InGoVerfuegbar);
   }
 }

@@ -30,7 +30,7 @@ public class MehrereSuchenViewModelTests : IDisposable
   [Fact]
   public void Vorschau_ZeigtAnzahlen()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var vm = new MehrereSuchenViewModel(bestand, _ => { });
 
     KalosShiny(vm);
@@ -42,7 +42,7 @@ public class MehrereSuchenViewModelTests : IDisposable
   [Fact]
   public void Anlegen_MitSicherung_SpeichertUndSichert()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     SammelErgebnis? ergebnis = null;
     var vm = new MehrereSuchenViewModel(bestand, e => ergebnis = e);
     KalosShiny(vm);
@@ -52,14 +52,14 @@ public class MehrereSuchenViewModelTests : IDisposable
     Assert.NotNull(ergebnis);
     Assert.Equal(5, ergebnis.NeueEintraege.Count);
     Assert.Single(Sicherungen.Liste(_ordner));
-    var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     Assert.Equal(5, neu.Suche.Count);
   }
 
   [Fact]
   public void Anlegen_OhneNeueZeilen_MeldetDas()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var vm = new MehrereSuchenViewModel(bestand, _ => { });
     KalosShiny(vm);
     vm.SicherungVorher = false;

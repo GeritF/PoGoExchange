@@ -11,6 +11,8 @@ public sealed class PokemonMap : ClassMap<Pokemon>
     Map(m => m.DexNr).Name("DexNr");
     Map(m => m.Name).Name("Name").TypeConverter<TextKonverter>();
     Map(m => m.Kategorie).Name("Kategorie").TypeConverter<TextKonverter>();
+    Map(m => m.InGoVerfuegbar).Name("InGoVerfuegbar")
+      .TypeConverter<WahrheitswertKonverter>().Optional();
   }
 }
 

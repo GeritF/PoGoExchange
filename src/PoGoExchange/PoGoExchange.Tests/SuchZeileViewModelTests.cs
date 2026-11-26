@@ -27,7 +27,7 @@ public class SuchZeileViewModelTests : IDisposable
 
   private (Datenbestand Bestand, Guid Pokemon, Guid Form) Vorbereiten()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var pokemon = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 4);
     var form = bestand.Katalog.FormenZuPokemon(pokemon.Guid).First();
     return (bestand, pokemon.Guid, form.Guid);
@@ -58,7 +58,7 @@ public class SuchZeileViewModelTests : IDisposable
     vm.AnforderungenUebernehmenCommand.Execute(null);
 
     Assert.False(vm.KonfliktSichtbar);
-    var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     Assert.True(Assert.Single(neu.Suche).Hundert);
   }
 
@@ -144,7 +144,7 @@ public class SuchZeileViewModelTests : IDisposable
     vm.AnzahlUebernehmenCommand.Execute(null);
 
     // Gemessen: nach dem Neuladen steht die Zeile mit Anzahl 2 in der Datei
-    var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     Assert.Equal(2, Assert.Single(neu.Suche).Anzahl);
   }
 

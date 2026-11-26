@@ -22,7 +22,7 @@ public class HabeNeuViewModelTests : IDisposable
   [Fact]
   public void Speichern_LegtZeileAn_UndSchreibtDatei()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     HabeAnlegeErgebnis? ergebnis = null;
     var vm = new HabeNeuViewModel(bestand, e => ergebnis = e);
 
@@ -34,7 +34,7 @@ public class HabeNeuViewModelTests : IDisposable
 
     Assert.NotNull(ergebnis);
     Assert.Equal(2, ergebnis.Nachher);
-    var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var zeile = Assert.Single(neu.Habe);
     Assert.Equal(2, zeile.Anzahl);
     Assert.True(zeile.Shiny);
@@ -43,7 +43,7 @@ public class HabeNeuViewModelTests : IDisposable
   [Fact]
   public void Auswahl_BleibtErhalten_WennSuchfeldSieAusblendet()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var vm = new HabeNeuViewModel(bestand, _ => { });
     vm.Suchtext = "4";
     var gewaehlt = vm.Ziele.Single();
@@ -59,7 +59,7 @@ public class HabeNeuViewModelTests : IDisposable
   [Fact]
   public void Erhalten_FesteForm_IstVorausgewaehlt_UndMerkmaleVorbelegt()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var pokemon = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 4);
     var form = bestand.Katalog.FormenZuPokemon(pokemon.Guid).First();
     var vorlage = new PoGoExchange.Models.HabeEintrag { Shiny = true, Glueck = true };
@@ -77,7 +77,7 @@ public class HabeNeuViewModelTests : IDisposable
   [Fact]
   public void Erhalten_FormBeliebig_ZeigtNurFormenDesPokemon()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var vulpix = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 37);
 
     var vm = new HabeNeuViewModel(bestand, _ => { }, null, vulpix.Guid, null, "Erhalten");

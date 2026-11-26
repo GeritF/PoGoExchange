@@ -22,7 +22,7 @@ public class SucheNeuViewModelTests : IDisposable
   [Fact]
   public void Speichern_LegtZeileAn_SchreibtDatei_UndMeldetErgebnis()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     AnlegeErgebnis? ergebnis = null;
     var vm = new SucheNeuViewModel(bestand, e => ergebnis = e);
 
@@ -33,14 +33,14 @@ public class SucheNeuViewModelTests : IDisposable
 
     Assert.NotNull(ergebnis);
     Assert.Equal("0/2", ergebnis.Nachher.ToString());
-    var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     Assert.Equal(2, Assert.Single(neu.Suche).Anzahl);
   }
 
   [Fact]
   public void OhneAuswahl_MeldetFehler_UndSpeichertNicht()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var aufgerufen = false;
     var vm = new SucheNeuViewModel(bestand, _ => aufgerufen = true);
 
@@ -54,7 +54,7 @@ public class SucheNeuViewModelTests : IDisposable
   [Fact]
   public void Auswahl_BleibtNachAenderungDerAnforderungen()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var vm = new SucheNeuViewModel(bestand, _ => { });
     vm.Suchtext = "4";
     var gewaehlt = vm.Verfuegbar.Single();

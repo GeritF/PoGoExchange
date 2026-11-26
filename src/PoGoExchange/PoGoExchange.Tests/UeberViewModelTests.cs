@@ -28,7 +28,7 @@ public class UeberViewModelTests : IDisposable
   [Fact]
   public void Neu_Speichern_LegtEintragAn_UndSchreibtDatei()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var neuGemeldet = false;
     var vm = new UeberNeuViewModel(bestand, (_, neu) => neuGemeldet = neu);
 
@@ -38,14 +38,14 @@ public class UeberViewModelTests : IDisposable
     vm.SpeichernCommand.Execute(null);
 
     Assert.True(neuGemeldet);
-    var neuGeladen = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neuGeladen = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     Assert.True(Assert.Single(neuGeladen.Ueber).Shiny);
   }
 
   [Fact]
   public void Neu_GleicherEintrag_WirdAlsVorhandenGemeldet()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     UeberNeuViewModel Anlegen(Action<UeberEintrag, bool> gespeichert)
     {
       var vm = new UeberNeuViewModel(bestand, gespeichert);
@@ -66,7 +66,7 @@ public class UeberViewModelTests : IDisposable
   [Fact]
   public void Zeile_Loeschen_ErstRueckfrage_JaEntferntUndGehtZurueck()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var pokemon = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 4);
     var form = bestand.Katalog.FormenZuPokemon(pokemon.Guid).First();
     var eintrag = new UeberEintrag

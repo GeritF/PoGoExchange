@@ -28,7 +28,7 @@ public class EigeneFormViewModelTests : IDisposable
   [Fact]
   public void Neu_Speichern_SchreibtDatei_UndErgaenztKatalog()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     PokemonForm? angelegt = null;
     var vm = new EigeneFormViewModel(new Navigation(), bestand, (f, _) => angelegt = f);
 
@@ -39,14 +39,14 @@ public class EigeneFormViewModelTests : IDisposable
 
     Assert.NotNull(angelegt);
     Assert.Same(angelegt, bestand.Katalog.FormZuGuid(angelegt.Guid));
-    var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     Assert.Contains(neu.EigeneFormen, f => f.Guid == angelegt.Guid && f.Form == "Z");
   }
 
   [Fact]
   public void Bearbeiten_VerwendeteForm_LoeschenNichtMoeglich()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var icognito = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 201);
     var (form, _) = FormVerwaltung.Anlegen(
       bestand.EigeneFormen, bestand.Katalog, icognito.Guid, "Z", "", false);
@@ -67,7 +67,7 @@ public class EigeneFormViewModelTests : IDisposable
   [Fact]
   public void HabeNeu_FormAnlegen_NeueFormIstDanachAusgewaehlt()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var navigation = new Navigation();
     navigation.Oeffnen(new Startseite());
     var habeNeu = new HabeNeuViewModel(bestand, _ => { }, navigation: navigation);

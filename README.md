@@ -557,11 +557,43 @@ Wichtig:
 ## Updates der Nutzdaten
 
 Mit neuen Versionen des Programms koennen neue Pokemon und Formen
-hinzukommen. Eigene Formen, die das Update ebenfalls enthaelt, werden
-automatisch durch die offizielle Form ersetzt. Formen, die das Update
-entfernt, aber noch in den eigenen Listen verwendet werden, bleiben erhalten
-und werden als "ungueltig" angezeigt, mit der Aufforderung, eine andere Form
-auszuwaehlen.
+hinzukommen. Eigene Formen, die das Update ebenfalls enthaelt (gleiches
+Pokemon, gleicher Form-Text und gleiche Region), werden beim Start
+automatisch durch die offizielle Form ersetzt:
+
+- Alle Eintraege in "Habe ich", "Suche ich" und "Habe ich ueber" werden auf
+  die offizielle Form umgestellt. Entstehen dabei doppelte Zeilen, werden sie
+  zusammengefuehrt.
+- Die eigene Form wird entfernt.
+- Vorher wird eine Sicherung angelegt, aber nur, wenn tatsaechlich etwas
+  uebernommen wird.
+- Ein Hinweis nennt jede uebernommene Form, z.B. "Die eigene Form 'Icognito
+  ?' gibt es jetzt offiziell".
+- Ist eine der Listen wegen Fehlern gesperrt, wird nichts uebernommen, bis
+  sie fehlerfrei geladen wird.
+
+Dass ein Update eine offizielle Form entfernt, ist bisher nicht vorgekommen
+und noch nicht behandelt (vorgesehen: siehe "Archivieren statt Loeschen").
+
+## Regeln fuer Formen
+
+Damit Formen einheitlich bleiben, gelten fuer die Nutzdaten und sinngemaess
+fuer eigene Formen diese Regeln:
+
+- **Eine Form** ist, was dauerhaft am Exemplar haengt und kein Merkmal ist:
+  Regionalformen, Icognito, Flabebe-Familie, Vivillon-Familie, Burmy, Formeo,
+  Deoxys, Rotom, Giratina, Kyurem, Coiffwaff, Irrbis, Wolwerock usw.
+- **Keine Form** sind Mega-Entwicklungen, Protomorphosen, Gigadynamax,
+  Kostueme (auch Pikachu mit Muetzen), Geschlechtsunterschiede (z.B.
+  Quabbel) und reine Kampf- oder Zeitformen (z.B. Zen-Modus, Durengard).
+- **Benennung:** offizieller deutscher Formtext ohne Pokemon-Namen, z.B.
+  "Rotbluetler", "Groesse S", "Westliches Meer". Leer bleibt der Formtext nur,
+  wenn die Standardform offiziell "Normalform" heisst oder keinen Namen hat;
+  benannte Standardformen behalten ihren Namen (z.B. Giratina "Wandelform").
+- **Regionalformen:** Region in der Spalte `Region`, Formtext leer.
+- **Shiny verfuegbar** nur bei sicherem Beleg; Kostuem-Shinys zaehlen nicht.
+- Formen werden nur fuer Pokemon angelegt, die es in Pokemon GO gibt; andere
+  bekommen nur eine leere Grundform.
 
 ## Wo die Daten liegen
 
@@ -687,12 +719,17 @@ LibreOffice geoeffnet werden.
 
 Eine Zeile pro Pokemon-Art.
 
-| Spalte    | Inhalt                                                                    |
-|-----------|---------------------------------------------------------------------------|
-| Guid      | Eindeutige Kennung                                                        |
-| DexNr     | Nationale Pokedex-Nummer                                                  |
-| Name      | Deutscher Name                                                            |
-| Kategorie | Leer, `Legendaer`, `Mysterioes` oder `Ultrabestie` (wird nicht angezeigt) |
+| Spalte         | Inhalt                                                                              |
+|----------------|-------------------------------------------------------------------------------------|
+| Guid           | Eindeutige Kennung                                                                  |
+| DexNr          | Nationale Pokedex-Nummer                                                            |
+| Name           | Deutscher Name                                                                      |
+| Kategorie      | Leer, `Legendaer`, `Mysterioes`, `Ultrabestie` oder `Paradox` (wird nicht angezeigt) |
+| InGoVerfuegbar | `1` = sicher belegt, dass es in Pokemon GO erhaeltlich ist, sonst `0`; optional    |
+
+`InGoVerfuegbar` wird gelesen, aber noch nicht genutzt (spaeter
+voraussichtlich bei "+ Mehrere"). Fehlt die Spalte, gilt `0`. Die Kategorie ist
+freier Text; neue Kategorien brauchen keine Programmaenderung.
 
 ### formen.csv
 
@@ -1390,6 +1427,13 @@ zugeordnet werden koennen.
   `if`-Bloecken, Zeilen bis etwa 100 Zeichen.
 - Laden und Speichern der Daten uebernimmt `Services/Datenbestand.cs`, das
   tolerante Lesen der CSV-Dateien `CsvSpeicher.LesenMitPruefung`.
+- Tests haengen nicht an den echten Nutzdaten: Wer einen `Datenbestand`
+  laedt, nutzt `TestNutzdaten.Laden` mit festen Testdaten (die frueheren 11
+  Beispiel-Pokemon in `PoGoExchange.Tests/Testdaten/`, eingebettet).
+  `Datenbestand.Laden` nimmt dafuer optional eigene `Nutzdaten` entgegen.
+  `NutzdatenTests` pruefen die echten Daten, aber nur ihre Struktur.
+- Den Abgleich eigener Formen mit offiziellen beim Laden uebernimmt
+  `Services/FormAbgleich.cs`.
 - Fuer eigene Tests mit Beispieldaten werden die CSV-Dateien einfach in den
   Datenordner kopiert. Beispieldaten fuer persoenliche Listen sind bewusst
   nicht im Repository, damit jeder Anwender mit leeren Listen beginnt.

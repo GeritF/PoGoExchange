@@ -143,4 +143,26 @@ public class NutzdatenTests
     Assert.True(int.TryParse(version.Wert, out var nummer), $"Version keine Zahl: '{version.Wert}'");
     Assert.True(nummer >= 1, $"Version kleiner 1: {nummer}");
   }
+
+  [Fact]
+  public void OffizielleFormtexte_ErfuellenDieZeichenregeln()
+  {
+    var formen = EingebetteteNutzdaten.Lesen<PokemonForm, PokemonFormMap>("formen.csv");
+
+    var verstoesse = formen
+      .Where(f => FormVerwaltung.FormTextFehler(f.Form) != null)
+      .Select(f => f.Form)
+      .ToList();
+
+    Assert.Empty(verstoesse);
+  }
+
+  [Fact]
+  public void SpalteInGoVerfuegbar_WirdGelesen()
+  {
+    var pokemon = EingebetteteNutzdaten.Lesen<Pokemon, PokemonMap>("pokemon.csv");
+
+    Assert.Contains(pokemon, p => p.InGoVerfuegbar);
+    Assert.Contains(pokemon, p => !p.InGoVerfuegbar);
+  }
 }

@@ -23,7 +23,7 @@ public class EntwickelnViewModelTests : IDisposable
   // Glumanda (Dex 4) mit 3 Shiny-Exemplaren, Suche nach 3 Shiny-Glumanda
   private (Datenbestand Bestand, HabeEintrag Habe, SucheEintrag Suche) Vorbereiten()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var glumanda = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 4);
     var form = bestand.Katalog.FormenZuPokemon(glumanda.Guid).First();
     var habe = new HabeEintrag
@@ -75,7 +75,7 @@ public class EntwickelnViewModelTests : IDisposable
     vm.EntwickelnCommand.Execute(null);
 
     Assert.Contains("Glurak", rueckmeldung);
-    var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     Assert.Equal(new[] { 2, 1 }, neu.Habe.Select(h => h.Anzahl).OrderDescending());
     Assert.Equal(new[] { 2, 1 }, neu.Suche.Select(s => s.Anzahl).OrderDescending());
     Assert.All(SuchZeilen.Bilden(neu.Suche, neu.Habe), z => Assert.Equal(0, z.Offen));

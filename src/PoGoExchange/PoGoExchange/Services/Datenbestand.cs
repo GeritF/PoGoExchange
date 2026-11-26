@@ -44,6 +44,7 @@ public sealed class Datenbestand
   private readonly HashSet<string> _gesperrt = new(StringComparer.OrdinalIgnoreCase);
   private readonly List<LadeMeldung> _meldungen = new();
   private List<SchluesselWert> _abgleichInfo = new();
+  private Nutzdaten? _nutzdaten;
 
   private Datenbestand(string ordner)
   {
@@ -87,10 +88,11 @@ public sealed class Datenbestand
     return _gesperrt.Contains(datei);
   }
 
-  public static Datenbestand Laden(string ordner, DateTime jetzt)
+  // nutzdaten: ohne Angabe die mitgelieferten (Tests uebergeben feste Testdaten)
+  public static Datenbestand Laden(string ordner, DateTime jetzt, Nutzdaten? nutzdaten = null)
   {
     Directory.CreateDirectory(ordner);
-    var bestand = new Datenbestand(ordner);
+    var bestand = new Datenbestand(ordner) { _nutzdaten = nutzdaten };
 
     bestand.EigeneFormen = bestand.DateiLaden<PokemonForm, PokemonFormMap>(
       Dateinamen.EigeneFormen, _ => false);
@@ -104,6 +106,7 @@ public sealed class Datenbestand
     bestand._abgleichInfo = bestand.DateiLaden<SchluesselWert, SchluesselWertMap>(
       Dateinamen.AbgleichInfo, _ => false);
 
+    bestand.EigeneFormenAbgleichen(jetzt);
     bestand.KatalogAufbauen();
     bestand.KonsistenzMelden();
     return bestand;
@@ -293,12 +296,77 @@ public sealed class Datenbestand
       $"Die Datei vor der \u00c4nderung wurde als {Path.GetFileName(sicherung)} gesichert.");
   }
 
+  // Eigene Formen, die es inzwischen offiziell gibt, werden uebernommen
+  // (siehe FormAbgleich). Vorher wird gesichert, weil persoenliche Daten
+  // geaendert werden. Ist eine der betroffenen Dateien gesperrt, passiert
+  // nichts, damit keine Verweise ins Leere zeigen.
+  private void EigeneFormenAbgleichen(DateTime jetzt)
+  {
+    var daten = _nutzdaten ??= EingebetteteNutzdaten.Alle();
+    var uebernahmen = FormAbgleich.Finden(EigeneFormen, daten.Formen);
+    if (uebernahmen.Count == 0)
+    {
+      return;
+    }
+
+    var dateien = new[]
+    {
+      Dateinamen.EigeneFormen, Dateinamen.Habe, Dateinamen.Suche, Dateinamen.Ueber
+    };
+    if (dateien.Any(d => _gesperrt.Contains(d)))
+    {
+      Hinweis(
+        Dateinamen.EigeneFormen,
+        "Eigene Formen, die es jetzt offiziell gibt, werden erst \u00fcbernommen, " +
+        "wenn alle Listen fehlerfrei geladen werden.");
+      return;
+    }
+
+    try
+    {
+      Sicherungen.Anlegen(Ordner, Sicherungen.Zeitpunkt(jetzt));
+    }
+    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+    {
+      Hinweis(
+        Dateinamen.EigeneFormen,
+        "Eigene Formen, die es jetzt offiziell gibt, wurden nicht \u00fcbernommen, " +
+        "weil die Sicherung vorher fehlgeschlagen ist: " + ex.Message);
+      return;
+    }
+
+    FormAbgleich.Uebernehmen(uebernahmen, EigeneFormen, Habe, Suche, Ueber);
+    var fehler = new[]
+    {
+      EigeneFormenSpeichern(), HabeSpeichern(), SucheSpeichern(), UeberSpeichern()
+    };
+    foreach (var text in fehler.Where(f => f != null))
+    {
+      Hinweis(Dateinamen.EigeneFormen, text!);
+    }
+
+    var namen = daten.Pokemon.ToDictionary(p => p.Guid, p => p.Name);
+    foreach (var u in uebernahmen)
+    {
+      var name = namen.TryGetValue(u.Offiziell.PokemonGuid, out var n) ? n : "?";
+      var form = (name + " " + u.Offiziell.Form).Trim();
+      if (u.Offiziell.Region != "")
+      {
+        form += " - " + u.Offiziell.Region;
+      }
+
+      Hinweis(
+        Dateinamen.EigeneFormen,
+        $"Die eigene Form \"{form}\" gibt es jetzt offiziell. Alle Eintr\u00e4ge " +
+        "wurden umgestellt und die eigene Form entfernt; der Stand vorher ist gesichert.");
+    }
+  }
+
   // Wird beim Laden und nach jeder Aenderung an den eigenen Formen aufgerufen
   public void KatalogAufbauen()
   {
-    var pokemon = EingebetteteNutzdaten.Lesen<Pokemon, PokemonMap>("pokemon.csv");
-    var formen = EingebetteteNutzdaten.Lesen<PokemonForm, PokemonFormMap>("formen.csv");
-    var regionen = EingebetteteNutzdaten.Lesen<RegionBereich, RegionBereichMap>("regionen.csv");
+    var daten = _nutzdaten ??= EingebetteteNutzdaten.Alle();
+    var formen = daten.Formen.ToList();
 
     var bekannt = formen.Select(f => f.Guid).ToHashSet();
     foreach (var eigene in EigeneFormen)
@@ -314,7 +382,7 @@ public sealed class Datenbestand
       formen.Add(eigene);
     }
 
-    Katalog = new Katalog(pokemon, formen, regionen);
+    Katalog = new Katalog(daten.Pokemon, formen, daten.Regionen);
   }
 
   private void KonsistenzMelden()

@@ -23,7 +23,7 @@ public class SicherungenViewModelTests : IDisposable
   [Fact]
   public void JetztSichern_ErscheintInDerListe()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var vm = new SicherungenViewModel(bestand, () => null);
     Assert.True(vm.KeineVorhanden);
 
@@ -37,7 +37,7 @@ public class SicherungenViewModelTests : IDisposable
   [Fact]
   public void Wiederherstellen_ErstRueckfrage_DannNeuLaden()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var glumanda = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 4);
     var form = bestand.Katalog.FormenZuPokemon(glumanda.Guid).First();
     // Aelterer Stand: eine Zeile in "Habe ich"; Sicherung mit festem, altem Zeitpunkt
@@ -53,7 +53,7 @@ public class SicherungenViewModelTests : IDisposable
     Datenbestand? neu = null;
     var vm = new SicherungenViewModel(bestand, () =>
     {
-      neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+      neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
       return neu;
     });
 

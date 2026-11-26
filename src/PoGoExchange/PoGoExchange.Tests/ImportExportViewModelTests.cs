@@ -27,7 +27,7 @@ public class ImportExportViewModelTests : IDisposable
   // Bestand mit einer offenen Suche nach Glumanda Shiny
   private Datenbestand MitGlumandaSuche()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var glumanda = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 4);
     var form = bestand.Katalog.FormenZuPokemon(glumanda.Guid).First();
     bestand.Suche.Add(new SucheEintrag
@@ -50,7 +50,7 @@ public class ImportExportViewModelTests : IDisposable
   [Fact]
   public void OhneEintraege_IstListeLeer()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
 
     var vm = new ImportExportViewModel(new Navigation(), bestand);
 

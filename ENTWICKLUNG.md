@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-25, 277 Tests gruen.
+Stand: 2026-11-26, 289 Tests gruen.
 
 ## Inhalt
 
@@ -49,7 +49,7 @@ Stand: 2026-11-25, 277 Tests gruen.
 | 1     | Grundlagen, Toolchain, Projektaufbau     | fertig                         |
 | 2     | Fachlogik (Services, Tests)              | fertig                         |
 | 3     | Oberflaeche                              | fertig (siehe Bauschritte)     |
-| 4     | Daten und Plattformen                    | in Arbeit (echte Nutzdaten)    |
+| 4     | Daten und Plattformen                    | teilweise (echte Nutzdaten da) |
 | 5     | Abgleich zwischen Geraeten (WLAN)        | offen                          |
 | 6     | Windows-Build, Verteilung                | offen                          |
 
@@ -73,49 +73,16 @@ Stand: 2026-11-25, 277 Tests gruen.
   Region gesammelt am Ende hinter einer Trennlinie.
 - Die fremde Liste wird nicht gespeichert.
 
-### Echte Nutzdaten einbauen (beschlossen, noch nicht gebaut)
+### Echte Nutzdaten (eingebaut)
 
-Gerit hat in einem eigenen Chat vollstaendige Nutzdaten erstellt
-(`pokemon.csv` mit 1025 Pokemon, `formen.csv` mit 1262 Formen). Die
-Arbeitsanweisung dazu (`NUTZDATEN_PFLEGE.md`) liegt bei Gerit und kommt
-nicht ins Repository. Geprueft: alle bisherigen GUIDs erhalten, keine
-doppelten Formen, keine Formtexte mit verbotenen Zeichen, Regionen bekannt.
-
-Vier Runden, jede endet mit gruenen Tests:
-
-1. **Tests entkoppeln.** Viele Tests laden einen `Datenbestand` mit den
-   eingebetteten Nutzdaten und haengen an deren Inhalt (z.B. Kalos mit genau
-   5 Shiny-Formen, Icognito "Z" als eigene Form). Neu:
-   - `Datenbestand.Laden` bekommt optional die Nutzdaten uebergeben
-     (Pokemon, Formen, Regionen); ohne Angabe die eingebetteten.
-   - Das Testprojekt bekommt feste Test-Nutzdaten (die bisherigen 11 Pokemon
-     als eingebettete Testdateien) und alle Tests mit `Datenbestand.Laden`
-     nutzen diese.
-   - `NutzdatenTests` pruefen weiter die echten, eingebetteten Daten (nur
-     Struktur, keine Anzahlen).
-2. **Programm erweitern.**
-   - Spalte `InGoVerfuegbar` (letzte Spalte in `pokemon.csv`, `1`/`0`) wird
-     ins Modell `Pokemon` uebernommen und gelesen, aber noch nicht genutzt
-     (spaeter fuer "+ Mehrere"). Test, dass der Wert ankommt.
-   - **Eigene Formen mit offiziellen abgleichen** (beim Laden): Gibt es zu
-     einer eigenen Form eine offizielle mit gleichem Pokemon, Form-Text und
-     Region (ohne Gross-/Kleinschreibung, Raender getrimmt), werden alle
-     Verweise in "Habe ich", "Suche ich" und "Habe ich ueber" auf die
-     offizielle GUID umgestellt, die eigene Form geloescht und dabei
-     entstehende doppelte Zeilen zusammengefuehrt. Vorher wird eine
-     Sicherung angelegt, aber nur, wenn persoenliche Daten betroffen sind.
-     Ein Hinweis nennt die uebernommenen Formen. Bisher wird nur der Fall
-     "gleiche GUID" behandelt (Form wird ignoriert), nicht "gleicher Text".
-   - Kategorie `Paradox`: keine Codeaenderung (freier Text).
-3. **Daten tauschen.** `pokemon.csv` und `formen.csv` nach `Nutzdaten/`,
-   `nutzdaten_info.csv` auf Version 2, Stand 2026-11-26. Zusaetzlicher
-   Strukturtest: Kein offizieller Formtext verletzt die Zeichenregeln der
-   eigenen Formen. Danach mit Gerits echten Daten starten: Erwartet ist die
-   Uebernahme von Icognito "?" und "!" mit Hinweis und Sicherung.
-4. **Dokumentation.** README: Spalte `InGoVerfuegbar`, Kategorie `Paradox`,
-   Regeln "Was ist eine Form" und Benennung (aus `NUTZDATEN_PFLEGE.md`,
-   Abschnitt 5), Abgleich eigener Formen beim Update. Diese Datei: Stand,
-   Hinweis auf die getrennte Datenpflege.
+- `pokemon.csv` mit 1025 Pokemon (Spalte `InGoVerfuegbar`, Kategorie
+  `Paradox`), `formen.csv` mit 1262 Formen, `nutzdaten_info.csv` Version 2,
+  Stand 2026-11-26. Erstellt in einem eigenen Chat nach Gerits
+  `NUTZDATEN_PFLEGE.md` (nicht im Repository).
+- Tests sind entkoppelt: `TestNutzdaten` mit den frueheren 11 Pokemon.
+- Eigene Formen, die es offiziell gibt, werden beim Laden uebernommen
+  (`FormAbgleich`). Mit Gerits Daten erprobt: Icognito "?" und "!" wurden
+  umgestellt, Sicherung angelegt.
 
 ### Was die Fachlogik bereits kann
 
@@ -133,7 +100,8 @@ Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
 - Sicherungen als ZIP mit Aufraeumregeln und Wiederherstellen
   (`Sicherungen`); Reparatur-Kopien `.bak_N` beim Laden (`Datenbestand`)
 
-- Eigene Formen anlegen, aendern, loeschen (`FormVerwaltung`)
+- Eigene Formen anlegen, aendern, loeschen (`FormVerwaltung`) und beim
+  Laden mit offiziellen abgleichen (`FormAbgleich`)
 
 Alle Fachfunktionen haben eine Oberflaeche. Noch nicht gebaut sind
 Exportpaket, Update der Nutzdaten und der Abgleich zwischen Geraeten.
@@ -234,6 +202,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   vorgegebenen Ergebnistext ohne Messung.
 - Tests mit Dateien nutzen einen eigenen temporaeren Ordner und raeumen ihn
   in `Dispose` auf.
+- Tests, die einen `Datenbestand` laden, nutzen `TestNutzdaten.Laden`, nie
+  die echten Nutzdaten.
 - Tests, die statische Werte in `AppActions` veraendern, gehoeren in die
   Sammlung `[Collection("Zwischenablage")]`, damit sie nicht parallel laufen.
 - Testlauf ueber `test/Test_XUnit.sh` (Auswertung pro Klasse).
@@ -280,7 +250,11 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - **NumericUpDown:** Ein versehentlicher Klick auf "Pfeil runter" setzt 0;
   deshalb die Rueckfrage bei Anzahl 0.
 - **Test-Hilfsmethoden fuer Rohzeilen** muessen neue Spalten mitfuehren,
-  sonst landen Werte in der falschen Spalte.
+  sonst landen Werte in der falschen Spalte. Auch `CsvSpeicherTests` nutzt
+  `PokemonMap` als Beispiel: Neue Spalten in Maps aendern dort die erwartete
+  Kopfzeile.
+- **Neue Spalten in Nutzdaten** als `.Optional()` mappen, sonst scheitert das
+  Lesen aelterer Dateien (Testdaten) an der fehlenden Kopfzeile.
 - **Rider:** Drag-and-Drop zwischen Projekten erzeugt Verweise statt
   Verschiebungen (mit `git mv` verschieben). "Unload Project" blendet nur aus.
 - **Debug-Start auf Android** dauert lange; der Start ueber das App-Symbol
@@ -302,9 +276,9 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   `/data/user/0/com.GeritF.PoGoExchange/files/PoGoExchange`.
 - Skripte: `test/Test_XUnit.sh` (Testlauf), `test/DatenAufsHandy.sh`
   (persoenliche Daten in die Debug-App kopieren, ueberschreibt sie).
-- Beispieldaten: Nutzdaten (bisher 11 Pokemon, bald die echten) im
-  Repository; persoenliche Beispieldaten nur im Datenordner, nicht im
-  Repository.
+- Nutzdaten: die echten (1025 Pokemon) in `PoGoExchange/Nutzdaten/`;
+  Testdaten (11 Pokemon) in `PoGoExchange.Tests/Testdaten/`. Persoenliche
+  Beispieldaten nur im Datenordner, nicht im Repository.
 - Datenpflege der Nutzdaten geschieht in eigenen Chats nach Gerits
   Arbeitsanweisung `NUTZDATEN_PFLEGE.md` (nicht im Repository). Regeln:
   GUIDs nie neu erzeugen, vorhandene Zeilen nur aendern; Shiny nur bei
@@ -331,8 +305,7 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes
 
-- Echte Nutzdaten einbauen (siehe Abschnitt 2, vier Runden).
-- Danach mit Gerit abstimmen: Exportpaket, Windows-Build, WLAN-Abgleich.
+- Mit Gerit abstimmen: Exportpaket, Windows-Build, WLAN-Abgleich.
 
 ### Spaeter
 

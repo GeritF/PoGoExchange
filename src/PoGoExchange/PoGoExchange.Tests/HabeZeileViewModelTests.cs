@@ -27,7 +27,7 @@ public class HabeZeileViewModelTests : IDisposable
 
   private (Datenbestand Bestand, Guid Pokemon, Guid Form) Vorbereiten()
   {
-    var bestand = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     var pokemon = bestand.Katalog.AllePokemon().Single(p => p.DexNr == 4);
     var form = bestand.Katalog.FormenZuPokemon(pokemon.Guid).First();
     return (bestand, pokemon.Guid, form.Guid);
@@ -66,7 +66,7 @@ public class HabeZeileViewModelTests : IDisposable
 
     var zeile = Assert.Single(bestand.Habe);
     Assert.Equal(5, zeile.Anzahl);
-    var neu = Datenbestand.Laden(_ordner, DateTime.UtcNow);
+    var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
     Assert.Equal(5, Assert.Single(neu.Habe).Anzahl);
   }
 

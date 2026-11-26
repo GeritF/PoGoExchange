@@ -9,4 +9,7 @@ public sealed class Pokemon
     public int DexNr { get; set; }
     public string Name { get; set; } = "";
     public string Kategorie { get; set; } = "";
+    // 1 = sicher belegt, dass das Pokemon in Pokemon GO erhaeltlich ist.
+    // Noch nicht genutzt (spaeter fuer "+ Mehrere"). Fehlt die Spalte: false.
+    public bool InGoVerfuegbar { get; set; }
 }
