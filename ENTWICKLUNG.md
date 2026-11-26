@@ -49,7 +49,7 @@ Stand: 2026-11-25, 277 Tests gruen.
 | 1     | Grundlagen, Toolchain, Projektaufbau     | fertig                         |
 | 2     | Fachlogik (Services, Tests)              | fertig                         |
 | 3     | Oberflaeche                              | fertig (siehe Bauschritte)     |
-| 4     | Daten und Plattformen                    | teilweise                      |
+| 4     | Daten und Plattformen                    | in Arbeit (echte Nutzdaten)    |
 | 5     | Abgleich zwischen Geraeten (WLAN)        | offen                          |
 | 6     | Windows-Build, Verteilung                | offen                          |
 
@@ -72,6 +72,50 @@ Stand: 2026-11-25, 277 Tests gruen.
 - Tauschlisten-Format: "1:1" und "fehlt" nach Region, "Abzugeben:" ohne
   Region gesammelt am Ende hinter einer Trennlinie.
 - Die fremde Liste wird nicht gespeichert.
+
+### Echte Nutzdaten einbauen (beschlossen, noch nicht gebaut)
+
+Gerit hat in einem eigenen Chat vollstaendige Nutzdaten erstellt
+(`pokemon.csv` mit 1025 Pokemon, `formen.csv` mit 1262 Formen). Die
+Arbeitsanweisung dazu (`NUTZDATEN_PFLEGE.md`) liegt bei Gerit und kommt
+nicht ins Repository. Geprueft: alle bisherigen GUIDs erhalten, keine
+doppelten Formen, keine Formtexte mit verbotenen Zeichen, Regionen bekannt.
+
+Vier Runden, jede endet mit gruenen Tests:
+
+1. **Tests entkoppeln.** Viele Tests laden einen `Datenbestand` mit den
+   eingebetteten Nutzdaten und haengen an deren Inhalt (z.B. Kalos mit genau
+   5 Shiny-Formen, Icognito "Z" als eigene Form). Neu:
+   - `Datenbestand.Laden` bekommt optional die Nutzdaten uebergeben
+     (Pokemon, Formen, Regionen); ohne Angabe die eingebetteten.
+   - Das Testprojekt bekommt feste Test-Nutzdaten (die bisherigen 11 Pokemon
+     als eingebettete Testdateien) und alle Tests mit `Datenbestand.Laden`
+     nutzen diese.
+   - `NutzdatenTests` pruefen weiter die echten, eingebetteten Daten (nur
+     Struktur, keine Anzahlen).
+2. **Programm erweitern.**
+   - Spalte `InGoVerfuegbar` (letzte Spalte in `pokemon.csv`, `1`/`0`) wird
+     ins Modell `Pokemon` uebernommen und gelesen, aber noch nicht genutzt
+     (spaeter fuer "+ Mehrere"). Test, dass der Wert ankommt.
+   - **Eigene Formen mit offiziellen abgleichen** (beim Laden): Gibt es zu
+     einer eigenen Form eine offizielle mit gleichem Pokemon, Form-Text und
+     Region (ohne Gross-/Kleinschreibung, Raender getrimmt), werden alle
+     Verweise in "Habe ich", "Suche ich" und "Habe ich ueber" auf die
+     offizielle GUID umgestellt, die eigene Form geloescht und dabei
+     entstehende doppelte Zeilen zusammengefuehrt. Vorher wird eine
+     Sicherung angelegt, aber nur, wenn persoenliche Daten betroffen sind.
+     Ein Hinweis nennt die uebernommenen Formen. Bisher wird nur der Fall
+     "gleiche GUID" behandelt (Form wird ignoriert), nicht "gleicher Text".
+   - Kategorie `Paradox`: keine Codeaenderung (freier Text).
+3. **Daten tauschen.** `pokemon.csv` und `formen.csv` nach `Nutzdaten/`,
+   `nutzdaten_info.csv` auf Version 2, Stand 2026-11-26. Zusaetzlicher
+   Strukturtest: Kein offizieller Formtext verletzt die Zeichenregeln der
+   eigenen Formen. Danach mit Gerits echten Daten starten: Erwartet ist die
+   Uebernahme von Icognito "?" und "!" mit Hinweis und Sicherung.
+4. **Dokumentation.** README: Spalte `InGoVerfuegbar`, Kategorie `Paradox`,
+   Regeln "Was ist eine Form" und Benennung (aus `NUTZDATEN_PFLEGE.md`,
+   Abschnitt 5), Abgleich eigener Formen beim Update. Diese Datei: Stand,
+   Hinweis auf die getrennte Datenpflege.
 
 ### Was die Fachlogik bereits kann
 
@@ -258,8 +302,13 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   `/data/user/0/com.GeritF.PoGoExchange/files/PoGoExchange`.
 - Skripte: `test/Test_XUnit.sh` (Testlauf), `test/DatenAufsHandy.sh`
   (persoenliche Daten in die Debug-App kopieren, ueberschreibt sie).
-- Beispieldaten: Nutzdaten (11 Pokemon) im Repository; persoenliche
-  Beispieldaten nur im Datenordner, nicht im Repository.
+- Beispieldaten: Nutzdaten (bisher 11 Pokemon, bald die echten) im
+  Repository; persoenliche Beispieldaten nur im Datenordner, nicht im
+  Repository.
+- Datenpflege der Nutzdaten geschieht in eigenen Chats nach Gerits
+  Arbeitsanweisung `NUTZDATEN_PFLEGE.md` (nicht im Repository). Regeln:
+  GUIDs nie neu erzeugen, vorhandene Zeilen nur aendern; Shiny nur bei
+  sicherem Beleg.
 
 ## 8. Glossar
 
@@ -282,14 +331,15 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes
 
-- Phase 3 ist abgeschlossen. Naechste Phase mit Gerit abstimmen (siehe
-  "Spaeter").
+- Echte Nutzdaten einbauen (siehe Abschnitt 2, vier Runden).
+- Danach mit Gerit abstimmen: Exportpaket, Windows-Build, WLAN-Abgleich.
 
 ### Spaeter
 
-- Echte Nutzdaten erstellen (alle Pokemon mit Formen, Regionen,
-  Shiny-Verfuegbarkeit).
-- Update der Nutzdaten (mit automatischer Sicherung vorher).
+- Update der Nutzdaten fuer offiziell entfernte Formen (archivieren und nach
+  `eigene_formen.csv` uebernehmen). Bisher wurde nie eine offizielle Form
+  entfernt; erst bauen, wenn der Fall eintritt.
+- "+ Mehrere" ueberspringt Pokemon mit `InGoVerfuegbar=0`.
 - Exportpaket als ZIP (Export und Import aller eigenen Daten).
 - Abgleich zwischen Geraeten per WLAN (Phase 5), vorher Testprogramm fuer
   Ports, Berechtigungen und Broadcast.
@@ -318,6 +368,10 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   Update diese Dex-Nummer, ersetzt der offizielle Eintrag den eigenen
   (Verweise umstellen, eigene Formen nach Form und Region zuordnen), egal ob
   Name oder andere Angaben abweichen.
+- **Nidoran beim Einlesen fremder Listen:** Die Namen enthalten die Symbole
+  U+2640 und U+2642. Zusaetzlich Schreibweisen wie "Nidoran w", "Nidoran
+  weiblich", "Nidoran (w)" bzw. "Nidoran m", "Nidoran maennlich",
+  "Nidoran (m)" erkennen.
 - Gestaltung der Oberflaeche ("schoen machen").
 
 ### Aufraeumen bei Gelegenheit
