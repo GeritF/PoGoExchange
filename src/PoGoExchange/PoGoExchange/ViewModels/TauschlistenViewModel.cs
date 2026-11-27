@@ -44,35 +44,39 @@ public sealed class TauschlistenViewModel : SeiteViewModel
     }
 
     Meldungshinweis = hinweis;
+    var regionen = bestand?.Katalog.RegionenInReihenfolge() ?? [];
 
     Suche = new ListenTabViewModel(
       true,
-      (filter, mitErledigten) =>
+      (filter, region, mitErledigten) =>
         bestand == null
           ? []
           : ListenAnzeige.Suche(
-            bestand.Katalog, bestand.Suche, bestand.Habe, mitErledigten, filter),
+            bestand.Katalog, bestand.Suche, bestand.Habe, mitErledigten, filter, region),
       sucheBearbeitbar ? SucheNeuOeffnen : null,
       sucheBearbeitbar ? SucheZeileOeffnen : null,
-      sucheBearbeitbar ? MehrereOeffnen : null);
+      sucheBearbeitbar ? MehrereOeffnen : null,
+      regionen);
 
     Habe = new ListenTabViewModel(
       false,
-      (filter, _) =>
+      (filter, region, _) =>
         bestand == null
           ? []
-          : ListenAnzeige.Habe(bestand.Katalog, bestand.Habe, filter),
+          : ListenAnzeige.Habe(bestand.Katalog, bestand.Habe, filter, region),
       habeBearbeitbar ? HabeNeuOeffnen : null,
-      habeBearbeitbar ? HabeZeileOeffnen : null);
+      habeBearbeitbar ? HabeZeileOeffnen : null,
+      regionen: regionen);
 
     Ueber = new ListenTabViewModel(
       false,
-      (filter, _) =>
+      (filter, region, _) =>
         bestand == null
           ? []
-          : ListenAnzeige.Ueber(bestand.Katalog, bestand.Ueber, filter),
+          : ListenAnzeige.Ueber(bestand.Katalog, bestand.Ueber, filter, region),
       ueberBearbeitbar ? UeberNeuOeffnen : null,
-      ueberBearbeitbar ? UeberZeileOeffnen : null);
+      ueberBearbeitbar ? UeberZeileOeffnen : null,
+      regionen: regionen);
   }
 
   public override string Titel => "Tauschlisten";

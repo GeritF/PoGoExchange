@@ -39,6 +39,8 @@ public sealed partial class HabeNeuViewModel : SeiteViewModel
     _nurPokemon = nurPokemon;
     _nurForm = nurForm;
     _titel = titel;
+    RegionFilter = new RegionFilterViewModel(bestand.Katalog.RegionenInReihenfolge());
+    RegionFilter.Geaendert += ZieleAktualisieren;
     if (vorlage != null)
     {
       Merkmale.Uebernehmen(vorlage);
@@ -66,6 +68,9 @@ public sealed partial class HabeNeuViewModel : SeiteViewModel
   [ObservableProperty] private decimal? _anzahl = 1;
 
   [ObservableProperty] private string _suchtext = "";
+
+  // Nur sichtbar, wenn auch das Suchfeld sichtbar ist
+  public RegionFilterViewModel RegionFilter { get; }
 
   public ObservableCollection<FormZiel> Ziele { get; } = [];
 
@@ -151,6 +156,8 @@ public sealed partial class HabeNeuViewModel : SeiteViewModel
       return;
     }
 
+    // Die neue Form soll sichtbar sein, auch wenn sie nicht zur Region passt
+    RegionFilter.RegionIndex = 0;
     var pokemon = _bestand.Katalog.PokemonZuGuid(form.PokemonGuid);
     if (_nurPokemon == null && pokemon != null)
     {
@@ -170,7 +177,8 @@ public sealed partial class HabeNeuViewModel : SeiteViewModel
     _aktualisiertGerade = true;
     try
     {
-      var ziele = HabeBearbeitung.Ziele(_bestand.Katalog, Suchtext, _nurPokemon, _nurForm);
+      var ziele = HabeBearbeitung.Ziele(
+        _bestand.Katalog, Suchtext, _nurPokemon, _nurForm, RegionFilter.Region);
       Ziele.Clear();
       foreach (var ziel in ziele.Take(MaxZiele))
       {

@@ -28,6 +28,8 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
     _bestand = bestand;
     _gespeichert = gespeichert;
     _navigation = navigation;
+    RegionFilter = new RegionFilterViewModel(bestand.Katalog.RegionenInReihenfolge());
+    RegionFilter.Geaendert += ZieleAktualisieren;
     Anforderungen.Geaendert += ZieleAktualisieren;
     ZieleAktualisieren();
   }
@@ -41,6 +43,8 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
   [ObservableProperty] private decimal? _anzahl = 1;
 
   [ObservableProperty] private string _suchtext = "";
+
+  public RegionFilterViewModel RegionFilter { get; }
 
   public ObservableCollection<SuchZiel> Verfuegbar { get; } = [];
   public ObservableCollection<SuchZiel> HastDuSchon { get; } = [];
@@ -139,6 +143,8 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
       return;
     }
 
+    // Die neue Form soll sichtbar sein, auch wenn sie nicht zur Region passt
+    RegionFilter.RegionIndex = 0;
     var pokemon = _bestand.Katalog.PokemonZuGuid(form.PokemonGuid);
     if (pokemon != null)
     {
@@ -181,7 +187,7 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
     try
     {
       var ziele = SuchBearbeitung.Ziele(
-        _bestand.Katalog, _bestand.Habe, Anforderungen.Vorlage(), Suchtext);
+        _bestand.Katalog, _bestand.Habe, Anforderungen.Vorlage(), Suchtext, RegionFilter.Region);
 
       Fuellen(Verfuegbar, ziele, ZielKategorie.Verfuegbar);
       Fuellen(HastDuSchon, ziele, ZielKategorie.HastDuSchon);

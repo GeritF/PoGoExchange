@@ -48,6 +48,8 @@ public sealed partial class EntwickelnViewModel : SeiteViewModel
     AnzahlHinweis = zeile.Anzahl > 1
       ? $"Es wird 1 von {zeile.Anzahl} Exemplaren entwickelt."
       : "";
+    RegionFilter = new RegionFilterViewModel(bestand.Katalog.RegionenInReihenfolge());
+    RegionFilter.Geaendert += ZieleAktualisieren;
     ZieleAktualisieren();
   }
 
@@ -60,6 +62,8 @@ public sealed partial class EntwickelnViewModel : SeiteViewModel
   public bool HatAnzahlHinweis => AnzahlHinweis != "";
 
   [ObservableProperty] private string _suchtext = "";
+
+  public RegionFilterViewModel RegionFilter { get; }
 
   public ObservableCollection<FormZiel> Ziele { get; } = [];
 
@@ -152,7 +156,7 @@ public sealed partial class EntwickelnViewModel : SeiteViewModel
     _aktualisiertGerade = true;
     try
     {
-      var ziele = HabeBearbeitung.Ziele(_bestand.Katalog, Suchtext)
+      var ziele = HabeBearbeitung.Ziele(_bestand.Katalog, Suchtext, region: RegionFilter.Region)
         .Where(z => z.FormGuid != _zeile.FormGuid)
         .ToList();
       Ziele.Clear();

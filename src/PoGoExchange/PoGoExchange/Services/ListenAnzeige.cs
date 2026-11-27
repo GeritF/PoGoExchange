@@ -28,8 +28,9 @@ public sealed record AnzeigeGruppe(string Region, IReadOnlyList<AnzeigeZeile> Ze
 
 // Bereitet die persoenlichen Listen fuer die Anzeige auf: gruppiert nach
 // Region, sortiert nach Dex-Nummer und Text, optional nach Name oder
-// Dex-Nummer gefiltert. Eintraege, die die Konsistenzpruefung nicht
-// bestehen, stehen unabhaengig vom Filter in einer eigenen Gruppe am Ende.
+// Dex-Nummer und zusaetzlich nach Region gefiltert (siehe RegionPasst).
+// Eintraege, die die Konsistenzpruefung nicht bestehen, stehen unabhaengig
+// vom Filter in einer eigenen Gruppe am Ende.
 public static class ListenAnzeige
 {
   public const string GruppeFehlerhaft = "Fehlerhafte Eintr\u00e4ge";
@@ -40,7 +41,8 @@ public static class ListenAnzeige
     IEnumerable<SucheEintrag> suche,
     IEnumerable<HabeEintrag> habe,
     bool mitErledigten,
-    string filter)
+    string filter,
+    string? region = null)
   {
     var zeilen = new List<AnzeigeZeile>();
     var gueltig = Pruefen(katalog, suche, false, zeilen);
@@ -53,7 +55,7 @@ public static class ListenAnzeige
       }
 
       var (pokemon, form) = Tauschliste.Aufloesen(katalog, zeile.Muster);
-      if (!FilterPasst(filter, pokemon))
+      if (!FilterPasst(filter, pokemon) || !RegionPasst(katalog, region, pokemon, form))
       {
         continue;
       }
@@ -74,13 +76,14 @@ public static class ListenAnzeige
   public static List<AnzeigeGruppe> Habe(
     Katalog katalog,
     IEnumerable<HabeEintrag> habe,
-    string filter)
+    string filter,
+    string? region = null)
   {
     var zeilen = new List<AnzeigeZeile>();
     foreach (var eintrag in Pruefen(katalog, habe, true, zeilen))
     {
       var (pokemon, form) = Tauschliste.Aufloesen(katalog, eintrag);
-      if (!FilterPasst(filter, pokemon))
+      if (!FilterPasst(filter, pokemon) || !RegionPasst(katalog, region, pokemon, form))
       {
         continue;
       }
@@ -102,13 +105,14 @@ public static class ListenAnzeige
   public static List<AnzeigeGruppe> Ueber(
     Katalog katalog,
     IEnumerable<UeberEintrag> ueber,
-    string filter)
+    string filter,
+    string? region = null)
   {
     var zeilen = new List<AnzeigeZeile>();
     foreach (var eintrag in Pruefen(katalog, ueber, true, zeilen))
     {
       var (pokemon, form) = Tauschliste.Aufloesen(katalog, eintrag);
-      if (!FilterPasst(filter, pokemon))
+      if (!FilterPasst(filter, pokemon) || !RegionPasst(katalog, region, pokemon, form))
       {
         continue;
       }
@@ -141,6 +145,30 @@ public static class ListenAnzeige
     }
 
     return pokemon.Name.Contains(text, StringComparison.OrdinalIgnoreCase);
+  }
+
+  // Leere Region passt immer. Sonst passt die Region zur Dex-Nummer
+  // (Katalog.RegionZuDex) oder zur Spalte Region der Form (ganzer Name, ohne
+  // Gross-/Kleinschreibung). Galar-Zapdos passt also zu Kanto und zu Galar.
+  // Ohne Form ("Form beliebig", Auswahl eines Pokemon) zaehlt nur die
+  // Dex-Nummer.
+  public static bool RegionPasst(
+    Katalog katalog,
+    string? region,
+    Pokemon pokemon,
+    PokemonForm? form)
+  {
+    if (string.IsNullOrEmpty(region))
+    {
+      return true;
+    }
+
+    if (katalog.RegionZuDex(pokemon.DexNr) == region)
+    {
+      return true;
+    }
+
+    return form != null && string.Equals(form.Region, region, StringComparison.OrdinalIgnoreCase);
   }
 
   // Gueltige Eintraege; ungueltige werden als fehlerhafte Zeilen gesammelt

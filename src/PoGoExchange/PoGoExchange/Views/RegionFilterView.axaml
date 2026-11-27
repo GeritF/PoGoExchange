@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PoGoExchange.ViewModels"
+             x:Class="PoGoExchange.Views.RegionFilterView"
+             x:DataType="vm:RegionFilterViewModel">
+  <StackPanel Orientation="Horizontal" Spacing="8">
+    <TextBlock Text="Region:" VerticalAlignment="Center" />
+    <ComboBox ItemsSource="{Binding Regionen}"
+              SelectedIndex="{Binding RegionIndex}"
+              MinWidth="150" />
+  </StackPanel>
+</UserControl>

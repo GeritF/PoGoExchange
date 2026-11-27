@@ -51,12 +51,27 @@ In allen Listen gilt:
 
 - Oben steht ein Suchfeld. Eine Zahl (auch mit `#`, z.B. `#37`) filtert nach
   Dex-Nummer, sonst wird im Namen gesucht.
+- Darunter steht die Auswahl **Region** ("Alle Regionen" oder eine Region aus
+  `regionen.csv`). Sie gilt zusaetzlich zum Suchfeld, jede Registerkarte hat
+  ihre eigene. Ein Eintrag passt, wenn die Region zu seiner Dex-Nummer passt
+  oder zur Region seiner Form. Beispiel: Galar-Zapdos (#145) erscheint bei
+  "Kanto" und bei "Galar", beide Male unter der Ueberschrift "Kanto".
+  Zeilen mit "Form beliebig" passen nur ueber die Dex-Nummer.
 - Die Eintraege sind nach Region gruppiert und nach Dex-Nummer sortiert.
 - Eintraege, die nicht zu den Nutzdaten passen (z.B. unbekanntes Pokemon),
   stehen in einer eigenen Gruppe "Fehlerhafte Eintraege" am Ende.
 - Gab es beim Laden Meldungen, weist eine Hinweisleiste darauf hin.
 - In "Habe ich" steht vor Zeilen mit mehreren gleichen Exemplaren die
   Anzahl, z.B. `3x #4 Glumanda - Shiny [Glueck]`.
+
+Suchfeld und Region gibt es genauso auf allen Seiten, auf denen ein Pokemon
+oder eine Form gewaehlt wird: "Neuer Sucheintrag", "Neues Exemplar",
+"Neuer Eintrag" in "Habe ich ueber", "Entwickeln" und "Neue eigene Form".
+Beim Erhalten entfallen beide, weil das Pokemon feststeht. Bei "Neue eigene
+Form" wird ein Pokemon gewaehlt, keine Form; dort zaehlt fuer die Region nur
+die Dex-Nummer (die zweite Auswahl "Region" auf dieser Seite gehoert zur neuen
+Form). Nach "Form fehlt? Eigene Form anlegen" steht die Region wieder auf
+"Alle Regionen", damit die neue Form sichtbar und ausgewaehlt ist.
 
 In allen drei Listen gibt es ausserdem:
 
@@ -1069,6 +1084,19 @@ keiner Region zuordnet (z.B. Meltan und Melmetal). Statt Ausnahmen im
 Programm zu pflegen, laesst man im Bereich der Regionen eine Luecke. Ebenso
 landen neue Pokemon dort, bevor `regionen.csv` erweitert wurde.
 
+### Auswahl "Region" unter dem Suchfeld
+
+Der Regionsfilter beruecksichtigt beides: die Region der Dex-Nummer und die
+Spalte `Region` der Form (ganzer Name, ohne Gross-/Kleinschreibung). Wer bei
+der Pflege "Galar" waehlt, will auch Galar-Zapdos sehen, obwohl es nach der
+Dex-Nummer zu Kanto gehoert. Die Gruppierung aendert sich dadurch nicht:
+Galar-Zapdos steht auch mit Filter "Galar" unter der Ueberschrift "Kanto".
+
+Ohne bestimmte Form ("Form beliebig", Auswahl eines Pokemon bei "Neue eigene
+Form") zaehlt nur die Dex-Nummer. "Zapdos - Form (beliebig)" erscheint also
+nur bei "Kanto". So bleibt die Regel ohne Sonderfaelle und deckt sich mit der
+Gruppierung.
+
 ## Warum es keine Angabe zur Tauschbarkeit gibt
 
 Ob ein Pokemon tauschbar ist, haengt teils von der Art, teils von einzelnen
@@ -1510,6 +1538,12 @@ zugeordnet werden koennen.
   Markierung in der Liste. So bleibt die Auswahl erhalten, wenn das Suchfeld
   sie voruebergehend ausblendet. Die
   Aufbereitung fuer die Anzeige uebernimmt `Services/ListenAnzeige.cs`.
+- Der Regionsfilter ist `ListenAnzeige.RegionPasst`; `Suche`, `Habe`, `Ueber`,
+  `SuchBearbeitung.Ziele`, `HabeBearbeitung.Ziele` und `FormVerwaltung.Pokemon`
+  nehmen die Region als optionalen Parameter (null = alle). In der Oberflaeche
+  ist die Auswahl ein eigener Baustein (`RegionFilterViewModel`,
+  `RegionFilterView`), den die Listen-Registerkarten und alle Seiten mit
+  Pokemon-Auswahl einbinden. "+ Mehrere" hat noch eine eigene Regionsauswahl.
 - Die Oberflaeche verwendet eine eigene, testbare Navigation
   (`ViewModels/Navigation.cs`) mit einem Seitenstapel. Seiten werden in
   `Views/MainView.axaml` ausdruecklich ihren ViewModels zugeordnet, nicht ueber

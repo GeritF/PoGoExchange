@@ -22,6 +22,9 @@
                  IsVisible="{Binding SuchfeldSichtbar}" />
       <TextBox Text="{Binding Suchtext}"
                IsVisible="{Binding SuchfeldSichtbar}" />
+      <Panel IsVisible="{Binding SuchfeldSichtbar}">
+        <views:RegionFilterView DataContext="{Binding RegionFilter}" />
+      </Panel>
       <TextBlock Text="{Binding MehrHinweis}"
                  IsVisible="{Binding HatMehrHinweis}"
                  Foreground="DarkOrange"

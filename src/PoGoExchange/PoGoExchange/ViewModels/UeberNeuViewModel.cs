@@ -23,6 +23,8 @@ public sealed partial class UeberNeuViewModel : SeiteViewModel
   {
     _bestand = bestand;
     _gespeichert = gespeichert;
+    RegionFilter = new RegionFilterViewModel(bestand.Katalog.RegionenInReihenfolge());
+    RegionFilter.Geaendert += ZieleAktualisieren;
     ZieleAktualisieren();
   }
 
@@ -31,6 +33,8 @@ public sealed partial class UeberNeuViewModel : SeiteViewModel
   public ExemplarViewModel Merkmale { get; } = new(mitGlueckUndHundert: false);
 
   [ObservableProperty] private string _suchtext = "";
+
+  public RegionFilterViewModel RegionFilter { get; }
 
   public ObservableCollection<FormZiel> Ziele { get; } = [];
 
@@ -100,7 +104,8 @@ public sealed partial class UeberNeuViewModel : SeiteViewModel
     _aktualisiertGerade = true;
     try
     {
-      var ziele = HabeBearbeitung.Ziele(_bestand.Katalog, Suchtext);
+      var ziele = HabeBearbeitung.Ziele(
+        _bestand.Katalog, Suchtext, region: RegionFilter.Region);
       Ziele.Clear();
       foreach (var ziel in ziele.Take(MaxZiele))
       {

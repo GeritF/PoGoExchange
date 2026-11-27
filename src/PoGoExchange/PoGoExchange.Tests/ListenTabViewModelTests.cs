@@ -10,7 +10,7 @@ public class ListenTabViewModelTests
   public void ErledigteEinblenden_ErstNachRueckfrage_AusblendenSofort()
   {
     var aufrufe = new List<bool>();
-    var tab = new ListenTabViewModel(true, (_, mitErledigten) =>
+    var tab = new ListenTabViewModel(true, (_, _, mitErledigten) =>
     {
       aufrufe.Add(mitErledigten);
       return [];
@@ -38,7 +38,7 @@ public class ListenTabViewModelTests
     var tab =
       new ListenTabViewModel(
         false,
-        (filter, _) =>
+        (filter, _, _) =>
           filter == ""
             ? []
             :
@@ -75,12 +75,35 @@ public class ListenTabViewModelTests
     var zeile = new AnzeigeZeile("Kanto", 4, "Glumanda", "", false, false, new SucheEintrag());
     var tab = new ListenTabViewModel(
       false,
-      (_, _) => [new("Kanto", [zeile])],
+      (_, _, _) => [new("Kanto", [zeile])],
       oeffnen: z => geoeffnet = z);
 
     tab.Ausgewaehlt = zeile;
 
     Assert.Same(zeile, geoeffnet);
     Assert.Null(tab.Ausgewaehlt);
+  }
+
+  [Fact]
+  public void Region_BautListeNeuAuf_ZusammenMitSuchtext()
+  {
+    var aufrufe = new List<(string Filter, string? Region)>();
+    var tab = new ListenTabViewModel(
+      false,
+      (filter, region, _) =>
+      {
+        aufrufe.Add((filter, region));
+        return [];
+      },
+      regionen: ["Kanto", "Galar"]);
+
+    Assert.Equal("", aufrufe.Last().Filter);
+    Assert.Null(aufrufe.Last().Region);
+
+    tab.Suchtext = "zap";
+    tab.RegionFilter.RegionIndex = 2;
+
+    Assert.Equal("zap", aufrufe.Last().Filter);
+    Assert.Equal("Galar", aufrufe.Last().Region);
   }
 }

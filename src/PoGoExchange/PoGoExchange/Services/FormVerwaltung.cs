@@ -33,13 +33,15 @@ public static class FormVerwaltung
     return null;
   }
 
-  // Alle Pokemon, passend zum Suchfeld
-  public static List<PokemonZiel> Pokemon(Katalog katalog, string filter)
+  // Alle Pokemon, passend zum Suchfeld und zur Region. Ohne Form zaehlt fuer
+  // die Region nur die Dex-Nummer (siehe ListenAnzeige.RegionPasst).
+  public static List<PokemonZiel> Pokemon(Katalog katalog, string filter, string? region = null)
   {
     return
     [
       .. katalog.AllePokemon()
         .Where(p => ListenAnzeige.FilterPasst(filter, p))
+        .Where(p => ListenAnzeige.RegionPasst(katalog, region, p, null))
         .Select(p => new PokemonZiel(p.Guid, p.DexNr, p.Name))
     ];
   }

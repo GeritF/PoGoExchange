@@ -47,13 +47,16 @@ public sealed class AnlegeErgebnis
 // Anlegen und Bearbeiten von Zeilen in "Suche ich".
 public static class SuchBearbeitung
 {
-  // Alle waehlbaren Ziele mit Kategorie, passend zu den Anforderungen.
-  // "Form beliebig" wird nur bei Pokemon mit mehreren Formen angeboten.
+  // Alle waehlbaren Ziele mit Kategorie, passend zu den Anforderungen, zum
+  // Suchfeld und zur Region (siehe ListenAnzeige.RegionPasst).
+  // "Form beliebig" wird nur bei Pokemon mit mehreren Formen angeboten und
+  // passt nur ueber die Dex-Nummer zur Region.
   public static List<SuchZiel> Ziele(
     Katalog katalog,
     IEnumerable<HabeEintrag> habe,
     SucheEintrag anforderung,
-    string filter)
+    string filter,
+    string? region = null)
   {
     var exemplare = habe.ToList();
     var ziele = new List<SuchZiel>();
@@ -72,7 +75,7 @@ public static class SuchBearbeitung
         continue;
       }
 
-      if (formen.Count > 1)
+      if (formen.Count > 1 && ListenAnzeige.RegionPasst(katalog, region, pokemon, null))
       {
         var irgendeineVerfuegbar = formen.Any(f => f.ShinyVerfuegbar);
         ziele.Add(Ziel(pokemon, null, irgendeineVerfuegbar, anforderung, exemplare));
@@ -80,6 +83,11 @@ public static class SuchBearbeitung
 
       foreach (var form in formen)
       {
+        if (!ListenAnzeige.RegionPasst(katalog, region, pokemon, form))
+        {
+          continue;
+        }
+
         ziele.Add(Ziel(pokemon, form, form.ShinyVerfuegbar, anforderung, exemplare));
       }
     }

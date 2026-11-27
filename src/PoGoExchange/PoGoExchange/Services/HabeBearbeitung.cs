@@ -25,13 +25,15 @@ public sealed class HabeAnlegeErgebnis
 // Anlegen und Bearbeiten von Zeilen in "Habe ich"
 public static class HabeBearbeitung
 {
-  // Alle waehlbaren Formen (ohne archivierte), passend zum Suchfeld.
-  // nurPokemon und nurForm schraenken die Auswahl ein (z.B. beim Erhalten).
+  // Alle waehlbaren Formen (ohne archivierte), passend zum Suchfeld und zur
+  // Region (siehe ListenAnzeige.RegionPasst). nurPokemon und nurForm
+  // schraenken die Auswahl ein (z.B. beim Erhalten).
   public static List<FormZiel> Ziele(
     Katalog katalog,
     string filter,
     Guid? nurPokemon = null,
-    Guid? nurForm = null)
+    Guid? nurForm = null,
+    string? region = null)
   {
     var ziele = new List<FormZiel>();
     foreach (var pokemon in katalog.AllePokemon())
@@ -48,7 +50,8 @@ public static class HabeBearbeitung
 
       var formen = katalog.FormenZuPokemon(pokemon.Guid)
         .Where(f => f.ArchiviertAm == null)
-        .Where(f => nurForm == null || f.Guid == nurForm);
+        .Where(f => nurForm == null || f.Guid == nurForm)
+        .Where(f => ListenAnzeige.RegionPasst(katalog, region, pokemon, f));
       foreach (var form in formen)
       {
         var text = EintragText.Erzeugen(pokemon, form, new HabeEintrag());

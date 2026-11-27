@@ -13,6 +13,7 @@
       <TextBlock Text="Pokemon und Form w&#xE4;hlen" FontWeight="Bold" Margin="0,12,0,0" />
       <TextBlock Text="Suche (Name oder Dex-Nummer):" />
       <TextBox Text="{Binding Suchtext}" />
+      <views:RegionFilterView DataContext="{Binding RegionFilter}" />
       <TextBlock Text="{Binding MehrHinweis}"
                  IsVisible="{Binding HatMehrHinweis}"
                  Foreground="DarkOrange"

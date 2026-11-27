@@ -10,28 +10,32 @@ namespace PoGoExchange.ViewModels;
 // Ueberschrift einer Regionsgruppe in der Liste
 public sealed record RegionKopf(string Region);
 
-// Eine Registerkarte mit Suchfeld und gruppierter Liste.
-// aufbauen(filter, mitErledigten) liefert die anzuzeigenden Gruppen.
+// Eine Registerkarte mit Suchfeld, Regionsauswahl und gruppierter Liste.
+// aufbauen(filter, region, mitErledigten) liefert die anzuzeigenden Gruppen;
+// region ist null bei "Alle Regionen". regionen: waehlbare Regionen.
 // neu: optional, oeffnet "Neuer Eintrag"; oeffnen: optional, oeffnet eine angetippte Zeile.
 public sealed partial class ListenTabViewModel : ViewModelBase
 {
-  private readonly Func<string, bool, List<AnzeigeGruppe>> _aufbauen;
+  private readonly Func<string, string?, bool, List<AnzeigeGruppe>> _aufbauen;
   private readonly Action? _neu;
   private readonly Action<AnzeigeZeile>? _oeffnen;
   private readonly Action? _mehrere;
 
   public ListenTabViewModel(
     bool hatErledigtUmschalter,
-    Func<string, bool, List<AnzeigeGruppe>> aufbauen,
+    Func<string, string?, bool, List<AnzeigeGruppe>> aufbauen,
     Action? neu = null,
     Action<AnzeigeZeile>? oeffnen = null,
-    Action? mehrere = null)
+    Action? mehrere = null,
+    IReadOnlyList<string>? regionen = null)
   {
     HatErledigtUmschalter = hatErledigtUmschalter;
     _aufbauen = aufbauen;
     _neu = neu;
     _oeffnen = oeffnen;
     _mehrere = mehrere;
+    RegionFilter = new RegionFilterViewModel(regionen ?? []);
+    RegionFilter.Geaendert += Aktualisieren;
     Aktualisieren();
   }
 
@@ -39,6 +43,8 @@ public sealed partial class ListenTabViewModel : ViewModelBase
 
   public bool HatNeu => _neu != null;
   public bool HatMehrere => _mehrere != null;
+
+  public RegionFilterViewModel RegionFilter { get; }
 
   // Ueberschriften (RegionKopf) und Zeilen (AnzeigeZeile) gemischt
   public ObservableCollection<object> Zeilen { get; } = [];
@@ -134,7 +140,7 @@ public sealed partial class ListenTabViewModel : ViewModelBase
   public void Aktualisieren()
   {
     Zeilen.Clear();
-    foreach (var gruppe in _aufbauen(Suchtext, ErledigteAnzeigen))
+    foreach (var gruppe in _aufbauen(Suchtext, RegionFilter.Region, ErledigteAnzeigen))
     {
       Zeilen.Add(new RegionKopf(gruppe.Region));
       foreach (var zeile in gruppe.Zeilen)

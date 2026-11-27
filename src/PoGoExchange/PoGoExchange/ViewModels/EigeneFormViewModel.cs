@@ -36,6 +36,8 @@ public sealed partial class EigeneFormViewModel : SeiteViewModel
     _fertig = fertig;
     _form = form;
     Regionen = [KeineRegion, .. bestand.Katalog.RegionenInReihenfolge()];
+    RegionFilter = new RegionFilterViewModel(bestand.Katalog.RegionenInReihenfolge());
+    RegionFilter.Geaendert += ZieleAktualisieren;
 
     if (form != null)
     {
@@ -82,6 +84,9 @@ public sealed partial class EigeneFormViewModel : SeiteViewModel
   [ObservableProperty] private bool _shinyVerfuegbar;
 
   [ObservableProperty] private string _suchtext = "";
+
+  // Filter fuer die Pokemon-Auswahl (nur Dex-Nummer), nicht die Region der Form
+  public RegionFilterViewModel RegionFilter { get; }
 
   public ObservableCollection<PokemonZiel> Ziele { get; } = [];
 
@@ -242,7 +247,7 @@ public sealed partial class EigeneFormViewModel : SeiteViewModel
     _aktualisiertGerade = true;
     try
     {
-      var ziele = FormVerwaltung.Pokemon(_bestand.Katalog, Suchtext);
+      var ziele = FormVerwaltung.Pokemon(_bestand.Katalog, Suchtext, RegionFilter.Region);
       Ziele.Clear();
       foreach (var ziel in ziele.Take(MaxZiele))
       {

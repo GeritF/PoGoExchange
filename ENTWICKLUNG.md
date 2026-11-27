@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-27, 310 Tests gruen.
+Stand: 2026-11-27, 347 Tests gruen.
 
 ## Inhalt
 
@@ -59,8 +59,8 @@ Stand: 2026-11-27, 310 Tests gruen.
 | 2     | Fachlogik (Services, Tests)              | fertig                         |
 | 3     | Oberflaeche                              | fertig (siehe Bauschritte)     |
 | 4     | Daten und Plattformen                    | weitgehend (Nutzdaten, Export) |
-| 5     | Abgleich zwischen Geraeten (WLAN)        | offen                          |
-| 6     | Windows-Build, Verteilung                | offen                          |
+| 5     | Abgleich zwischen Geraeten (WLAN)        | zurueckgestellt                |
+| 6     | Windows-Build, Verteilung                | zurueckgestellt                |
 
 ### Bauschritte der Oberflaeche (Phase 3)
 
@@ -103,6 +103,20 @@ Stand: 2026-11-27, 310 Tests gruen.
 - Auf Android wird der Dateiname ohne Endung vorgeschlagen, weil das System
   `.zip` selbst anhaengt.
 
+### Regionsfilter (eingebaut)
+
+- Unter jedem Suchfeld eine Auswahl "Region" ("Alle Regionen" oder eine
+  Region), zusaetzlich zur Textsuche: in den drei Registerkarten von
+  "Tauschlisten" (je Karte eigene Auswahl) und auf allen Seiten mit
+  Pokemon-Auswahl (Neuer Sucheintrag, Neues Exemplar, Habe ich ueber > Neu,
+  Entwickeln, Neue eigene Form). Beim Erhalten ausgeblendet.
+- Regel (`ListenAnzeige.RegionPasst`): Dex-Region oder Spalte `Region` der
+  Form. Galar-Zapdos erscheint bei Kanto und bei Galar, immer unter der
+  Ueberschrift Kanto. Ohne Form ("Form beliebig", Pokemon-Auswahl bei
+  eigenen Formen) nur die Dex-Region.
+- Baustein `RegionFilterViewModel`/`RegionFilterView`. Nach "Form fehlt?
+  Eigene Form anlegen" springt die Region auf "Alle Regionen" zurueck.
+
 ### Was die Fachlogik bereits kann
 
 Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
@@ -116,6 +130,7 @@ Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
 - Tauschliste erzeugen (`Tauschliste`) und einlesen (`TauschlistenImport`),
   Abgleich (`Abgleich`, `AngebotsVergleich`)
 - "+ Mehrere" (`SammelSuche`, mit Region und Shiny-Verfuegbarkeit)
+- Regionsfilter fuer Listen und Auswahlseiten (`ListenAnzeige.RegionPasst`)
 - Sicherungen als ZIP mit Aufraeumregeln und Wiederherstellen
   (`Sicherungen`); Reparatur-Kopien `.bak_N` beim Laden (`Datenbestand`)
 
@@ -471,6 +486,7 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 | passt / pruefen    | Ergebnis des Merkmalsvergleichs mit einer fremden Liste      |
 | Nutzdaten          | Pokemon, Formen, Regionen; werden mit dem Programm geliefert |
 | + Mehrere          | Viele Suchzeilen auf einmal anlegen (intern `SammelSuche`)   |
+| Regionsfilter      | Auswahl "Region" unter dem Suchfeld (Dex- oder Form-Region)  |
 | Eigene Listen      | Export/Import aller eigenen Daten als Datei (Exportpaket)    |
 | Sicherung          | ZIP der eigenen Daten in `sicherungen/`, mit Aufraeumregeln  |
 | .bak_N             | Kopie einer Datei vor einer Reparatur beim Laden             |
@@ -479,7 +495,6 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes
 
-- Mit Gerit abstimmen: Windows-Build, WLAN-Abgleich.
 - **`ViewLocator` entfernen (eigene Runde):** Er ist in `App.axaml` noch als
   Reflexions-Fallback registriert, obwohl die Seiten in `MainView.axaml`
   ausdruecklich zugeordnet werden. Die KI erklaert vorher, was das Entfernen
@@ -488,19 +503,38 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Spaeter
 
+- **Bildschirmtastatur auf dem Handy** verdeckt wesentliche Teile der
+  Oberflaeche. Beispiel: "py" eingeben, dann den Haken "Shiny" setzen, dann
+  in der Liste Pygraulon waehlen. Die App muss auf das Einblenden der Tastatur
+  reagieren und den Sichtbereich anpassen. Ansatz aus Gerits FMX-Erfahrung:
+  alles liegt in einem Scrollbereich, der bei eingeblendeter Tastatur einen
+  Rand in Tastaturhoehe bekommt, sodass weiterhin alles erreichbar ist.
+- **"(1:1)" in der eigenen Tauschliste pruefen:** Gerit bekommt bei keinem
+  Eintrag ein " (1:1)" angehaengt, egal ob das Pokemon in "Habe ich" oder
+  "Habe ich ueber" steht. Laut README ist "1:1" kein Anhang, sondern ein
+  eigener Abschnitt ("Kanto 1:1:") fuer Zeilen aus "Suche ich" mit 1:1.
+  Zuerst klaeren, ob ein anderes Verhalten erwartet wird oder das Programm
+  von der README abweicht.
+- **Design ueberarbeiten** (bisher sehr schlicht). Groesseres Vorhaben,
+  vermutlich mit einem eigenen Testprojekt, in dem sich verschiedene Stile
+  schnell ausprobieren und wechseln lassen. Wichtig: Die Stile sollen
+  ressourcenschonend bleiben, kein Komponentenpaket, das das Projekt stark
+  vergroessert (z.B. auf 100 MB).
 - Update der Nutzdaten fuer offiziell entfernte Formen (archivieren und nach
   `eigene_formen.csv` uebernehmen). Bisher wurde nie eine offizielle Form
   entfernt; erst bauen, wenn der Fall eintritt.
-- WLAN-Abgleich: ersetzt auf dem Zielgeraet alles (wie der Import), mit
-  Rueckfrage "Wirklich ersetzen?"; gleiche Paket- und Versionsregeln.
-- Abgleich zwischen Geraeten per WLAN (Phase 5), vorher Testprogramm fuer
-  Ports, Berechtigungen und Broadcast.
-- Windows-Build und Verteilung (Phase 6).
 - `install/Entwicklungsumgebung_Linux.md` auf den aktuellen Stand bringen
   (Testprojekt, CsvHelper, Skripte).
 
 ### Sehr viel spaeter
 
+- **WLAN-Abgleich und Windows-Build** (Phasen 5 und 6) sind zurueckgestellt;
+  der Austausch per Datei (Eigene Listen exportieren/importieren) reicht
+  vorerst. Fuer spaeter:
+  - WLAN-Abgleich: ersetzt auf dem Zielgeraet alles (wie der Import), mit
+    Rueckfrage "Wirklich ersetzen?"; gleiche Paket- und Versionsregeln.
+  - Vorher Testprogramm fuer Ports, Berechtigungen und Broadcast.
+  - Windows-Build und Verteilung.
 - **Kopf- und Fusstext** fuer die eigene Tauschliste (z.B. Trainername,
   Freundescode); erster Punkt unter "Einstellungen".
 - **"Teilen"** der eigenen Tauschliste auf Android (Teilen-Menue, z.B.
@@ -524,8 +558,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   U+2640 und U+2642. Zusaetzlich Schreibweisen wie "Nidoran w", "Nidoran
   weiblich", "Nidoran (w)" bzw. "Nidoran m", "Nidoran maennlich",
   "Nidoran (m)" erkennen.
-- Gestaltung der Oberflaeche ("schoen machen").
 
 ### Aufraeumen bei Gelegenheit
 
-- Derzeit keine offenen Punkte (letzte Aufraeumrunde 2026-11-27).
+- "+ Mehrere" auf den Baustein `RegionFilterViewModel` umstellen (hat noch
+  eine eigene Regionsauswahl mit eigenem "Alle Regionen"). Nicht dringend.
