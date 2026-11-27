@@ -173,6 +173,15 @@ public class SammelSucheTests
       _katalog, vorlage, SammelModus.ProPokemon,
       Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>());
 
+    // Assert.All ist bei einer leeren Liste immer erfuellt. Deshalb zuerst
+    // pruefen, dass ueberhaupt Eintraege entstanden sind; die Meldung
+    // unterscheidet "keine Daten" von "falsche Daten".
+    Assert.True(
+      ergebnis.NeueEintraege.Count > 0,
+      "Keine Eintraege angelegt - Testaufbau pruefen (z.B. InGoVerfuegbar)");
+    // ProPokemon: je ein Eintrag fuer Glumanda, Vulpix und Flabebe
+    Assert.Equal(3, ergebnis.NeueEintraege.Count);
+
     Assert.All(ergebnis.NeueEintraege, e =>
     {
       Assert.Equal(Geschlecht.Weiblich, e.Geschlecht);

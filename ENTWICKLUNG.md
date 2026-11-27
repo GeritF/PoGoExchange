@@ -331,6 +331,12 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   Ergebnissen sinnvoll sind.
 - **README** nach jedem abgeschlossenen Bauschritt aktualisieren;
   **diese Datei** bei Aenderungen an Stand, Konventionen oder ToDos.
+- **Doku zuletzt:** README und diese Datei erst in einem eigenen Schritt
+  aendern, nachdem Gerit die Code-Aenderungen uebernommen hat und die Tests
+  gruen sind. Vorher Doku-Aenderungen hoechstens als Vorschau nennen.
+- **Doku als ganze Dateien:** Geaenderte Dokumente immer vollstaendig zum
+  Herunterladen bereitstellen, keine Anweisungen der Art "in Zeile x
+  folgendes aendern".
 - Gerit committet selbst; die KI schlaegt den Zeitpunkt vor.
 
 ## 6. Stolpersteine und Erfahrungen
@@ -383,7 +389,12 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - **Git, Zwischenstand vormerken:** `git add -A` (grosses A) legt den Stand
   in den Index; danach zeigt `git diff` nur die neuen Aenderungen.
 - **`Assert.All` bei leerer Liste** ist immer erfuellt. Wo Eintraege erwartet
-  werden, zusaetzlich `Assert.NotEmpty` pruefen.
+  werden, vorher pruefen, dass die Liste nicht leer ist, mit einer Meldung,
+  die im Testprotokoll "keine Daten" von "falsche Daten" unterscheidet
+  (Beispiel: `SammelSucheTests.Vorlage_WirdVollstaendigUebernommen` mit
+  `Assert.True(... .Count > 0, "Keine Eintraege angelegt ...")`). Die
+  Meldung erscheint in `Test_XUnit.sh` unter "Fehlermeldung" (geprueft mit
+  einem Gegentest).
 - **Rider:** Drag-and-Drop zwischen Projekten erzeugt Verweise statt
   Verschiebungen (mit `git mv` verschieben). "Unload Project" blendet nur aus.
 - **Debug-Start auf Android** dauert lange; der Start ueber das App-Symbol
@@ -446,8 +457,6 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   `new[] { "a", "b" }`) und `using` alphabetisch sortieren. Laeuft ueber den
   Rider-Cleanup und aendert Code, daher mit Diff-Kontrolle
   (`git diff -w --ignore-blank-lines`) und Testlauf.
-- `SammelSucheTests`: Der Test mit `Assert.All` soll zusaetzlich pruefen,
-  dass ueberhaupt Eintraege geliefert werden.
 - Mit Gerit abstimmen: Windows-Build, WLAN-Abgleich.
 - **`ViewLocator` entfernen (eigene Runde):** Er ist in `App.axaml` noch als
   Reflexions-Fallback registriert, obwohl die Seiten in `MainView.axaml`
