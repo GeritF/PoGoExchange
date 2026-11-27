@@ -1,7 +1,7 @@
-using System;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using PoGoExchange.Services;
+using System;
 
 namespace PoGoExchange.ViewModels;
 

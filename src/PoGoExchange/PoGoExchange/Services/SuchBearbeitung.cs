@@ -1,7 +1,7 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -232,7 +232,7 @@ public static class SuchBearbeitung
   internal static List<SucheEintrag> Aktive(IEnumerable<SucheEintrag> suche, SucheEintrag muster)
   {
     var schluessel = SuchZeilen.Schluessel(muster);
-    return suche.Where(e => SuchZeilen.Schluessel(e) == schluessel).ToList();
+    return [.. suche.Where(e => SuchZeilen.Schluessel(e) == schluessel)];
   }
 
   // Alle weiteren Datensaetze derselben Zeile gehen in "behalten" auf

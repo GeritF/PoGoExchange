@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System.Text;
 
 namespace PoGoExchange.Tests;
 
@@ -47,7 +43,7 @@ public class CsvSpeicherTests : IDisposable
   public void Datei_BeginntMitBom_UndNutztSemikolon()
   {
     var eintrag = new Pokemon { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" };
-    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, new[] { eintrag });
+    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, [eintrag]);
 
     var bytes = File.ReadAllBytes(_pfad);
     Assert.True(bytes.Length >= 3, $"Datei zu kurz: {bytes.Length} Bytes");
@@ -74,7 +70,7 @@ public class CsvSpeicherTests : IDisposable
       Anzahl = 3
     };
 
-    CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, new[] { original });
+    CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, [original]);
 
     // Gemessen: Rohtext der Datei
     var zeilen = File.ReadAllLines(_pfad, Encoding.UTF8);
@@ -109,7 +105,7 @@ public class CsvSpeicherTests : IDisposable
       FormGuid = Guid.Empty
     };
 
-    CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, new[] { original });
+    CsvSpeicher.Schreiben<SucheEintrag, SucheEintragMap>(_pfad, [original]);
 
     // Gemessen: drittes Feld (FormGuid) ist leer
     var felder = File.ReadAllLines(_pfad, Encoding.UTF8)[1].Split(';');
@@ -135,7 +131,7 @@ public class CsvSpeicherTests : IDisposable
   public void Schreiben_NutztWindowsZeilenumbruch()
   {
     var eintrag = new Pokemon { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" };
-    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, new[] { eintrag });
+    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, [eintrag]);
 
     // Gemessen: jeder Zeilenvorschub gehoert zu einem CRLF
     var text = File.ReadAllText(_pfad, Encoding.UTF8);
@@ -148,7 +144,7 @@ public class CsvSpeicherTests : IDisposable
   [Fact]
   public void LeereListe_SchreibtNurKopfzeile()
   {
-    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, Array.Empty<Pokemon>());
+    CsvSpeicher.Schreiben<Pokemon, PokemonMap>(_pfad, []);
 
     var zeilen = File.ReadAllLines(_pfad, Encoding.UTF8);
     Assert.Equal(new[] { "Guid;DexNr;Name;Kategorie;InGoVerfuegbar" }, zeilen);

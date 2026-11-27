@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PoGoExchange.Services;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace PoGoExchange.ViewModels;
 
@@ -41,7 +41,7 @@ public sealed partial class ListenTabViewModel : ViewModelBase
   public bool HatMehrere => _mehrere != null;
 
   // Ueberschriften (RegionKopf) und Zeilen (AnzeigeZeile) gemischt
-  public ObservableCollection<object> Zeilen { get; } = new();
+  public ObservableCollection<object> Zeilen { get; } = [];
 
   public bool IstLeer => Zeilen.Count == 0;
 

@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -23,14 +21,13 @@ public class ListenAnzeigeTests
     _flabebeRot = Form(_flabebe, form: "Rot");
 
     _katalog = new Katalog(
-      new[] { _glumanda, _vulpix, _flabebe },
-      new[] { _glumandaForm, _vulpixAlola, _flabebeRot },
-      new[]
-      {
+      [_glumanda, _vulpix, _flabebe],
+      [_glumandaForm, _vulpixAlola, _flabebeRot],
+      [
         new RegionBereich { Region = "Kanto", DexVon = 1, DexBis = 151 },
         new RegionBereich { Region = "Kalos", DexVon = 650, DexBis = 721 },
         new RegionBereich { Region = "Alola", DexVon = 722, DexBis = 807 }
-      });
+      ]);
   }
 
   private static Pokemon Pkmn(int dex, string name)
@@ -84,11 +81,11 @@ public class ListenAnzeigeTests
   {
     var suche = new[] { Suche(_flabebeRot), Suche(_vulpixAlola), Suche(_glumandaForm) };
 
-    var gruppen = ListenAnzeige.Suche(_katalog, suche, Array.Empty<HabeEintrag>(), false, "");
+    var gruppen = ListenAnzeige.Suche(_katalog, suche, [], false, "");
 
-    Assert.Equal(new[] { "Kanto", "Kalos" }, gruppen.Select(g => g.Region));
+    Assert.Equal(["Kanto", "Kalos"], gruppen.Select(g => g.Region));
     Assert.Equal(
-      new[] { "#4 Glumanda - Shiny", "#37 Vulpix - Shiny - Alola" },
+      ["#4 Glumanda - Shiny", "#37 Vulpix - Shiny - Alola"],
       gruppen[0].Zeilen.Select(z => z.Anzeige));
     Assert.Equal("#669 Flab\u00e9b\u00e9 Rot - Shiny", gruppen[1].Zeilen.Single().Anzeige);
   }
@@ -129,7 +126,7 @@ public class ListenAnzeigeTests
   {
     var suche = new[] { Suche(_flabebeRot), Suche(_vulpixAlola), Suche(_glumandaForm) };
 
-    var gruppen = ListenAnzeige.Suche(_katalog, suche, Array.Empty<HabeEintrag>(), false, filter);
+    var gruppen = ListenAnzeige.Suche(_katalog, suche, [], false, filter);
 
     Assert.Equal(erwarteteZeilen, gruppen.Sum(g => g.Zeilen.Count));
   }
@@ -147,7 +144,7 @@ public class ListenAnzeigeTests
       Hundert = true
     };
 
-    var zeile = ListenAnzeige.Habe(_katalog, new[] { exemplar }, "").Single().Zeilen.Single();
+    var zeile = ListenAnzeige.Habe(_katalog, [exemplar], "").Single().Zeilen.Single();
 
     Assert.Equal("#4 Glumanda - Shiny [Gl\u00fcck, 100er]", zeile.Anzeige);
   }
@@ -161,7 +158,7 @@ public class ListenAnzeigeTests
     };
     var ohneForm = new HabeEintrag { Guid = Guid.NewGuid(), PokemonGuid = _glumanda.Guid };
 
-    var gruppen = ListenAnzeige.Habe(_katalog, new[] { ohneForm, gueltig }, "xyz");
+    var gruppen = ListenAnzeige.Habe(_katalog, [ohneForm, gueltig], "xyz");
 
     var gruppe = Assert.Single(gruppen);
     Assert.Equal(ListenAnzeige.GruppeFehlerhaft, gruppe.Region);
@@ -182,7 +179,7 @@ public class ListenAnzeigeTests
       Anzahl = 3
     };
 
-    var zeile = ListenAnzeige.Habe(_katalog, new[] { exemplar }, "").Single().Zeilen.Single();
+    var zeile = ListenAnzeige.Habe(_katalog, [exemplar], "").Single().Zeilen.Single();
 
     Assert.Equal("3x #4 Glumanda - Shiny", zeile.Anzeige);
   }

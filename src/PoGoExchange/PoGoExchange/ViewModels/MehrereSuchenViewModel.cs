@@ -1,10 +1,10 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using PoGoExchange.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using PoGoExchange.Services;
 
 namespace PoGoExchange.ViewModels;
 
@@ -22,9 +22,11 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
   {
     _bestand = bestand;
     _gespeichert = gespeichert;
-    Regionen = new[] { AlleRegionen }
-      .Concat(bestand.Katalog.RegionenInReihenfolge())
-      .ToList();
+    Regionen =
+    [
+      AlleRegionen,
+      .. bestand.Katalog.RegionenInReihenfolge()
+    ];
     Anforderungen.Geaendert += VorschauAktualisieren;
     VorschauAktualisieren();
   }
@@ -35,11 +37,11 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
 
   public IReadOnlyList<string> Regionen { get; }
 
-  public IReadOnlyList<string> ModusAuswahl { get; } = new[]
-  {
+  public IReadOnlyList<string> ModusAuswahl { get; } =
+  [
     "Eine Zeile pro Form",
     "Eine Zeile pro Pokemon (Form beliebig)"
-  };
+  ];
 
   [ObservableProperty] private int _regionIndex;
 

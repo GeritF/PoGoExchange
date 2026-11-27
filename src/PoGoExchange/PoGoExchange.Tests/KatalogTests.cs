@@ -1,4 +1,3 @@
-using System;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -8,7 +7,7 @@ public class KatalogTests
 {
   private static Katalog MitRegionen(params RegionBereich[] regionen)
   {
-    return new Katalog(Array.Empty<Pokemon>(), Array.Empty<PokemonForm>(), regionen);
+    return new Katalog([], [], regionen);
   }
 
   private static RegionBereich Bereich(string name, int? von, int? bis)
@@ -43,7 +42,7 @@ public class KatalogTests
     var katalog = MitRegionen(Bereich("Kanto", 1, 151));
 
     Assert.Equal(Katalog.RegionErsatz, katalog.RegionZuDex(500));
-    Assert.Equal(new[] { "Kanto", Katalog.RegionErsatz }, katalog.RegionenInReihenfolge());
+    Assert.Equal(["Kanto", Katalog.RegionErsatz], katalog.RegionenInReihenfolge());
   }
 
   [Fact]
@@ -54,6 +53,6 @@ public class KatalogTests
       Bereich("Kalos", 650, 721),
       Bereich("Kanto", 1, 151));
 
-    Assert.Equal(new[] { "Kanto", "Kalos", "Unbekannt" }, katalog.RegionenInReihenfolge());
+    Assert.Equal(["Kanto", "Kalos", "Unbekannt"], katalog.RegionenInReihenfolge());
   }
 }

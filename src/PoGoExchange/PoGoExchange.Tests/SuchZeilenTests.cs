@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -46,7 +44,7 @@ public class SuchZeilenTests
   {
     var habe = Enumerable.Range(0, passende).Select(_ => Habe()).ToList();
 
-    var zeile = SuchZeilen.Bilden(new[] { Suche(anzahl) }, habe).Single();
+    var zeile = SuchZeilen.Bilden([Suche(anzahl)], habe).Single();
 
     Assert.Equal(erwartet, zeile.Zaehler);
   }
@@ -68,7 +66,7 @@ public class SuchZeilenTests
   public void DoppelteDatensaetze_WerdenZuEinerZeileAddiert()
   {
     var zeile = SuchZeilen.Bilden(
-      new[] { Suche(2), Suche(3) }, Array.Empty<HabeEintrag>()).Single();
+      [Suche(2), Suche(3)], []).Single();
 
     Assert.Equal(5, zeile.Ziel);
   }
@@ -80,7 +78,7 @@ public class SuchZeilenTests
     var b = Suche();
     b.EinsZuEins = true;
 
-    Assert.Equal(2, SuchZeilen.Bilden(new[] { a, b }, Array.Empty<HabeEintrag>()).Count);
+    Assert.Equal(2, SuchZeilen.Bilden([a, b], []).Count);
   }
 
   [Fact]
@@ -97,7 +95,7 @@ public class SuchZeilenTests
     c.KostuemText = "Zylinder";
     var d = Suche();
 
-    var zeilen = SuchZeilen.Bilden(new[] { a, b, c, d }, Array.Empty<HabeEintrag>());
+    var zeilen = SuchZeilen.Bilden([a, b, c, d], []);
 
     // a und b gehoeren zusammen, c und d ebenfalls (Text ohne Haken zaehlt nicht)
     Assert.Equal(2, zeilen.Count);
@@ -111,7 +109,7 @@ public class SuchZeilenTests
     var beliebig = Suche();
     beliebig.FormGuid = Guid.Empty;
 
-    var zeilen = SuchZeilen.Bilden(new[] { bestimmt, beliebig }, Array.Empty<HabeEintrag>());
+    var zeilen = SuchZeilen.Bilden([bestimmt, beliebig], []);
 
     Assert.Equal(2, zeilen.Count);
   }
@@ -124,7 +122,7 @@ public class SuchZeilenTests
     var andereForm = Habe();
     andereForm.FormGuid = Guid.NewGuid();
 
-    var zeile = SuchZeilen.Bilden(new[] { beliebig }, new[] { Habe(), andereForm }).Single();
+    var zeile = SuchZeilen.Bilden([beliebig], [Habe(), andereForm]).Single();
 
     Assert.Equal("(2/2)", zeile.Zaehler);
   }
@@ -132,7 +130,7 @@ public class SuchZeilenTests
   [Fact]
   public void HabeZeileMitAnzahl_ZaehltAlleExemplare()
   {
-    var zeile = SuchZeilen.Bilden(new[] { Suche(5) }, new[] { Habe(anzahl: 3) }).Single();
+    var zeile = SuchZeilen.Bilden([Suche(5)], [Habe(anzahl: 3)]).Single();
 
     Assert.Equal("(3/5)", zeile.Zaehler);
   }

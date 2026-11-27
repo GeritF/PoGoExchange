@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 using PoGoExchange.ViewModels;
@@ -76,8 +73,8 @@ public class EntwickelnViewModelTests : IDisposable
 
     Assert.Contains("Glurak", rueckmeldung);
     var neu = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
-    Assert.Equal(new[] { 2, 1 }, neu.Habe.Select(h => h.Anzahl).OrderDescending());
-    Assert.Equal(new[] { 2, 1 }, neu.Suche.Select(s => s.Anzahl).OrderDescending());
+    Assert.Equal([2, 1], neu.Habe.Select(h => h.Anzahl).OrderDescending());
+    Assert.Equal([2, 1], neu.Suche.Select(s => s.Anzahl).OrderDescending());
     Assert.All(SuchZeilen.Bilden(neu.Suche, neu.Habe), z => Assert.Equal(0, z.Offen));
   }
 

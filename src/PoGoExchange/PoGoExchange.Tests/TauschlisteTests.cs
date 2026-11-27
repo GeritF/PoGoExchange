@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -32,15 +29,14 @@ public class TauschlisteTests
     _meltanForm = Form(_meltan);
 
     _katalog = new Katalog(
-      new[] { _glumanda, _glurak, _vulpix, _flabebe, _meltan },
-      new[] { _glumandaForm, _glurakForm, _vulpixForm, _vulpixAlola, _flabebeRot, _meltanForm },
-      new[]
-      {
+      [_glumanda, _glurak, _vulpix, _flabebe, _meltan],
+      [_glumandaForm, _glurakForm, _vulpixForm, _vulpixAlola, _flabebeRot, _meltanForm],
+      [
         new RegionBereich { Region = "Unbekannt" },
         new RegionBereich { Region = "Kalos", DexVon = 650, DexBis = 721 },
         new RegionBereich { Region = "Kanto", DexVon = 1, DexBis = 151 },
         new RegionBereich { Region = "Alola", DexVon = 722, DexBis = 807 }
-      });
+      ]);
   }
 
   private static Pokemon Pkmn(int dex, string name)
@@ -91,7 +87,7 @@ public class TauschlisteTests
     };
   }
 
-  private static readonly HabeEintrag[] KeinHabe = Array.Empty<HabeEintrag>();
+  private static readonly HabeEintrag[] KeinHabe = [];
 
   private static UeberEintrag Ueber(PokemonForm form, bool shiny = true)
   {
@@ -152,7 +148,7 @@ public class TauschlisteTests
     var suche = new[] { Suche(_glumandaForm, anzahl: 2) };
     var habe = new[] { Habe(_glumandaForm), Habe(_glumandaForm) };
 
-    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, habe, Array.Empty<UeberEintrag>());
+    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, habe, []);
 
     Assert.Equal("", ergebnis.Text);
   }
@@ -162,7 +158,7 @@ public class TauschlisteTests
   {
     var suche = new[] { Suche(_glumandaForm, glueck: true, hundert: true) };
 
-    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, KeinHabe, Array.Empty<UeberEintrag>());
+    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, KeinHabe, []);
 
     Assert.Equal("Kanto fehlt:\n- #4 Glumanda - Shiny [Gl\u00fcck, 100er]\n", ergebnis.Text);
   }
@@ -172,7 +168,7 @@ public class TauschlisteTests
   {
     var suche = new[] { Suche(_meltanForm), Suche(_glumandaForm) };
 
-    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, KeinHabe, Array.Empty<UeberEintrag>());
+    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, KeinHabe, []);
 
     var erwartet =
       "Kanto fehlt:\n" +
@@ -190,7 +186,7 @@ public class TauschlisteTests
     var defektesUeber = new UeberEintrag { Guid = Guid.NewGuid(), FormGuid = Guid.NewGuid() };
     var suche = new[] { defekteSuche, Suche(_glumandaForm) };
 
-    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, KeinHabe, new[] { defektesUeber });
+    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, KeinHabe, [defektesUeber]);
 
     Assert.Equal("Kanto fehlt:\n- #4 Glumanda - Shiny\n", ergebnis.Text);
     Assert.Equal(2, ergebnis.Fehler.Count);
@@ -211,7 +207,7 @@ public class TauschlisteTests
       new SucheEintrag { Guid = Guid.NewGuid(), PokemonGuid = _vulpix.Guid, Shiny = true }
     };
 
-    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, KeinHabe, Array.Empty<UeberEintrag>());
+    var ergebnis = Tauschliste.Erzeugen(_katalog, suche, KeinHabe, []);
 
     Assert.Equal("Kanto fehlt:\n- #37 Vulpix - Form (beliebig) - Shiny\n", ergebnis.Text);
     Assert.Empty(ergebnis.Fehler);
@@ -222,8 +218,7 @@ public class TauschlisteTests
   {
     var ohneForm = new UeberEintrag { Guid = Guid.NewGuid(), PokemonGuid = _glumanda.Guid };
 
-    var ergebnis = Tauschliste.Erzeugen(_katalog, Array.Empty<SucheEintrag>(), KeinHabe,
-      new[] { ohneForm });
+    var ergebnis = Tauschliste.Erzeugen(_katalog, [], KeinHabe, [ohneForm]);
 
     Assert.Equal("", ergebnis.Text);
     var fehler = Assert.Single(ergebnis.Fehler);

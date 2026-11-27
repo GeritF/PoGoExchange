@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -26,14 +24,13 @@ public class AbgleichTests
     _flabebeRot = Form(_flabebe, form: "Rot");
 
     _katalog = new Katalog(
-      new[] { _glumanda, _glurak, _vulpix, _flabebe },
-      new[] { _glumandaForm, _glurakForm, _vulpixAlola, _flabebeRot },
-      new[]
-      {
+      [_glumanda, _glurak, _vulpix, _flabebe],
+      [_glumandaForm, _glurakForm, _vulpixAlola, _flabebeRot],
+      [
         new RegionBereich { Region = "Kanto", DexVon = 1, DexBis = 151 },
         new RegionBereich { Region = "Kalos", DexVon = 650, DexBis = 721 },
         new RegionBereich { Region = "Alola", DexVon = 722, DexBis = 807 }
-      });
+      ]);
   }
 
   private static Pokemon Pkmn(int dex, string name)
@@ -88,7 +85,7 @@ public class AbgleichTests
   {
     var fremd = TauschlistenImport.Einlesen(_katalog, fremderText);
     return Abgleich.Durchfuehren(
-      fremd, meineSuche, meinHabe ?? Array.Empty<HabeEintrag>(), meinUeber);
+      fremd, meineSuche, meinHabe ?? [], meinUeber);
   }
 
   [Fact]
@@ -96,8 +93,8 @@ public class AbgleichTests
   {
     var ergebnis = Abgleichen(
       "Kanto 1:1:\n- #4 Glumanda - Shiny\n",
-      new[] { Suche(_glumandaForm, shiny: true, einsZuEins: true) },
-      Array.Empty<UeberEintrag>());
+      [Suche(_glumandaForm, shiny: true, einsZuEins: true)],
+      []);
 
     var treffer = Assert.Single(ergebnis.EinsZuEins);
     Assert.Equal(Passung.Passt, treffer.Passung);
@@ -110,8 +107,8 @@ public class AbgleichTests
   {
     var ergebnis = Abgleichen(
       "Kanto abzugeben:\n- #37 Vulpix - Shiny - Alola\n",
-      new[] { Suche(_vulpixAlola, shiny: true) },
-      Array.Empty<UeberEintrag>());
+      [Suche(_vulpixAlola, shiny: true)],
+      []);
 
     var treffer = Assert.Single(ergebnis.ErHat);
     Assert.Equal(Passung.Passt, treffer.Passung);
@@ -125,8 +122,8 @@ public class AbgleichTests
   {
     var ergebnis = Abgleichen(
       "Kanto fehlt:\n- #6 Glurak\n",
-      Array.Empty<SucheEintrag>(),
-      new[] { Ueber(_glurakForm, shiny: true) });
+      [],
+      [Ueber(_glurakForm, shiny: true)]);
 
     var treffer = Assert.Single(ergebnis.ErSucht);
     Assert.Equal(Passung.Passt, treffer.Passung);
@@ -138,8 +135,8 @@ public class AbgleichTests
   {
     var ergebnis = Abgleichen(
       "Kalos abzugeben:\n- #669 Flab\u00e9b\u00e9 Rot\n",
-      new[] { Suche(_flabebeRot, geschlecht: Geschlecht.Weiblich) },
-      Array.Empty<UeberEintrag>());
+      [Suche(_flabebeRot, geschlecht: Geschlecht.Weiblich)],
+      []);
 
     var treffer = Assert.Single(ergebnis.ErHat);
     Assert.Equal(Passung.Pruefen, treffer.Passung);
@@ -151,8 +148,8 @@ public class AbgleichTests
   {
     var ergebnis = Abgleichen(
       "Kanto 1:1:\n- #4 Glumanda - Shiny\n",
-      new[] { Suche(_glumandaForm, shiny: true) },
-      Array.Empty<UeberEintrag>());
+      [Suche(_glumandaForm, shiny: true)],
+      []);
 
     Assert.Empty(ergebnis.EinsZuEins);
     var treffer = Assert.Single(ergebnis.ErHat);
@@ -166,8 +163,8 @@ public class AbgleichTests
 
     var ergebnis = Abgleichen(
       "Kanto fehlt:\n- #4 Glumanda\n",
-      new[] { meine },
-      Array.Empty<UeberEintrag>());
+      [meine],
+      []);
 
     Assert.Empty(ergebnis.ErHat);
     var treffer = Assert.Single(ergebnis.ErSucht);
@@ -188,16 +185,15 @@ public class AbgleichTests
 
     var ergebnis = Abgleichen(
       text,
-      new[]
-      {
+      [
         Suche(_flabebeRot, geschlecht: Geschlecht.Weiblich),
         Suche(_glurakForm),
         Suche(_vulpixAlola, shiny: true)
-      },
-      Array.Empty<UeberEintrag>());
+      ],
+      []);
 
     // Vulpix (1:1 gewuenscht), Glurak (sicher), Flabebe (pruefen)
-    Assert.Equal(new[] { 37, 6, 669 }, ergebnis.ErHat.Select(t => t.Fremd.DexNr));
+    Assert.Equal([37, 6, 669], ergebnis.ErHat.Select(t => t.Fremd.DexNr));
   }
 
   [Fact]
@@ -213,8 +209,8 @@ public class AbgleichTests
 
     var ergebnis = Abgleichen(
       "Kanto abzugeben:\n- #4 Glumanda\n",
-      new[] { Suche(_glumandaForm) },
-      Array.Empty<UeberEintrag>(),
+      [Suche(_glumandaForm)],
+      [],
       habe);
 
     Assert.Empty(ergebnis.ErHat);
@@ -225,8 +221,8 @@ public class AbgleichTests
   {
     var ergebnis = Abgleichen(
       "Kanto fehlt:\n- #6 Glurak\n",
-      Array.Empty<SucheEintrag>(),
-      new[] { Ueber(_glurakForm), Ueber(_glurakForm) });
+      [],
+      [Ueber(_glurakForm), Ueber(_glurakForm)]);
 
     Assert.Single(ergebnis.ErSucht);
   }
@@ -236,8 +232,8 @@ public class AbgleichTests
   {
     var ergebnis = Abgleichen(
       "Kanto fehlt:\n- #999 Irgendwas\n",
-      Array.Empty<SucheEintrag>(),
-      Array.Empty<UeberEintrag>());
+      [],
+      []);
 
     var fehler = Assert.Single(ergebnis.Fehler);
     Assert.Contains("999", fehler.Grund);
@@ -255,8 +251,8 @@ public class AbgleichTests
 
     var ergebnis = Abgleichen(
       "Kanto abzugeben:\n- #37 Vulpix - Shiny - Alola\n",
-      new[] { beliebig },
-      Array.Empty<UeberEintrag>());
+      [beliebig],
+      []);
 
     var treffer = Assert.Single(ergebnis.ErHat);
     Assert.Equal(Passung.Passt, treffer.Passung);
@@ -267,8 +263,8 @@ public class AbgleichTests
   {
     var ergebnis = Abgleichen(
       "Kanto abzugeben:\n- #37 Vulpix - Form (beliebig) - Shiny\n",
-      new[] { Suche(_vulpixAlola, shiny: true) },
-      Array.Empty<UeberEintrag>());
+      [Suche(_vulpixAlola, shiny: true)],
+      []);
 
     var treffer = Assert.Single(ergebnis.ErHat);
     Assert.Equal(Passung.Pruefen, treffer.Passung);

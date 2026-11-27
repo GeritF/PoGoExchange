@@ -1,8 +1,8 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -27,11 +27,11 @@ public static class Tauschliste
   internal const string Trennlinie = "--------------------";
 
   private static readonly string[] Abschnitte =
-  {
+  [
     AbschnittEinsZuEins,
     AbschnittFehlt,
     AbschnittAbzugeben
-  };
+  ];
 
   // Gliederung: "1:1" und "fehlt" nach Region (siehe Katalog), "Abzugeben"
   // ohne Region gesammelt am Ende; jeweils nach Dex-Nummer und Text sortiert.
@@ -48,9 +48,11 @@ public static class Tauschliste
     var gueltigeSuche = NurGueltige(katalog, suche, ListenNamen.Suche, false, fehler);
     var gueltigeUeber = NurGueltige(katalog, ueber, ListenNamen.Ueber, true, fehler);
 
-    var zeilen = new List<ExportZeile>();
-    zeilen.AddRange(SuchZeilenFuerExport(katalog, gueltigeSuche, habe));
-    zeilen.AddRange(UeberZeilenFuerExport(katalog, gueltigeUeber));
+    List<ExportZeile> zeilen =
+    [
+      .. SuchZeilenFuerExport(katalog, gueltigeSuche, habe),
+      .. UeberZeilenFuerExport(katalog, gueltigeUeber)
+    ];
 
     return new TauschlistenErgebnis
     {
@@ -186,11 +188,13 @@ public static class Tauschliste
 
   private static List<ExportZeile> Sortiert(IEnumerable<ExportZeile> zeilen)
   {
-    return zeilen
-      .OrderBy(z => z.DexNr)
-      .ThenBy(z => z.Text, StringComparer.OrdinalIgnoreCase)
-      .ThenBy(z => z.Zusatz, StringComparer.Ordinal)
-      .ToList();
+    return
+    [
+      .. zeilen
+        .OrderBy(z => z.DexNr)
+        .ThenBy(z => z.Text, StringComparer.OrdinalIgnoreCase)
+        .ThenBy(z => z.Zusatz, StringComparer.Ordinal)
+    ];
   }
 
   private static void ZeilenAnhaengen(StringBuilder ausgabe, List<ExportZeile> liste)

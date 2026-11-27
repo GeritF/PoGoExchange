@@ -1,9 +1,6 @@
-using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System.IO.Compression;
 
 namespace PoGoExchange.Tests;
 
@@ -112,7 +109,7 @@ public class ExportpaketTests : IDisposable
   [Fact]
   public void Pruefen_KeinZip_IstUngueltig()
   {
-    var pruefung = Exportpaket.Pruefen(new byte[] { 1, 2, 3 }, TestNutzdaten.Daten, Jetzt);
+    var pruefung = Exportpaket.Pruefen([1, 2, 3], TestNutzdaten.Daten, Jetzt);
 
     Assert.False(pruefung.Gueltig);
     Assert.Contains("kein g\u00fcltiges Paket", pruefung.Fehler);

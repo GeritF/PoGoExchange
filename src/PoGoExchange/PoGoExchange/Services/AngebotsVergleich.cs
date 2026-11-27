@@ -1,6 +1,6 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -36,7 +36,7 @@ public static class AngebotsVergleich
       return new Vergleichsergebnis
       {
         Passung = Passung.PasstNicht,
-        Hinweise = Array.Empty<string>()
+        Hinweise = []
       };
     }
 

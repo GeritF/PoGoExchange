@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PoGoExchange.ViewModels;
 
@@ -35,7 +35,7 @@ public sealed partial class EigeneFormViewModel : SeiteViewModel
     _bestand = bestand;
     _fertig = fertig;
     _form = form;
-    Regionen = new[] { KeineRegion }.Concat(bestand.Katalog.RegionenInReihenfolge()).ToList();
+    Regionen = [KeineRegion, .. bestand.Katalog.RegionenInReihenfolge()];
 
     if (form != null)
     {
@@ -83,7 +83,7 @@ public sealed partial class EigeneFormViewModel : SeiteViewModel
 
   [ObservableProperty] private string _suchtext = "";
 
-  public ObservableCollection<PokemonZiel> Ziele { get; } = new();
+  public ObservableCollection<PokemonZiel> Ziele { get; } = [];
 
   [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
   private string _mehrHinweis = "";

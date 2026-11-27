@@ -1,5 +1,5 @@
-using System;
 using PoGoExchange.Models;
+using System;
 
 namespace PoGoExchange.Services;
 

@@ -1,7 +1,7 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -25,7 +25,7 @@ public static class FormVerwaltung
   // sonst Export und Import der Tauschliste durcheinanderbringen.
   public static string? FormTextFehler(string text)
   {
-    if (text.IndexOfAny(new[] { '"', '[', ']', '(', ')', '\n', '\r' }) >= 0 || text.Contains(" - "))
+    if (text.IndexOfAny(['"', '[', ']', '(', ')', '\n', '\r']) >= 0 || text.Contains(" - "))
     {
       return MeldungZeichen;
     }
@@ -36,10 +36,12 @@ public static class FormVerwaltung
   // Alle Pokemon, passend zum Suchfeld
   public static List<PokemonZiel> Pokemon(Katalog katalog, string filter)
   {
-    return katalog.AllePokemon()
-      .Where(p => ListenAnzeige.FilterPasst(filter, p))
-      .Select(p => new PokemonZiel(p.Guid, p.DexNr, p.Name))
-      .ToList();
+    return
+    [
+      .. katalog.AllePokemon()
+        .Where(p => ListenAnzeige.FilterPasst(filter, p))
+        .Select(p => new PokemonZiel(p.Guid, p.DexNr, p.Name))
+    ];
   }
 
   // Vorhandene Form desselben Pokemon mit gleicher Form und Region (ohne

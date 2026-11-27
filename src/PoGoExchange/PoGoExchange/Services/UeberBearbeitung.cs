@@ -1,7 +1,7 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -81,7 +81,7 @@ public static class UeberBearbeitung
   private static List<UeberEintrag> Gleiche(IEnumerable<UeberEintrag> ueber, UeberEintrag muster)
   {
     var schluessel = Schluessel(muster);
-    return ueber.Where(e => Schluessel(e) == schluessel).ToList();
+    return [.. ueber.Where(e => Schluessel(e) == schluessel)];
   }
 
   private static UeberEintrag NeuerEintrag(ListenEintrag merkmale, Guid pokemonGuid, Guid formGuid)

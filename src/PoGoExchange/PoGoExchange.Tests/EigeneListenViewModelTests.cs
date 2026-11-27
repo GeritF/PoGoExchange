@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 using PoGoExchange.ViewModels;

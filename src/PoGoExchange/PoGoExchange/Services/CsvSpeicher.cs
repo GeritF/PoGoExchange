@@ -1,11 +1,11 @@
+using CsvHelper;
+using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using CsvHelper;
-using CsvHelper.Configuration;
 
 namespace PoGoExchange.Services;
 
@@ -52,7 +52,7 @@ public static class CsvSpeicher
   // Spaltennamen in der Reihenfolge der Map
   public static List<string> Spaltennamen<T, TMap>() where TMap : ClassMap<T>, new()
   {
-    return new TMap().MemberMaps.Select(m => m.Data.Names[0]).ToList();
+    return [.. new TMap().MemberMaps.Select(m => m.Data.Names[0])];
   }
 
   public static List<T> Lesen<T, TMap>(string pfad) where TMap : ClassMap<T>
@@ -65,7 +65,7 @@ public static class CsvSpeicher
   {
     using var csv = new CsvReader(reader, LeseKonfiguration());
     csv.Context.RegisterClassMap<TMap>();
-    return csv.GetRecords<T>().ToList();
+    return [.. csv.GetRecords<T>()];
   }
 
   // Liest tolerant: Spalten duerfen fehlen, zusaetzlich vorhanden oder anders
@@ -174,7 +174,7 @@ public static class CsvSpeicher
     using var parser = new CsvParser(reader, LeseKonfiguration());
     while (parser.Read())
     {
-      zeilen.Add(parser.Record ?? Array.Empty<string>());
+      zeilen.Add(parser.Record ?? []);
     }
 
     return zeilen;

@@ -1,10 +1,10 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using PoGoExchange.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using PoGoExchange.Services;
 
 namespace PoGoExchange.ViewModels;
 
@@ -39,7 +39,7 @@ public sealed partial class ImportExportViewModel : SeiteViewModel
     var ergebnis = Tauschliste.Erzeugen(
       bestand.Katalog, bestand.Suche, bestand.Habe, bestand.Ueber);
     EigeneListe = ergebnis.Text;
-    ExportFehler = ergebnis.Fehler.Select(f => $"{f.Liste}: {f.Meldung}").ToList();
+    ExportFehler = [.. ergebnis.Fehler.Select(f => $"{f.Liste}: {f.Meldung}")];
     ListeLeerText = ergebnis.Text == ""
       ? "Deine Tauschliste ist leer: Es gibt keine offenen Suchen und nichts abzugeben."
       : "";

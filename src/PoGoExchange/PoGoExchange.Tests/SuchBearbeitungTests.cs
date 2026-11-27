@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -28,9 +25,9 @@ public class SuchBearbeitungTests
     _flabebeBlau = Form(_flabebe, form: "Blau", shiny: false);
 
     _katalog = new Katalog(
-      new[] { _glumanda, _vulpix, _flabebe },
-      new[] { _glumandaForm, _vulpixKanto, _vulpixAlola, _flabebeRot, _flabebeBlau },
-      Array.Empty<RegionBereich>());
+      [_glumanda, _vulpix, _flabebe],
+      [_glumandaForm, _vulpixKanto, _vulpixAlola, _flabebeRot, _flabebeBlau],
+      []);
   }
 
   private static Pokemon Pkmn(int dex, string name)
@@ -88,7 +85,7 @@ public class SuchBearbeitungTests
   [Fact]
   public void Ziele_FormBeliebigNurBeiMehrerenFormen()
   {
-    var ziele = SuchBearbeitung.Ziele(_katalog, Array.Empty<HabeEintrag>(), NurShiny, "");
+    var ziele = SuchBearbeitung.Ziele(_katalog, [], NurShiny, "");
 
     Assert.Single(ziele, z => z.PokemonGuid == _glumanda.Guid);
     Assert.Equal(3, ziele.Count(z => z.PokemonGuid == _vulpix.Guid));
@@ -98,17 +95,17 @@ public class SuchBearbeitungTests
   [Fact]
   public void Ziele_TexteEntsprechenDemEintragstext()
   {
-    var ziele = SuchBearbeitung.Ziele(_katalog, Array.Empty<HabeEintrag>(), NurShiny, "vulpix");
+    var ziele = SuchBearbeitung.Ziele(_katalog, [], NurShiny, "vulpix");
 
     Assert.Equal(
-      new[] { "#37 Vulpix - Form (beliebig)", "#37 Vulpix", "#37 Vulpix - Alola" },
+      ["#37 Vulpix - Form (beliebig)", "#37 Vulpix", "#37 Vulpix - Alola"],
       ziele.Select(z => z.Anzeige));
   }
 
   [Fact]
   public void Ziele_KategorienNachHabeUndShinyVerfuegbarkeit()
   {
-    var ziele = SuchBearbeitung.Ziele(_katalog, new[] { Habe(_glumandaForm) }, NurShiny, "");
+    var ziele = SuchBearbeitung.Ziele(_katalog, [Habe(_glumandaForm)], NurShiny, "");
 
     ZielKategorie Kategorie(Guid pokemonGuid, Guid formGuid) =>
       ziele.Single(z => z.PokemonGuid == pokemonGuid && z.FormGuid == formGuid).Kategorie;
@@ -124,7 +121,7 @@ public class SuchBearbeitungTests
   public void Ziele_OhneShinyAnforderung_IstNichtsNichtVerfuegbar()
   {
     var ziele = SuchBearbeitung.Ziele(
-      _katalog, Array.Empty<HabeEintrag>(), new SucheEintrag(), "");
+      _katalog, [], new SucheEintrag(), "");
 
     Assert.DoesNotContain(ziele, z => z.Kategorie == ZielKategorie.NichtVerfuegbar);
   }
@@ -135,7 +132,7 @@ public class SuchBearbeitungTests
     var suche = new List<SucheEintrag>();
 
     var ergebnis = SuchBearbeitung.Anlegen(
-      suche, new[] { Habe(_glumandaForm) }, NurShiny, ZielFuer(_glumandaForm), 3);
+      suche, [Habe(_glumandaForm)], NurShiny, ZielFuer(_glumandaForm), 3);
 
     Assert.Null(ergebnis.Vorher);
     Assert.Equal("1/3", ergebnis.Nachher.ToString());
@@ -150,7 +147,7 @@ public class SuchBearbeitungTests
     var suche = new List<SucheEintrag> { Suche(_glumandaForm, anzahl: 2) };
 
     var ergebnis = SuchBearbeitung.Anlegen(
-      suche, new[] { Habe(_glumandaForm) }, NurShiny, ZielFuer(_glumandaForm), 3);
+      suche, [Habe(_glumandaForm)], NurShiny, ZielFuer(_glumandaForm), 3);
 
     Assert.Equal("1/2", ergebnis.Vorher?.ToString());
     Assert.Equal("1/5", ergebnis.Nachher.ToString());
@@ -165,14 +162,14 @@ public class SuchBearbeitungTests
       Suche(_glumandaForm, glueck: true),
       Suche(_glumandaForm)
     };
-    var zeileMitGlueck = SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>())
+    var zeileMitGlueck = SuchZeilen.Bilden(suche, [])
       .Single(z => z.Muster.Glueck);
 
     var konflikt = SuchBearbeitung.Konflikt(
-      suche, Array.Empty<HabeEintrag>(), zeileMitGlueck, NurShiny);
+      suche, [], zeileMitGlueck, NurShiny);
     var unveraendert = SuchBearbeitung.Konflikt(
       suche,
-      Array.Empty<HabeEintrag>(),
+      [],
       zeileMitGlueck,
       new SucheEintrag { Shiny = true, Glueck = true });
 
@@ -185,7 +182,7 @@ public class SuchBearbeitungTests
   public void AnforderungenAendern_PokemonUndFormBleiben_TexteGetrimmt()
   {
     var suche = new List<SucheEintrag> { Suche(_glumandaForm, anzahl: 2) };
-    var zeile = SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()).Single();
+    var zeile = SuchZeilen.Bilden(suche, []).Single();
     var neu = new SucheEintrag
     {
       Shiny = true,
@@ -211,21 +208,21 @@ public class SuchBearbeitungTests
     var mitGlueck = Suche(_glumandaForm, anzahl: 2, glueck: true);
     var ohneGlueck = Suche(_glumandaForm, anzahl: 3);
     var suche = new List<SucheEintrag> { mitGlueck, ohneGlueck };
-    var zeileMitGlueck = SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>())
+    var zeileMitGlueck = SuchZeilen.Bilden(suche, [])
       .Single(z => z.Muster.Glueck);
 
     var ergebnis = SuchBearbeitung.AnforderungenAendern(suche, zeileMitGlueck, NurShiny);
 
     Assert.Same(mitGlueck, ergebnis);
     Assert.Equal(5, ergebnis.Anzahl);
-    Assert.Single(SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()));
+    Assert.Single(SuchZeilen.Bilden(suche, []));
   }
 
   [Fact]
   public void AnzahlSetzen_UeberschreibtAnzahl()
   {
     var suche = new List<SucheEintrag> { Suche(_glumandaForm, anzahl: 2) };
-    var zeile = SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()).Single();
+    var zeile = SuchZeilen.Bilden(suche, []).Single();
 
     SuchBearbeitung.AnzahlSetzen(suche, zeile, 4);
 
@@ -236,10 +233,10 @@ public class SuchBearbeitungTests
   public void AnzahlSetzen_Null_LoeschtZeile()
   {
     var suche = new List<SucheEintrag> { Suche(_glumandaForm, anzahl: 2) };
-    var zeile = SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()).Single();
+    var zeile = SuchZeilen.Bilden(suche, []).Single();
 
     SuchBearbeitung.AnzahlSetzen(suche, zeile, 0);
 
-    Assert.Empty(SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()));
+    Assert.Empty(SuchZeilen.Bilden(suche, []));
   }
 }

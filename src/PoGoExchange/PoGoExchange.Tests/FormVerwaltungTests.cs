@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -14,25 +12,28 @@ public class FormVerwaltungTests
     new() { Guid = Guid.NewGuid(), DexNr = 37, Name = "Vulpix" };
 
   private readonly List<PokemonForm> _offiziell;
-  private readonly List<PokemonForm> _eigene = new();
+  private readonly List<PokemonForm> _eigene = [];
 
   public FormVerwaltungTests()
   {
-    _offiziell = new List<PokemonForm>
-    {
+    _offiziell =
+    [
       new() { Guid = Guid.NewGuid(), PokemonGuid = _icognito.Guid, Form = "A" },
       new() { Guid = Guid.NewGuid(), PokemonGuid = _vulpix.Guid },
       new() { Guid = Guid.NewGuid(), PokemonGuid = _vulpix.Guid, Region = "Alola" }
-    };
+    ];
   }
 
   // Katalog wie im Programm: offizielle und eigene Formen zusammen
   private Katalog Katalog()
   {
-    var formen = new List<PokemonForm>(_offiziell);
-    formen.AddRange(_eigene);
+    List<PokemonForm> formen =
+    [
+      .. _offiziell,
+      .. _eigene
+    ];
     return new Katalog(
-      new[] { _icognito, _vulpix }, formen, Array.Empty<RegionBereich>());
+      [_icognito, _vulpix], formen, []);
   }
 
   [Theory]
@@ -92,7 +93,7 @@ public class FormVerwaltungTests
     var habe = new[] { new HabeEintrag { PokemonGuid = _icognito.Guid, FormGuid = form!.Guid } };
     var suche = new[] { new SucheEintrag { PokemonGuid = _icognito.Guid, FormGuid = form.Guid } };
 
-    var fehler = FormVerwaltung.Loeschen(_eigene, form, habe, suche, Array.Empty<UeberEintrag>());
+    var fehler = FormVerwaltung.Loeschen(_eigene, form, habe, suche, []);
 
     Assert.Contains("Habe ich", fehler);
     Assert.Contains("Suche ich", fehler);
@@ -104,9 +105,7 @@ public class FormVerwaltungTests
   {
     var (form, _) = FormVerwaltung.Anlegen(_eigene, Katalog(), _icognito.Guid, "?", "", false);
 
-    var fehler = FormVerwaltung.Loeschen(
-      _eigene, form!, Array.Empty<HabeEintrag>(), Array.Empty<SucheEintrag>(),
-      Array.Empty<UeberEintrag>());
+    var fehler = FormVerwaltung.Loeschen(_eigene, form!, [], [], []);
 
     Assert.Null(fehler);
     Assert.Empty(_eigene);

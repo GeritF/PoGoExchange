@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PoGoExchange.ViewModels;
 
@@ -32,9 +32,11 @@ public sealed class AbgleichErgebnisViewModel : SeiteViewModel
     Hinzufuegen(abschnitte, "Er sucht, was ich \u00fcbrig habe", ergebnis.ErSucht);
     Abschnitte = abschnitte;
 
-    Fehler = ergebnis.Fehler
-      .Select(f => $"Zeile {f.ZeilenNummer}: {f.Zeile.Trim()} ({f.Grund})")
-      .ToList();
+    Fehler =
+    [
+      .. ergebnis.Fehler
+        .Select(f => $"Zeile {f.ZeilenNummer}: {f.Zeile.Trim()} ({f.Grund})")
+    ];
   }
 
   public override string Titel => "Abgleich";

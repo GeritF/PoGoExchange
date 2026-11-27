@@ -1,9 +1,9 @@
-using System.Collections.ObjectModel;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PoGoExchange.ViewModels;
 
@@ -45,7 +45,7 @@ public sealed partial class EigeneFormenViewModel : SeiteViewModel
 
   public override string Titel => "Eigene Formen";
 
-  public ObservableCollection<EigeneFormEintrag> Liste { get; } = new();
+  public ObservableCollection<EigeneFormEintrag> Liste { get; } = [];
 
   [ObservableProperty] private bool _keineVorhanden;
 

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -29,16 +26,15 @@ public class TauschlistenImportTests
     _flabebeRot = Form(_flabebe, form: "Rot");
 
     _katalog = new Katalog(
-      new[] { _glumanda, _glurak, _vulpix, _flabebe },
-      new[] { _glumandaForm, _glurakForm, _vulpixForm, _vulpixAlola, _flabebeRot },
-      new[]
-      {
+      [_glumanda, _glurak, _vulpix, _flabebe],
+      [_glumandaForm, _glurakForm, _vulpixForm, _vulpixAlola, _flabebeRot],
+      [
         new RegionBereich { Region = "Kanto", DexVon = 1, DexBis = 151 },
         new RegionBereich { Region = "Kalos", DexVon = 650, DexBis = 721 },
         new RegionBereich { Region = "Alola", DexVon = 722, DexBis = 807 },
         new RegionBereich { Region = "Galar", DexVon = 810, DexBis = 898 },
         new RegionBereich { Region = "Unbekannt" }
-      });
+      ]);
   }
 
   private static Pokemon Pkmn(int dex, string name)
@@ -120,12 +116,11 @@ public class TauschlistenImportTests
 
     var export = Tauschliste.Erzeugen(
       _katalog,
-      new[]
-      {
+      [
         glumandaEinsZuEins, glumanda100er, vulpixAlola, vulpixBeliebig, flabebeWeiblich, glurakGiga
-      },
-      Array.Empty<HabeEintrag>(),
-      new[] { vulpixUeber, glurakUeber });
+      ],
+      [],
+      [vulpixUeber, glurakUeber]);
     var import = TauschlistenImport.Einlesen(_katalog, export.Text);
 
     var erwartet = new List<string>
@@ -265,7 +260,7 @@ public class TauschlistenImportTests
 
     Assert.Empty(ergebnis.Fehler);
     Assert.Equal(
-      new[] { "fehlt", "abzugeben" },
+      ["fehlt", "abzugeben"],
       ergebnis.Eintraege.Select(e => e.Abschnitt));
   }
 }

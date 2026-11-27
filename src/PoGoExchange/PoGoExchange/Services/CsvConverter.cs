@@ -1,9 +1,9 @@
-using System;
-using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using PoGoExchange.Models;
+using System;
+using System.Globalization;
 
 namespace PoGoExchange.Services;
 

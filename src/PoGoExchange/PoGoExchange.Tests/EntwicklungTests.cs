@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -93,10 +90,10 @@ public class EntwicklungTests
   public void Exemplar100er_BetrifftBeideZeilen_NormalesNurEine()
   {
     List<HabeEintrag> HabeListe() =>
-      new() { Habe(Glumanda, hundert: true), Habe(Glumanda) };
+      [Habe(Glumanda, hundert: true), Habe(Glumanda)];
 
     List<SucheEintrag> SucheListe() =>
-      new() { Suche(Glumanda, anzahl: 2), Suche(Glumanda, hundert: true) };
+      [Suche(Glumanda, anzahl: 2), Suche(Glumanda, hundert: true)];
 
     var habeA = HabeListe();
     var sucheA = SucheListe();

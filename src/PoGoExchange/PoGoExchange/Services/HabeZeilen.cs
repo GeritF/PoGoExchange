@@ -1,7 +1,7 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -28,7 +28,7 @@ public static class HabeZeilen
   internal static List<HabeEintrag> Aktive(IEnumerable<HabeEintrag> habe, HabeEintrag muster)
   {
     var schluessel = Schluessel(muster);
-    return habe.Where(e => Schluessel(e) == schluessel).ToList();
+    return [.. habe.Where(e => Schluessel(e) == schluessel)];
   }
 }
 

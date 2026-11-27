@@ -1,7 +1,7 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 

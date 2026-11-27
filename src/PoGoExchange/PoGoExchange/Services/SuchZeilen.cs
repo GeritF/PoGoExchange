@@ -1,7 +1,7 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -28,24 +28,26 @@ public static class SuchZeilen
     IEnumerable<HabeEintrag> habe)
   {
     var exemplare = habe.ToList();
-    return suche
-      .Where(e => e.Anzahl > 0)
-      .GroupBy(Schluessel)
-      .Select(g =>
-      {
-        var muster = g.First();
-        var ziel = g.Sum(e => e.Anzahl);
-        var passend = exemplare
-          .Where(h => Anforderung.Erfuellt(h, muster))
-          .Sum(h => h.Anzahl);
-        return new SuchZeile
+    return
+    [
+      .. suche
+        .Where(e => e.Anzahl > 0)
+        .GroupBy(Schluessel)
+        .Select(g =>
         {
-          Muster = muster,
-          Ziel = ziel,
-          Erledigt = Math.Min(passend, ziel)
-        };
-      })
-      .ToList();
+          var muster = g.First();
+          var ziel = g.Sum(e => e.Anzahl);
+          var passend = exemplare
+            .Where(h => Anforderung.Erfuellt(h, muster))
+            .Sum(h => h.Anzahl);
+          return new SuchZeile
+          {
+            Muster = muster,
+            Ziel = ziel,
+            Erledigt = Math.Min(passend, ziel)
+          };
+        })
+    ];
   }
 
   // Freie Texte zaehlen nur bei gesetztem Haken, Vergleich in Kleinbuchstaben

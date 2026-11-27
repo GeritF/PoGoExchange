@@ -1,9 +1,9 @@
-using System;
-using System.Collections.ObjectModel;
-using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PoGoExchange.Services;
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
 
 namespace PoGoExchange.ViewModels;
 
@@ -47,7 +47,7 @@ public sealed partial class SicherungenViewModel : SeiteViewModel
 
   public override string Titel => "Sicherungen";
 
-  public ObservableCollection<SicherungEintrag> Liste { get; } = new();
+  public ObservableCollection<SicherungEintrag> Liste { get; } = [];
 
   [ObservableProperty] private bool _keineVorhanden;
 

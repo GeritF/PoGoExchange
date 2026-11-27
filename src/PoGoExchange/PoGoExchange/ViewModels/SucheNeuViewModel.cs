@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PoGoExchange.ViewModels;
 
@@ -42,9 +42,9 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
 
   [ObservableProperty] private string _suchtext = "";
 
-  public ObservableCollection<SuchZiel> Verfuegbar { get; } = new();
-  public ObservableCollection<SuchZiel> HastDuSchon { get; } = new();
-  public ObservableCollection<SuchZiel> NichtVerfuegbar { get; } = new();
+  public ObservableCollection<SuchZiel> Verfuegbar { get; } = [];
+  public ObservableCollection<SuchZiel> HastDuSchon { get; } = [];
+  public ObservableCollection<SuchZiel> NichtVerfuegbar { get; } = [];
 
   [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
   private string _mehrHinweis = "";

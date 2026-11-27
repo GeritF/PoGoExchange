@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using CsvHelper.Configuration;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System.Text;
 
 namespace PoGoExchange.Tests;
 

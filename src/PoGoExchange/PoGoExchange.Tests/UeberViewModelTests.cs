@@ -1,8 +1,4 @@
-using System;
-using System.IO;
-using System.Linq;
 using PoGoExchange.Models;
-using PoGoExchange.Services;
 using PoGoExchange.ViewModels;
 
 namespace PoGoExchange.Tests;

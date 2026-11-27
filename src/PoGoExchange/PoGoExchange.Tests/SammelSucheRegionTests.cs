@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -19,14 +17,13 @@ public class SammelSucheRegionTests
     _flabebeRot = Form(_flabebe, "Rot", shiny: true);
     _flabebeBlau = Form(_flabebe, "Blau", shiny: false);
     _katalog = new Katalog(
-      new[] { _glumanda, _feurigel, _flabebe },
-      new[] { Form(_glumanda), Form(_feurigel), _flabebeRot, _flabebeBlau },
-      new[]
-      {
+      [_glumanda, _feurigel, _flabebe],
+      [Form(_glumanda), Form(_feurigel), _flabebeRot, _flabebeBlau],
+      [
         new RegionBereich { Region = "Kanto", DexVon = 1, DexBis = 151 },
         new RegionBereich { Region = "Johto", DexVon = 152, DexBis = 251 },
         new RegionBereich { Region = "Kalos", DexVon = 650, DexBis = 721 }
-      });
+      ]);
   }
 
   private static Pokemon Pkmn(int dex, string name)
@@ -49,7 +46,7 @@ public class SammelSucheRegionTests
   {
     return SammelSuche.Anlegen(
       _katalog, vorlage, modus,
-      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>(), region);
+      [], [], region);
   }
 
   [Fact]
@@ -96,13 +93,13 @@ public class SammelSucheRegionTests
     var nichtInGo = Pkmn(5, "Glutexo");
     nichtInGo.InGoVerfuegbar = false;
     var katalog = new Katalog(
-      new[] { inGo, nichtInGo },
-      new[] { Form(inGo), Form(nichtInGo) },
-      Array.Empty<RegionBereich>());
+      [inGo, nichtInGo],
+      [Form(inGo), Form(nichtInGo)],
+      []);
 
     var ergebnis = SammelSuche.Anlegen(
       katalog, new SucheEintrag(), SammelModus.ProForm,
-      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>());
+      [], []);
 
     Assert.Equal(inGo.Guid, Assert.Single(ergebnis.NeueEintraege).PokemonGuid);
     Assert.Equal(1, ergebnis.NichtInGo);

@@ -1,7 +1,7 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -57,10 +57,12 @@ public static class Entwicklung
     IEnumerable<SucheEintrag> suche,
     IEnumerable<HabeEintrag> habe)
   {
-    return SuchZeilen.Bilden(suche, habe)
-      .Where(z => Anforderung.Erfuellt(vorher, z.Muster))
-      .Where(z => !Anforderung.Erfuellt(nachher, z.Muster))
-      .ToList();
+    return
+    [
+      .. SuchZeilen.Bilden(suche, habe)
+        .Where(z => Anforderung.Erfuellt(vorher, z.Muster))
+        .Where(z => !Anforderung.Erfuellt(nachher, z.Muster))
+    ];
   }
 
   // Die Anzahl der Zeile sinkt um 1 (bei 0 wird sie entfernt). Eine Zeile mit

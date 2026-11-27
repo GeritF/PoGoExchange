@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System.Collections.Generic;
 
 namespace PoGoExchange.ViewModels;
 
@@ -20,10 +20,10 @@ public sealed partial class ExemplarViewModel : ViewModelBase
 
   // Reihenfolge entspricht den Enum-Werten (Unbestimmt/Keins = 0)
   public IReadOnlyList<string> GeschlechtAuswahl { get; } =
-    new[] { "unbekannt", "m\u00e4nnlich", "weiblich" };
+    ["unbekannt", "m\u00e4nnlich", "weiblich"];
 
   public IReadOnlyList<string> DynamaxAuswahl { get; } =
-    new[] { "keins", "Dynamax", "Gigadynamax" };
+    ["keins", "Dynamax", "Gigadynamax"];
 
   [ObservableProperty] private int _geschlechtIndex;
 

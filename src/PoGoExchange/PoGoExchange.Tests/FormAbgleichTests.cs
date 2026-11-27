@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -39,7 +37,7 @@ public class FormAbgleichTests
     var andereRegion = Eigene("Q", "Alola");
 
     var uebernahmen = FormAbgleich.Finden(
-      new[] { klein, nbsp, andere, andereRegion }, new[] { OffiziellQ });
+      [klein, nbsp, andere, andereRegion], [OffiziellQ]);
 
     Assert.Equal(2, uebernahmen.Count);
     Assert.All(uebernahmen, u => Assert.Same(OffiziellQ, u.Offiziell));
@@ -53,7 +51,7 @@ public class FormAbgleichTests
       Guid = OffiziellQ.Guid, PokemonGuid = Icognito, Form = "Q"
     };
 
-    Assert.Empty(FormAbgleich.Finden(new[] { gleicheGuid }, new[] { OffiziellQ }));
+    Assert.Empty(FormAbgleich.Finden([gleicheGuid], [OffiziellQ]));
   }
 
   [Fact]
@@ -66,9 +64,9 @@ public class FormAbgleichTests
     {
       new() { Guid = Guid.NewGuid(), PokemonGuid = Icognito, FormGuid = eigene.Guid }
     };
-    var uebernahmen = FormAbgleich.Finden(formen, new[] { OffiziellQ });
+    var uebernahmen = FormAbgleich.Finden(formen, [OffiziellQ]);
 
-    FormAbgleich.Uebernehmen(uebernahmen, formen, habe, suche, new List<UeberEintrag>());
+    FormAbgleich.Uebernehmen(uebernahmen, formen, habe, suche, []);
 
     Assert.Empty(formen);
     var zeile = Assert.Single(habe);
@@ -87,10 +85,10 @@ public class FormAbgleichTests
       new() { Guid = Guid.NewGuid(), PokemonGuid = Icognito, FormGuid = eigene.Guid },
       new() { Guid = Guid.NewGuid(), PokemonGuid = Icognito, FormGuid = OffiziellQ.Guid }
     };
-    var uebernahmen = FormAbgleich.Finden(formen, new[] { OffiziellQ });
+    var uebernahmen = FormAbgleich.Finden(formen, [OffiziellQ]);
 
     FormAbgleich.Uebernehmen(
-      uebernahmen, formen, new List<HabeEintrag>(), new List<SucheEintrag>(), ueber);
+      uebernahmen, formen, [], [], ueber);
 
     Assert.Equal(OffiziellQ.Guid, Assert.Single(ueber).FormGuid);
   }

@@ -1,7 +1,7 @@
-using System;
-using System.Linq;
 using CommunityToolkit.Mvvm.Input;
 using PoGoExchange.Services;
+using System;
+using System.Linq;
 
 namespace PoGoExchange.ViewModels;
 

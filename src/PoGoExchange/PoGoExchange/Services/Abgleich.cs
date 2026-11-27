@@ -1,7 +1,6 @@
-using System;
+using PoGoExchange.Models;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -180,11 +179,13 @@ public static class Abgleich
   // 1:1 gewuenscht zuerst, dann sicher vor pruefen, dann Dex-Nummer
   private static List<AbgleichTreffer> Sortieren(IEnumerable<AbgleichTreffer> treffer)
   {
-    return treffer
-      .OrderByDescending(t => t.EinsZuEinsGewuenscht)
-      .ThenBy(t => t.Passung)
-      .ThenBy(t => t.Fremd.DexNr)
-      .ThenBy(t => t.Fremd.ZeilenNummer)
-      .ToList();
+    return
+    [
+      .. treffer
+        .OrderByDescending(t => t.EinsZuEinsGewuenscht)
+        .ThenBy(t => t.Passung)
+        .ThenBy(t => t.Fremd.DexNr)
+        .ThenBy(t => t.Fremd.ZeilenNummer)
+    ];
   }
 }

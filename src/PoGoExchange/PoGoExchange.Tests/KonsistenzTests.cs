@@ -1,4 +1,3 @@
-using System;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -17,9 +16,9 @@ public class KonsistenzTests
   {
     _glumandaForm = new PokemonForm { Guid = Guid.NewGuid(), PokemonGuid = _glumanda.Guid };
     _katalog = new Katalog(
-      new[] { _glumanda, _glurak },
-      new[] { _glumandaForm },
-      Array.Empty<RegionBereich>());
+      [_glumanda, _glurak],
+      [_glumandaForm],
+      []);
   }
 
   [Fact]
@@ -79,9 +78,9 @@ public class KonsistenzTests
 
     var fehler = Konsistenz.ListenPruefen(
       _katalog,
-      new[] { habeOhneForm },
-      new[] { sucheBeliebig },
-      Array.Empty<UeberEintrag>());
+      [habeOhneForm],
+      [sucheBeliebig],
+      []);
 
     var einziger = Assert.Single(fehler);
     Assert.Equal("Habe ich", einziger.Liste);

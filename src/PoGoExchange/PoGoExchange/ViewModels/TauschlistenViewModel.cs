@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
+using System.Collections.Generic;
 
 namespace PoGoExchange.ViewModels;
 
@@ -49,7 +49,7 @@ public sealed class TauschlistenViewModel : SeiteViewModel
       true,
       (filter, mitErledigten) =>
         bestand == null
-          ? new List<AnzeigeGruppe>()
+          ? []
           : ListenAnzeige.Suche(
             bestand.Katalog, bestand.Suche, bestand.Habe, mitErledigten, filter),
       sucheBearbeitbar ? SucheNeuOeffnen : null,
@@ -60,7 +60,7 @@ public sealed class TauschlistenViewModel : SeiteViewModel
       false,
       (filter, _) =>
         bestand == null
-          ? new List<AnzeigeGruppe>()
+          ? []
           : ListenAnzeige.Habe(bestand.Katalog, bestand.Habe, filter),
       habeBearbeitbar ? HabeNeuOeffnen : null,
       habeBearbeitbar ? HabeZeileOeffnen : null);
@@ -69,7 +69,7 @@ public sealed class TauschlistenViewModel : SeiteViewModel
       false,
       (filter, _) =>
         bestand == null
-          ? new List<AnzeigeGruppe>()
+          ? []
           : ListenAnzeige.Ueber(bestand.Katalog, bestand.Ueber, filter),
       ueberBearbeitbar ? UeberNeuOeffnen : null,
       ueberBearbeitbar ? UeberZeileOeffnen : null);

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using PoGoExchange.Models;
+using System.Collections.Generic;
 
 namespace PoGoExchange.Services;
 

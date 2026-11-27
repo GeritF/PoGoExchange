@@ -1,10 +1,10 @@
+using CsvHelper;
+using CsvHelper.Configuration;
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CsvHelper;
-using CsvHelper.Configuration;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -42,8 +42,8 @@ public sealed class Datenbestand
   internal const string SchluesselLetzteAenderung = "LetzteAenderung";
 
   private readonly HashSet<string> _gesperrt = new(StringComparer.OrdinalIgnoreCase);
-  private readonly List<LadeMeldung> _meldungen = new();
-  private List<SchluesselWert> _abgleichInfo = new();
+  private readonly List<LadeMeldung> _meldungen = [];
+  private List<SchluesselWert> _abgleichInfo = [];
   private Nutzdaten? _nutzdaten;
 
   private Datenbestand(string ordner)
@@ -53,10 +53,10 @@ public sealed class Datenbestand
 
   public string Ordner { get; }
   public Katalog Katalog { get; private set; } = null!;
-  public List<PokemonForm> EigeneFormen { get; private set; } = new();
-  public List<HabeEintrag> Habe { get; private set; } = new();
-  public List<SucheEintrag> Suche { get; private set; } = new();
-  public List<UeberEintrag> Ueber { get; private set; } = new();
+  public List<PokemonForm> EigeneFormen { get; private set; } = [];
+  public List<HabeEintrag> Habe { get; private set; } = [];
+  public List<SucheEintrag> Suche { get; private set; } = [];
+  public List<UeberEintrag> Ueber { get; private set; } = [];
 
   public IReadOnlyList<LadeMeldung> Meldungen => _meldungen;
 
@@ -160,8 +160,8 @@ public sealed class Datenbestand
     var pfad = Path.Combine(Ordner, datei);
     if (!File.Exists(pfad))
     {
-      CsvSpeicher.Schreiben<T, TMap>(pfad, Array.Empty<T>());
-      return new List<T>();
+      CsvSpeicher.Schreiben<T, TMap>(pfad, []);
+      return [];
     }
 
     CsvLeseErgebnis<T> ergebnis;
@@ -174,7 +174,7 @@ public sealed class Datenbestand
     {
       _gesperrt.Add(datei);
       Fehler(datei, "Datei konnte nicht gelesen werden: " + ex.Message);
-      return new List<T>();
+      return [];
     }
 
     // Keine einzige bekannte Spalte gefunden: Die Datei hat ein falsches Format
@@ -192,7 +192,7 @@ public sealed class Datenbestand
         datei,
         "Die Kopfzeile enth\u00e4lt keine bekannte Spalte." + kommaHinweis +
         " Die Datei wird nicht ver\u00e4ndert, bis der Fehler behoben ist.");
-      return new List<T>();
+      return [];
     }
 
     if (ergebnis.Fehler.Count > 0)

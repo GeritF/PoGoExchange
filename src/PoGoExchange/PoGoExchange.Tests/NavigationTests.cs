@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using PoGoExchange.ViewModels;
 
 namespace PoGoExchange.Tests;

@@ -1,7 +1,7 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -41,20 +41,23 @@ public sealed class Katalog
     _formenNachPokemon = _formen.Values.ToLookup(f => f.PokemonGuid);
 
     var alle = regionen.ToList();
-    _regionenMitBereich = alle
-      .Where(r => r.DexVon != null && r.DexBis != null)
-      .OrderBy(r => r.DexVon)
-      .ToList();
+    _regionenMitBereich =
+    [
+      .. alle
+        .Where(r => r.DexVon != null && r.DexBis != null)
+        .OrderBy(r => r.DexVon)
+    ];
     var ohneBereich = alle
       .Where(r => r.DexVon == null || r.DexBis == null)
       .Select(r => r.Region)
       .ToList();
 
     _auffangRegion = ohneBereich.FirstOrDefault() ?? RegionErsatz;
-    _regionenReihenfolge = _regionenMitBereich
-      .Select(r => r.Region)
-      .Concat(ohneBereich)
-      .ToList();
+    _regionenReihenfolge =
+    [
+      .. _regionenMitBereich.Select(r => r.Region),
+      .. ohneBereich
+    ];
     if (!_regionenReihenfolge.Contains(_auffangRegion))
     {
       _regionenReihenfolge.Add(_auffangRegion);

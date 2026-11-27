@@ -21,13 +21,13 @@ public static class Sicherungen
 
   // Persoenliche Dateien; die Nutzdaten kommen mit dem Programm
   internal static readonly string[] Dateien =
-  {
+  [
     Dateinamen.Habe,
     Dateinamen.Suche,
     Dateinamen.Ueber,
     Dateinamen.EigeneFormen,
     Dateinamen.AbgleichInfo
-  };
+  ];
 
   // Zeitpunkt fuer eine Sicherung: UTC, auf die Sekunde abgeschnitten
   public static DateTime Zeitpunkt(DateTime jetzt)
@@ -86,7 +86,7 @@ public static class Sicherungen
     var ordner = Path.Combine(datenordner, Ordnername);
     if (!Directory.Exists(ordner))
     {
-      return new List<SicherungInfo>();
+      return [];
     }
 
     var liste = new List<SicherungInfo>();
@@ -100,7 +100,7 @@ public static class Sicherungen
       }
     }
 
-    return liste.OrderByDescending(s => s.Zeitpunkt).ToList();
+    return [.. liste.OrderByDescending(s => s.Zeitpunkt)];
   }
 
   // Zeitpunkte, die nach den Aufraeumregeln erhalten bleiben (Tage und Monate
@@ -108,14 +108,16 @@ public static class Sicherungen
   // neuesten 3 Tage, 3. insgesamt die 10 neuesten
   public static HashSet<DateTime> Behalten(IEnumerable<DateTime> zeitpunkte)
   {
-    return zeitpunkte
-      .GroupBy(z => z.Date)
-      .Select(g => g.Max())
-      .GroupBy(z => (z.Year, z.Month))
-      .SelectMany(g => g.OrderByDescending(z => z).Take(3))
-      .OrderByDescending(z => z)
-      .Take(10)
-      .ToHashSet();
+    return
+    [
+      .. zeitpunkte
+        .GroupBy(z => z.Date)
+        .Select(g => g.Max())
+        .GroupBy(z => (z.Year, z.Month))
+        .SelectMany(g => g.OrderByDescending(z => z).Take(3))
+        .OrderByDescending(z => z)
+        .Take(10)
+    ];
   }
 
   public static void Aufraeumen(string datenordner)

@@ -1,10 +1,10 @@
+using PoGoExchange.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Services;
 
@@ -45,11 +45,11 @@ public static class TauschlistenImport
     RegexOptions.CultureInvariant);
 
   private static readonly string[] Abschnitte =
-  {
+  [
     Tauschliste.AbschnittEinsZuEins,
     Tauschliste.AbschnittFehlt,
     Tauschliste.AbschnittAbzugeben
-  };
+  ];
 
   public static ImportErgebnis Einlesen(Katalog katalog, string text)
   {

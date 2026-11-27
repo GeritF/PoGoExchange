@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -26,9 +23,9 @@ public class HabeBearbeitungTests
     _vulpixArchiviert.ArchiviertAm = DateTime.UtcNow;
 
     _katalog = new Katalog(
-      new[] { _glumanda, _vulpix },
-      new[] { _glumandaForm, _vulpixKanto, _vulpixAlola, _vulpixArchiviert },
-      Array.Empty<RegionBereich>());
+      [_glumanda, _vulpix],
+      [_glumandaForm, _vulpixKanto, _vulpixAlola, _vulpixArchiviert],
+      []);
   }
 
   private static Pokemon Pkmn(int dex, string name)
@@ -72,7 +69,7 @@ public class HabeBearbeitungTests
   {
     var ziele = HabeBearbeitung.Ziele(_katalog, "vulpix");
 
-    Assert.Equal(new[] { "#37 Vulpix", "#37 Vulpix - Alola" }, ziele.Select(z => z.Anzeige));
+    Assert.Equal(["#37 Vulpix", "#37 Vulpix - Alola"], ziele.Select(z => z.Anzeige));
   }
 
   [Fact]

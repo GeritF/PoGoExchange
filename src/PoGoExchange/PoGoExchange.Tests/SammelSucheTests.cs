@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using PoGoExchange.Models;
 using PoGoExchange.Services;
 
@@ -32,12 +30,11 @@ public class SammelSucheTests
     _flabebeArchiviert.ArchiviertAm = Jetzt.AddYears(-1);
 
     _katalog = new Katalog(
-      new[] { _flabebe, _vulpix, _glumanda },
-      new[]
-      {
+      [_flabebe, _vulpix, _glumanda],
+      [
         _glumandaForm, _vulpixKanto, _vulpixAlola, _flabebeRot, _flabebeBlau, _flabebeArchiviert
-      },
-      Array.Empty<RegionBereich>());
+      ],
+      []);
   }
 
   private static Pokemon Pkmn(int dex, string name)
@@ -78,7 +75,7 @@ public class SammelSucheTests
   {
     var ergebnis = SammelSuche.Anlegen(
       _katalog, Hundert, SammelModus.ProForm,
-      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>());
+      [], []);
 
     // Glumanda 1, Vulpix 2, Flabebe 2 (archivierte Form ausgenommen)
     Assert.Equal(5, ergebnis.NeueEintraege.Count);
@@ -91,7 +88,7 @@ public class SammelSucheTests
   {
     var ergebnis = SammelSuche.Anlegen(
       _katalog, Hundert, SammelModus.ProForm,
-      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>());
+      [], []);
 
     var pokemonFolge = ergebnis.NeueEintraege.Select(e => e.PokemonGuid).Distinct().ToList();
     Assert.Equal(new[] { _glumanda.Guid, _vulpix.Guid, _flabebe.Guid }, pokemonFolge);
@@ -102,7 +99,7 @@ public class SammelSucheTests
   {
     var ergebnis = SammelSuche.Anlegen(
       _katalog, Hundert, SammelModus.ProPokemon,
-      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>());
+      [], []);
 
     Assert.Equal(3, ergebnis.NeueEintraege.Count);
     Assert.All(ergebnis.NeueEintraege, e => Assert.True(e.FormBeliebig));
@@ -115,7 +112,7 @@ public class SammelSucheTests
 
     var ergebnis = SammelSuche.Anlegen(
       _katalog, Hundert, SammelModus.ProForm,
-      Array.Empty<SucheEintrag>(), habe);
+      [], habe);
 
     // Nur Glumanda ist ein 100er; das Vulpix ohne 100er zaehlt nicht
     Assert.Equal(1, ergebnis.SofortErledigt);
@@ -128,7 +125,7 @@ public class SammelSucheTests
 
     var ergebnis = SammelSuche.Anlegen(
       _katalog, Hundert, SammelModus.ProPokemon,
-      Array.Empty<SucheEintrag>(), habe);
+      [], habe);
 
     Assert.Equal(1, ergebnis.SofortErledigt);
   }
@@ -146,7 +143,7 @@ public class SammelSucheTests
 
     var ergebnis = SammelSuche.Anlegen(
       _katalog, Hundert, SammelModus.ProForm,
-      new[] { vorhanden }, Array.Empty<HabeEintrag>());
+      [vorhanden], []);
 
     Assert.Equal(4, ergebnis.NeueEintraege.Count);
     Assert.Equal(1, ergebnis.Uebersprungen);
@@ -171,7 +168,7 @@ public class SammelSucheTests
 
     var ergebnis = SammelSuche.Anlegen(
       _katalog, vorlage, SammelModus.ProPokemon,
-      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>());
+      [], []);
 
     // Assert.All ist bei einer leeren Liste immer erfuellt. Deshalb zuerst
     // pruefen, dass ueberhaupt Eintraege entstanden sind; die Meldung

@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
+using PoGoExchange.Models;
 using PoGoExchange.Services;
 using PoGoExchange.ViewModels;
-using PoGoExchange.Models;
 
 namespace PoGoExchange.Tests;
 
@@ -15,7 +13,7 @@ public class ListenTabViewModelTests
     var tab = new ListenTabViewModel(true, (_, mitErledigten) =>
     {
       aufrufe.Add(mitErledigten);
-      return new List<AnzeigeGruppe>();
+      return [];
     });
 
     tab.ErledigtUmschaltenCommand.Execute(null);
@@ -37,13 +35,29 @@ public class ListenTabViewModelTests
   [Fact]
   public void Suchtext_BautListeNeuAuf_MitUeberschriften()
   {
-    var tab = new ListenTabViewModel(false, (filter, _) =>
-      filter == ""
-        ? new List<AnzeigeGruppe>()
-        : new List<AnzeigeGruppe>
-        {
-          new("Kanto", new[] { new AnzeigeZeile("Kanto", 4, "Glumanda", "", false, false) })
-        });
+    var tab =
+      new ListenTabViewModel(
+        false,
+        (filter, _) =>
+          filter == ""
+            ? []
+            :
+            [
+              new(
+                "Kanto",
+                [
+                  new AnzeigeZeile(
+                    "Kanto",
+                    4,
+                    "Glumanda",
+                    "",
+                    false,
+                    false
+                  )
+                ]
+              )
+            ]
+      );
 
     Assert.True(tab.IstLeer);
 
@@ -61,7 +75,7 @@ public class ListenTabViewModelTests
     var zeile = new AnzeigeZeile("Kanto", 4, "Glumanda", "", false, false, new SucheEintrag());
     var tab = new ListenTabViewModel(
       false,
-      (_, _) => new List<AnzeigeGruppe> { new("Kanto", new[] { zeile }) },
+      (_, _) => [new("Kanto", [zeile])],
       oeffnen: z => geoeffnet = z);
 
     tab.Ausgewaehlt = zeile;
