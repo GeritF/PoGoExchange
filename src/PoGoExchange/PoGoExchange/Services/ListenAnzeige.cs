@@ -148,8 +148,9 @@ public static class ListenAnzeige
   }
 
   // Leere Region passt immer. Sonst passt die Region zur Dex-Nummer
-  // (Katalog.RegionZuDex) oder zur Spalte Region der Form (ganzer Name, ohne
-  // Gross-/Kleinschreibung). Galar-Zapdos passt also zu Kanto und zu Galar.
+  // (Katalog.RegionZuDex) oder zur Spalte Region der Form. Verglichen wird
+  // jeweils der ganze Name ohne Gross-/Kleinschreibung. Galar-Zapdos passt
+  // also zu Kanto und zu Galar.
   // Ohne Form ("Form beliebig", Auswahl eines Pokemon) zaehlt nur die
   // Dex-Nummer.
   public static bool RegionPasst(
@@ -163,7 +164,8 @@ public static class ListenAnzeige
       return true;
     }
 
-    if (katalog.RegionZuDex(pokemon.DexNr) == region)
+    var dexRegion = katalog.RegionZuDex(pokemon.DexNr);
+    if (string.Equals(dexRegion, region, StringComparison.OrdinalIgnoreCase))
     {
       return true;
     }

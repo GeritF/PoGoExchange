@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-27, 347 Tests gruen.
+Stand: 2026-11-27, 348 Tests gruen.
 
 ## Inhalt
 
@@ -111,11 +111,14 @@ Stand: 2026-11-27, 347 Tests gruen.
   Pokemon-Auswahl (Neuer Sucheintrag, Neues Exemplar, Habe ich ueber > Neu,
   Entwickeln, Neue eigene Form). Beim Erhalten ausgeblendet.
 - Regel (`ListenAnzeige.RegionPasst`): Dex-Region oder Spalte `Region` der
-  Form. Galar-Zapdos erscheint bei Kanto und bei Galar, immer unter der
+  Form, jeweils ganzer Name ohne Gross-/Kleinschreibung. Galar-Zapdos erscheint bei Kanto und bei Galar, immer unter der
   Ueberschrift Kanto. Ohne Form ("Form beliebig", Pokemon-Auswahl bei
   eigenen Formen) nur die Dex-Region.
 - Baustein `RegionFilterViewModel`/`RegionFilterView`. Nach "Form fehlt?
   Eigene Form anlegen" springt die Region auf "Alle Regionen" zurueck.
+- Bei "Neue eigene Form" stehen zwei Auswahlen "Region:" (Filter fuer die
+  Pokemon-Auswahl und Region der neuen Form). Von Gerit geprueft und bewusst
+  so belassen.
 
 ### Was die Fachlogik bereits kann
 
@@ -509,12 +512,6 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   reagieren und den Sichtbereich anpassen. Ansatz aus Gerits FMX-Erfahrung:
   alles liegt in einem Scrollbereich, der bei eingeblendeter Tastatur einen
   Rand in Tastaturhoehe bekommt, sodass weiterhin alles erreichbar ist.
-- **"(1:1)" in der eigenen Tauschliste pruefen:** Gerit bekommt bei keinem
-  Eintrag ein " (1:1)" angehaengt, egal ob das Pokemon in "Habe ich" oder
-  "Habe ich ueber" steht. Laut README ist "1:1" kein Anhang, sondern ein
-  eigener Abschnitt ("Kanto 1:1:") fuer Zeilen aus "Suche ich" mit 1:1.
-  Zuerst klaeren, ob ein anderes Verhalten erwartet wird oder das Programm
-  von der README abweicht.
 - **Design ueberarbeiten** (bisher sehr schlicht). Groesseres Vorhaben,
   vermutlich mit einem eigenen Testprojekt, in dem sich verschiedene Stile
   schnell ausprobieren und wechseln lassen. Wichtig: Die Stile sollen

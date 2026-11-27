@@ -102,6 +102,7 @@ public class RegionFilterTests
   [InlineData("zapdosBeliebig", "Kanto", true)]
   [InlineData("krarmor", "Galar", true)]
   [InlineData("krarmor", "Kanto", false)]
+  [InlineData("krarmor", "GALAR", true)]
   [InlineData("meltan", "Unbekannt", true)]
   [InlineData("glumanda", null, true)]
   [InlineData("glumanda", "", true)]
