@@ -65,8 +65,7 @@ public sealed partial class ImportExportViewModel : SeiteViewModel
 
   public bool HatExportFehler => ExportFehler.Count > 0;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatExportRueckmeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatExportRueckmeldung))]
   private string _exportRueckmeldung = "";
 
   public bool HatExportRueckmeldung => ExportRueckmeldung != "";
@@ -94,11 +93,9 @@ public sealed partial class ImportExportViewModel : SeiteViewModel
 
   // --- Fremde Liste abgleichen ---
 
-  [ObservableProperty]
-  private string _fremderText = "";
+  [ObservableProperty] private string _fremderText = "";
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatAbgleichMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatAbgleichMeldung))]
   private string _abgleichMeldung = "";
 
   public bool HatAbgleichMeldung => AbgleichMeldung != "";

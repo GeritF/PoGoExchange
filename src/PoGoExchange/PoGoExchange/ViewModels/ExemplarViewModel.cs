@@ -25,14 +25,11 @@ public sealed partial class ExemplarViewModel : ViewModelBase
   public IReadOnlyList<string> DynamaxAuswahl { get; } =
     new[] { "keins", "Dynamax", "Gigadynamax" };
 
-  [ObservableProperty]
-  private int _geschlechtIndex;
+  [ObservableProperty] private int _geschlechtIndex;
 
-  [ObservableProperty]
-  private bool _shiny;
+  [ObservableProperty] private bool _shiny;
 
-  [ObservableProperty]
-  private int _dynamaxIndex;
+  [ObservableProperty] private int _dynamaxIndex;
 
   [ObservableProperty]
   [NotifyPropertyChangedFor(nameof(Fehler))]
@@ -54,38 +51,13 @@ public sealed partial class ExemplarViewModel : ViewModelBase
   [NotifyPropertyChangedFor(nameof(HatFehler))]
   private string _hintergrundText = "";
 
-  [ObservableProperty]
-  private bool _glueck;
+  [ObservableProperty] private bool _glueck;
 
-  [ObservableProperty]
-  private bool _hundert;
+  [ObservableProperty] private bool _hundert;
 
   // Fehler in den freien Texten; Texte zaehlen nur bei gesetztem Haken
-  public string Fehler
-  {
-    get
-    {
-      if (KostuemAktiv)
-      {
-        var fehler = SuchBearbeitung.FreitextFehler(KostuemText);
-        if (fehler != null)
-        {
-          return "Kost\u00fcm: " + fehler;
-        }
-      }
-
-      if (HintergrundAktiv)
-      {
-        var fehler = SuchBearbeitung.FreitextFehler(HintergrundText);
-        if (fehler != null)
-        {
-          return "Hintergrund: " + fehler;
-        }
-      }
-
-      return "";
-    }
-  }
+  public string Fehler =>
+    Freitext.MerkmaleFehler(KostuemAktiv, KostuemText, HintergrundAktiv, HintergrundText);
 
   public bool HatFehler => Fehler != "";
 

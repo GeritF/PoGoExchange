@@ -11,4 +11,3 @@ public partial class ExemplarView : UserControl
     InitializeComponent();
   }
 }
-

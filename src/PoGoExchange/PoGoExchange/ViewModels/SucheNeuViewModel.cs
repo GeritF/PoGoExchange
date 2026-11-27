@@ -38,42 +38,34 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
 
   public AnforderungenViewModel Anforderungen { get; } = new();
 
-  [ObservableProperty]
-  private decimal? _anzahl = 1;
+  [ObservableProperty] private decimal? _anzahl = 1;
 
-  [ObservableProperty]
-  private string _suchtext = "";
+  [ObservableProperty] private string _suchtext = "";
 
   public ObservableCollection<SuchZiel> Verfuegbar { get; } = new();
   public ObservableCollection<SuchZiel> HastDuSchon { get; } = new();
   public ObservableCollection<SuchZiel> NichtVerfuegbar { get; } = new();
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
   private string _mehrHinweis = "";
 
   public bool HatMehrHinweis => MehrHinweis != "";
 
   // Je Abschnitt eine eigene Auswahl, damit sich die Listen nicht gegenseitig zuruecksetzen
-  [ObservableProperty]
-  private SuchZiel? _auswahlVerfuegbar;
+  [ObservableProperty] private SuchZiel? _auswahlVerfuegbar;
 
-  [ObservableProperty]
-  private SuchZiel? _auswahlHastDuSchon;
+  [ObservableProperty] private SuchZiel? _auswahlHastDuSchon;
 
-  [ObservableProperty]
-  private SuchZiel? _auswahlNichtVerfuegbar;
+  [ObservableProperty] private SuchZiel? _auswahlNichtVerfuegbar;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(AuswahlText))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(AuswahlText))]
   private SuchZiel? _ziel;
 
   public string AuswahlText => Ziel == null
     ? "Noch kein Pokemon ausgew\u00e4hlt"
     : "Ausgew\u00e4hlt: " + Ziel.Anzeige;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
@@ -121,7 +113,7 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
     }
 
     var ergebnis = SuchBearbeitung.Anlegen(
-      _bestand.Suche, _bestand.Habe, Anforderungen.Vorlage(), Ziel, anzahl, DateTime.UtcNow);
+      _bestand.Suche, _bestand.Habe, Anforderungen.Vorlage(), Ziel, anzahl);
     var fehler = _bestand.SucheSpeichern();
     if (fehler != null)
     {
@@ -198,13 +190,13 @@ public sealed partial class SucheNeuViewModel : SeiteViewModel
       var zuViele = ziele.GroupBy(z => z.Kategorie).Any(g => g.Count() > MaxProAbschnitt);
       MehrHinweis = zuViele
         ? $"Es werden h\u00f6chstens {MaxProAbschnitt} Eintr\u00e4ge je Abschnitt angezeigt. " +
-          "Bitte das Suchfeld nutzen."
+        "Bitte das Suchfeld nutzen."
         : "";
 
       if (Ziel != null)
       {
-        var neu = ziele.FirstOrDefault(
-          z => z.PokemonGuid == Ziel.PokemonGuid && z.FormGuid == Ziel.FormGuid);
+        var neu = ziele.FirstOrDefault(z =>
+          z.PokemonGuid == Ziel.PokemonGuid && z.FormGuid == Ziel.FormGuid);
         if (neu != null)
         {
           Ziel = neu;

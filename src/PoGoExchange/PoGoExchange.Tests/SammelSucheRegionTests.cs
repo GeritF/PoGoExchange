@@ -7,8 +7,6 @@ namespace PoGoExchange.Tests;
 
 public class SammelSucheRegionTests
 {
-  private static readonly DateTime Jetzt = new(2026, 11, 25, 12, 0, 0, DateTimeKind.Utc);
-
   private readonly Pokemon _glumanda = Pkmn(4, "Glumanda");
   private readonly Pokemon _feurigel = Pkmn(155, "Feurigel");
   private readonly Pokemon _flabebe = Pkmn(669, "Flab\u00e9b\u00e9");
@@ -51,7 +49,7 @@ public class SammelSucheRegionTests
   {
     return SammelSuche.Anlegen(
       _katalog, vorlage, modus,
-      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>(), Jetzt, region);
+      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>(), region);
   }
 
   [Fact]
@@ -104,7 +102,7 @@ public class SammelSucheRegionTests
 
     var ergebnis = SammelSuche.Anlegen(
       katalog, new SucheEintrag(), SammelModus.ProForm,
-      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>(), Jetzt);
+      Array.Empty<SucheEintrag>(), Array.Empty<HabeEintrag>());
 
     Assert.Equal(inGo.Guid, Assert.Single(ergebnis.NeueEintraege).PokemonGuid);
     Assert.Equal(1, ergebnis.NichtInGo);

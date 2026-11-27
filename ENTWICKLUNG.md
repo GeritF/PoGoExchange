@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-26, 305 Tests gruen.
+Stand: 2026-11-27, 310 Tests gruen.
 
 ## Inhalt
 
@@ -121,8 +121,9 @@ Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
 
 - Eigene Formen anlegen, aendern, loeschen (`FormVerwaltung`) und beim
   Laden mit offiziellen abgleichen (`FormAbgleich`)
-
 - Exportpaket der eigenen Listen (`Exportpaket`)
+- Pruefung der freien Texte fuer Kostuem und Hintergrund (`Freitext`),
+  gemeinsam genutzt von "Habe ich" und "Suche ich"
 
 Alle Fachfunktionen haben eine Oberflaeche. Noch nicht gebaut sind das
 Update der Nutzdaten fuer entfernte Formen und der Abgleich zwischen Geraeten.
@@ -175,8 +176,9 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 ### Allgemein
 
 - C# mit .NET 10, Avalonia 12.1.6, CommunityToolkit.Mvvm, xUnit.
-- Einrueckung 2 Leerzeichen, geschweifte Klammern bei `if` immer, Zeilen
-  moeglichst unter 100 Zeichen, Umbrueche grosszuegig.
+- Einrueckung 2 Leerzeichen, geschweifte Klammern bei `if`, `else`, `for`,
+  `foreach` und `while` immer. Details zur Formatierung im naechsten
+  Abschnitt.
 - **Alle Quelltexte und Dokumente in reinem ASCII**, ohne BOM:
   - Umlaute in C#-Strings als `\u00fc` usw.
   - Umlaute in XAML als `&#xFC;` usw.
@@ -186,6 +188,63 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   duerfen in derselben Datei stehen.
 - Neue Views in Rider ueber "Add > Avalonia UserControl" anlegen; dann nur
   die `.axaml` ersetzen.
+
+### Formatierung
+
+- Festgelegt in `src/PoGoExchange/.editorconfig` (fuer `.cs`, `.axaml`,
+  `.csproj`, `.props`, `.slnx`). In Rider muss "Enable EditorConfig support"
+  aktiv sein.
+- In Rider nur mit dem Profil "Built-in: Reformat Code" formatieren. Der
+  Code-Cleanup kann Code inhaltlich aendern (siehe Stolpersteine).
+- Zeilenlaenge: harte Grenze 100 Zeichen, ab etwa 80 Zeichen nach Ermessen
+  umbrechen.
+- Folgezeilen stehen 2 Leerzeichen tiefer als die Zeile davor, nicht unter
+  dem Ausdruck ausgerichtet (auch nach `+`, `&&`, `||`, `??`).
+- Lange Zuweisungen: Umbruch nach `=`, `?? throw` auf eigener Zeile:
+
+  ```csharp
+  var pokemon =
+    katalog.PokemonZuGuid(eintrag.PokemonGuid)
+    ?? throw new InvalidOperationException(
+      "Eintrag wurde vor dem Aufloesen nicht geprueft");
+
+  private readonly Pokemon _glumanda =
+    new() { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" };
+  ```
+
+- Bedingungen: Bei mehreren booleschen Ausdruecken, bei gemischtem `&&` und
+  `||` oder wenn die Zeile zu lang wird, darf die Bedingung zwischen Klammern
+  auf eigenen Zeilen stehen. Beide Formen kommen im Code vor; die Form wird
+  nicht nachtraeglich vereinheitlicht.
+
+  ```csharp
+  if (
+    OperatingSystem.IsAndroid() &&
+    name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)
+  )
+  {
+  ```
+
+- Attribute: ein einzelnes Attribut mit kurzem Feld auf einer Zeile
+  (`[ObservableProperty] private bool _shiny;`), sonst jedes Attribut und
+  das Feld auf einer eigenen Zeile.
+- `using` alphabetisch, `System` wird nicht vorgezogen
+  (`dotnet_sort_system_directives_first = false`). Umsortiert wird erst im
+  eigenen Cleanup-Lauf (siehe ToDo-Liste).
+- Laengere Texte in XAML als Inhalt des `TextBlock` statt im Attribut
+  `Text`; Umbrueche und Einrueckung erscheinen als einfache Leerzeichen
+  (Beobachtung auf Android, Stichproben):
+
+  ```xml
+  <TextBlock TextWrapping="Wrap">
+    Sicherungen enthalten die pers&#xF6;nlichen Listen und eigenen Formen.
+    Alte Sicherungen werden automatisch aufger&#xE4;umt.
+  </TextBlock>
+  ```
+
+- Pruefung: `test/Pruefung_Format.sh` meldet zu lange Zeilen, fehlende
+  Klammern, BOM, Einrueckung, Nicht-ASCII-Zeichen und ausgerichtete
+  Folgezeilen.
 
 ### Architektur
 
@@ -252,7 +311,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   uebersetzbarem Stand und gruenen Tests enden.
 - **Jede Aenderung mit Dateipfad, ungefaehrer Zeilennummer und
   Suchbegriff** angeben. Neue oder stark geaenderte Dateien vollstaendig
-  liefern (bei vielen Dateien als Download-Dateien).
+  liefern. Mehrere Aenderungen an einer `.cs`-Datei als komplette Datei zum
+  Herunterladen.
 - **Am echten Stand arbeiten:** Bei Unsicherheit um ein aktuelles Archiv
   (`git archive`) bitten statt zu raten.
 - **Erwartete Testanzahl** nach jeder Runde nennen und sorgfaeltig zaehlen
@@ -263,7 +323,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - **Fehler offen benennen:** Liegt ein Fehler im gelieferten Code oder in
   einer falschen Aussage, das klar sagen; Gerits Tippfehler als Nebendetail
   behandeln.
-- **Skripte:** Bash fuer Linux Mint. Ausgaben mit Ueberschriften
+- **Skripte:** Bash fuer Linux Mint, immer vollstaendig als Code-Abschnitt
+  (keine Teilstuecke zum Einfuegen). Ausgaben mit Ueberschriften
   `=== ... ===` und jedem Wert als `Schluessel: Wert`; leere Ergebnisse
   ausdruecklich melden.
 - **Diagnose:** Pro Antwort nur Schritte, die unabhaengig von offenen
@@ -308,6 +369,21 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   Dateien sind unkritisch. `test/Test_XUnit.sh` fuehrt deshalb vor jedem
   Testlauf `dotnet clean` aus (abschaltbar mit `SAUBER=0`). (Gemessen bei den
   Testdaten.)
+- **Rider, Code-Cleanup:** Beim Formatieren ging in `SammelSucheTests` die
+  Zuweisung `InGoVerfuegbar = true` verloren; 6 Tests lieferten 0 Eintraege.
+  Ob Rider oder eine versehentliche Bearbeitung die Ursache war, ist nicht
+  geklaert. Deshalb nur "Reformat Code" verwenden und danach inhaltliche
+  Aenderungen mit `git diff -w --ignore-blank-lines` pruefen.
+- **Rider und `.editorconfig`:** Unbekannte Schluessel meldet Rider
+  ("Property ... not supported"). Ob ein Schluessel wirkt, zeigt der
+  Code-Style-Dialog mit einem Verweis auf die `.editorconfig`. Wirksam:
+  `resharper_csharp_wrap_lines`,
+  `resharper_csharp_align_multiline_binary_expressions_chain`. Nicht
+  unterstuetzt: `resharper_csharp_align_multiline_binary_expr`.
+- **Git, Zwischenstand vormerken:** `git add -A` (grosses A) legt den Stand
+  in den Index; danach zeigt `git diff` nur die neuen Aenderungen.
+- **`Assert.All` bei leerer Liste** ist immer erfuellt. Wo Eintraege erwartet
+  werden, zusaetzlich `Assert.NotEmpty` pruefen.
 - **Rider:** Drag-and-Drop zwischen Projekten erzeugt Verweise statt
   Verschiebungen (mit `git mv` verschieben). "Unload Project" blendet nur aus.
 - **Debug-Start auf Android** dauert lange; der Start ueber das App-Symbol
@@ -327,7 +403,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - Datenordner: Linux `~/.local/share/PoGoExchange`, Windows
   `%LOCALAPPDATA%\PoGoExchange`, Android
   `/data/user/0/com.GeritF.PoGoExchange/files/PoGoExchange`.
-- Skripte: `test/Test_XUnit.sh` (Testlauf), `test/DatenAufsHandy.sh`
+- Skripte: `test/Test_XUnit.sh` (Testlauf), `test/Pruefung_Format.sh`
+  (Formatierungsregeln pruefen, nur lesend), `test/DatenAufsHandy.sh`
   (persoenliche Daten in die Debug-App kopieren, ueberschreibt sie).
 - Nutzdaten: die echten (1025 Pokemon) in `PoGoExchange/Nutzdaten/`;
   Testdaten (11 Pokemon) in `PoGoExchange.Tests/Testdaten/`. Persoenliche
@@ -365,7 +442,18 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes
 
-- Mit Gerit abstimmen: Exportpaket, Windows-Build, WLAN-Abgleich.
+- **Cleanup-Lauf (eigene Runde):** Sammlungsausdruecke (`["a", "b"]` statt
+  `new[] { "a", "b" }`) und `using` alphabetisch sortieren. Laeuft ueber den
+  Rider-Cleanup und aendert Code, daher mit Diff-Kontrolle
+  (`git diff -w --ignore-blank-lines`) und Testlauf.
+- `SammelSucheTests`: Der Test mit `Assert.All` soll zusaetzlich pruefen,
+  dass ueberhaupt Eintraege geliefert werden.
+- Mit Gerit abstimmen: Windows-Build, WLAN-Abgleich.
+- **`ViewLocator` entfernen (eigene Runde):** Er ist in `App.axaml` noch als
+  Reflexions-Fallback registriert, obwohl die Seiten in `MainView.axaml`
+  ausdruecklich zugeordnet werden. Die KI erklaert vorher, was das Entfernen
+  bewirkt, und prueft, ob irgendwo ein ViewModel ohne eigene Vorlage
+  angezeigt wird.
 
 ### Spaeter
 
@@ -374,7 +462,6 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   entfernt; erst bauen, wenn der Fall eintritt.
 - WLAN-Abgleich: ersetzt auf dem Zielgeraet alles (wie der Import), mit
   Rueckfrage "Wirklich ersetzen?"; gleiche Paket- und Versionsregeln.
-- Exportpaket als ZIP (Export und Import aller eigenen Daten).
 - Abgleich zwischen Geraeten per WLAN (Phase 5), vorher Testprogramm fuer
   Ports, Berechtigungen und Broadcast.
 - Windows-Build und Verteilung (Phase 6).
@@ -410,11 +497,4 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Aufraeumen bei Gelegenheit
 
-- Veraltete Kommentare: `Services/Tauschliste.cs` (doppelte Kommentarzeile
-  vor `SuchZeilenFuerExport`, "nicht geloeschte"), `Services/Konsistenz.cs`
-  ("nicht geloeschte").
-- Unbenutzter Parameter `jetzt` in `SuchBearbeitung` und `SammelSuche`.
-- Doppelte Freitext-Pruefung in `AnforderungenViewModel` und
-  `ExemplarViewModel` zusammenfassen.
-- Einzelne Zeilen ueber 100 Zeichen (z.B. `CsvSpeicher.cs`,
-  `EingebetteteNutzdaten.cs`).
+- Derzeit keine offenen Punkte (letzte Aufraeumrunde 2026-11-27).

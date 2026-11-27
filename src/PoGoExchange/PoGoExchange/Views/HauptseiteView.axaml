@@ -3,24 +3,24 @@
              xmlns:vm="using:PoGoExchange.ViewModels"
              x:Class="PoGoExchange.Views.HauptseiteView"
              x:DataType="vm:HauptseiteViewModel">
-    <ScrollViewer>
-        <StackPanel Margin="16" Spacing="12">
-            <TextBlock Text="{Binding Meldungshinweis}"
-                       IsVisible="{Binding HatMeldungen}"
-                       Foreground="DarkOrange"
-                       TextWrapping="Wrap" />
-            <Button Content="Tauschlisten"
-                    Command="{Binding TauschlistenOeffnenCommand}"
-                    HorizontalAlignment="Stretch" MinHeight="60" />
-            <Button Content="Import/Export"
-                    Command="{Binding ImportExportOeffnenCommand}"
-                    HorizontalAlignment="Stretch" MinHeight="60" />
-            <Button Content="Verwaltung"
-                    Command="{Binding VerwaltungOeffnenCommand}"
-                    HorizontalAlignment="Stretch" MinHeight="60" />
-            <Button Content="Beenden"
-                    Command="{Binding BeendenCommand}"
-                    HorizontalAlignment="Stretch" Margin="0,24,0,0" />
-        </StackPanel>
-    </ScrollViewer>
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="12">
+      <TextBlock Text="{Binding Meldungshinweis}"
+                 IsVisible="{Binding HatMeldungen}"
+                 Foreground="DarkOrange"
+                 TextWrapping="Wrap" />
+      <Button Content="Tauschlisten"
+              Command="{Binding TauschlistenOeffnenCommand}"
+              HorizontalAlignment="Stretch" MinHeight="60" />
+      <Button Content="Import/Export"
+              Command="{Binding ImportExportOeffnenCommand}"
+              HorizontalAlignment="Stretch" MinHeight="60" />
+      <Button Content="Verwaltung"
+              Command="{Binding VerwaltungOeffnenCommand}"
+              HorizontalAlignment="Stretch" MinHeight="60" />
+      <Button Content="Beenden"
+              Command="{Binding BeendenCommand}"
+              HorizontalAlignment="Stretch" Margin="0,24,0,0" />
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

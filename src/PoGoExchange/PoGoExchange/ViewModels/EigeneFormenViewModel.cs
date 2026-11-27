@@ -47,11 +47,9 @@ public sealed partial class EigeneFormenViewModel : SeiteViewModel
 
   public ObservableCollection<EigeneFormEintrag> Liste { get; } = new();
 
-  [ObservableProperty]
-  private bool _keineVorhanden;
+  [ObservableProperty] private bool _keineVorhanden;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatRueckmeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatRueckmeldung))]
   private string _rueckmeldung = "";
 
   public bool HatRueckmeldung => Rueckmeldung != "";

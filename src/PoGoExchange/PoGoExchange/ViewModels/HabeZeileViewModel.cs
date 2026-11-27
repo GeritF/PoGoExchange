@@ -34,29 +34,22 @@ public sealed partial class HabeZeileViewModel : SeiteViewModel
 
   public ExemplarViewModel Merkmale { get; } = new();
 
-  [ObservableProperty]
-  private string _kopf = "";
+  [ObservableProperty] private string _kopf = "";
 
-  [ObservableProperty]
-  private decimal? _anzahl;
+  [ObservableProperty] private decimal? _anzahl;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
 
-  [ObservableProperty]
-  private string _konfliktText = "";
+  [ObservableProperty] private string _konfliktText = "";
 
-  [ObservableProperty]
-  private bool _konfliktSichtbar;
+  [ObservableProperty] private bool _konfliktSichtbar;
 
-  [ObservableProperty]
-  private bool _loeschHinweisSichtbar;
+  [ObservableProperty] private bool _loeschHinweisSichtbar;
 
-  [ObservableProperty]
-  private bool _loeschRueckfrageSichtbar;
+  [ObservableProperty] private bool _loeschRueckfrageSichtbar;
 
   // Gilt fuer die ganze Zeile
   [RelayCommand]

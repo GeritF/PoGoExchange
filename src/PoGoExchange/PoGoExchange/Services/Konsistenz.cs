@@ -44,7 +44,8 @@ public static class Konsistenz
     return null;
   }
 
-  // Prueft alle nicht geloeschten Eintraege der drei Listen
+  // Prueft alle Eintraege der drei Listen und liefert die Fehler gesammelt
+  // (leere Liste, wenn alles gueltig ist)
   public static List<KonsistenzFehler> ListenPruefen(
     Katalog katalog,
     IEnumerable<HabeEintrag> habe,

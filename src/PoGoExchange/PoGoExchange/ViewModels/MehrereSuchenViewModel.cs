@@ -41,20 +41,15 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
     "Eine Zeile pro Pokemon (Form beliebig)"
   };
 
-  [ObservableProperty]
-  private int _regionIndex;
+  [ObservableProperty] private int _regionIndex;
 
-  [ObservableProperty]
-  private int _modusIndex;
+  [ObservableProperty] private int _modusIndex;
 
-  [ObservableProperty]
-  private string _vorschau = "";
+  [ObservableProperty] private string _vorschau = "";
 
-  [ObservableProperty]
-  private bool _sicherungVorher = true;
+  [ObservableProperty] private bool _sicherungVorher = true;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
@@ -125,7 +120,6 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
       modus,
       _bestand.Suche,
       _bestand.Habe,
-      DateTime.UtcNow,
       region);
   }
 
@@ -141,6 +135,7 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
     {
       teile.Add($"Shiny nicht verf\u00fcgbar: {e.NichtVerfuegbar}");
     }
+
     if (e.NichtInGo > 0)
     {
       teile.Add($"nicht in GO: {e.NichtInGo}");

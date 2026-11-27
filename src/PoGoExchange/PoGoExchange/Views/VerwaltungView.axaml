@@ -3,19 +3,19 @@
              xmlns:vm="using:PoGoExchange.ViewModels"
              x:Class="PoGoExchange.Views.VerwaltungView"
              x:DataType="vm:VerwaltungViewModel">
-    <ScrollViewer>
-        <StackPanel Margin="16" Spacing="12">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Kopieren" Command="{Binding KopierenCommand}" />
-                <TextBlock Text="{Binding Rueckmeldung}" VerticalAlignment="Center" />
-            </StackPanel>
-            <Button Content="Sicherungen"
-                    Command="{Binding SicherungenOeffnenCommand}"
-                    IsVisible="{Binding HatSicherungen}" />
-            <Button Content="Eigene Formen"
-                    Command="{Binding EigeneFormenOeffnenCommand}"
-                    IsVisible="{Binding HatEigeneFormen}" />
-            <SelectableTextBlock Text="{Binding Status}" TextWrapping="Wrap" />
-        </StackPanel>
-    </ScrollViewer>
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="12">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="Kopieren" Command="{Binding KopierenCommand}" />
+        <TextBlock Text="{Binding Rueckmeldung}" VerticalAlignment="Center" />
+      </StackPanel>
+      <Button Content="Sicherungen"
+              Command="{Binding SicherungenOeffnenCommand}"
+              IsVisible="{Binding HatSicherungen}" />
+      <Button Content="Eigene Formen"
+              Command="{Binding EigeneFormenOeffnenCommand}"
+              IsVisible="{Binding HatEigeneFormen}" />
+      <SelectableTextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

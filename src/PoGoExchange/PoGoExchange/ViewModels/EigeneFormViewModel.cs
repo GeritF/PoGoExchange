@@ -75,45 +75,36 @@ public sealed partial class EigeneFormViewModel : SeiteViewModel
 
   public IReadOnlyList<string> Regionen { get; }
 
-  [ObservableProperty]
-  private string _formText = "";
+  [ObservableProperty] private string _formText = "";
 
-  [ObservableProperty]
-  private int _regionIndex;
+  [ObservableProperty] private int _regionIndex;
 
-  [ObservableProperty]
-  private bool _shinyVerfuegbar;
+  [ObservableProperty] private bool _shinyVerfuegbar;
 
-  [ObservableProperty]
-  private string _suchtext = "";
+  [ObservableProperty] private string _suchtext = "";
 
   public ObservableCollection<PokemonZiel> Ziele { get; } = new();
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
   private string _mehrHinweis = "";
 
   public bool HatMehrHinweis => MehrHinweis != "";
 
-  [ObservableProperty]
-  private PokemonZiel? _auswahl;
+  [ObservableProperty] private PokemonZiel? _auswahl;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(AuswahlText))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(AuswahlText))]
   private PokemonZiel? _ziel;
 
   public string AuswahlText => Ziel == null
     ? "Noch kein Pokemon ausgew\u00e4hlt"
     : "Ausgew\u00e4hlt: " + Ziel.Anzeige;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
 
-  [ObservableProperty]
-  private bool _loeschRueckfrageSichtbar;
+  [ObservableProperty] private bool _loeschRueckfrageSichtbar;
 
   // Text einer Form fuer Listen, z.B. "#201 Icognito ? - Alola (archiviert)"
   internal static string Text(Pokemon? pokemon, PokemonForm form)

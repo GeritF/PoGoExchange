@@ -46,6 +46,7 @@ public class UeberViewModelTests : IDisposable
   public void Neu_GleicherEintrag_WirdAlsVorhandenGemeldet()
   {
     var bestand = TestNutzdaten.Laden(_ordner, DateTime.UtcNow);
+
     UeberNeuViewModel Anlegen(Action<UeberEintrag, bool> gespeichert)
     {
       var vm = new UeberNeuViewModel(bestand, gespeichert);

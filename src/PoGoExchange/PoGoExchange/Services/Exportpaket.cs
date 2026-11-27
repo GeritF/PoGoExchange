@@ -81,7 +81,7 @@ public static class Exportpaket
       }
 
       using (var reader = new StreamReader(
-        infoEintrag.Open(), Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
+               infoEintrag.Open(), Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
       {
         info = CsvSpeicher.Lesen<SchluesselWert, SchluesselWertMap>(reader)
           .ToDictionary(e => e.Schluessel, e => e.Wert);

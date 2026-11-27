@@ -1,21 +1,22 @@
-﻿using Android.App;
+using Android.App;
 using Android.Runtime;
 using Avalonia;
 using Avalonia.Android;
 
 namespace PoGoExchange.Android
 {
-    [Application]
-    public class Application : AvaloniaAndroidApplication<App>
+  [Application]
+  public class Application : AvaloniaAndroidApplication<App>
+  {
+    protected Application(nint javaReference, JniHandleOwnership transfer)
+      : base(javaReference, transfer)
     {
-        protected Application(nint javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-        {
-        }
-
-        protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
-        {
-            return base.CustomizeAppBuilder(builder)
-                .WithInterFont();
-        }
     }
+
+    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
+    {
+      return base.CustomizeAppBuilder(builder)
+        .WithInterFont();
+    }
+  }
 }

@@ -11,6 +11,18 @@ indent_style = space
 indent_size = 2
 max_line_length = 100
 csharp_prefer_braces = true:warning
+resharper_csharp_wrap_lines = true
+resharper_csharp_align_multiline_binary_expressions_chain = false
+dotnet_sort_system_directives_first = false
+
+[*.{axaml,xaml}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+[*.{csproj,props,slnx}]
+indent_style = space
+indent_size = 2
 
 [*.csv]
 charset = utf-8-bom

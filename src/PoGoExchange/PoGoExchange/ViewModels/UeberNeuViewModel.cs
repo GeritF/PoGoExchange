@@ -30,30 +30,25 @@ public sealed partial class UeberNeuViewModel : SeiteViewModel
 
   public ExemplarViewModel Merkmale { get; } = new(mitGlueckUndHundert: false);
 
-  [ObservableProperty]
-  private string _suchtext = "";
+  [ObservableProperty] private string _suchtext = "";
 
   public ObservableCollection<FormZiel> Ziele { get; } = new();
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
   private string _mehrHinweis = "";
 
   public bool HatMehrHinweis => MehrHinweis != "";
 
-  [ObservableProperty]
-  private FormZiel? _auswahl;
+  [ObservableProperty] private FormZiel? _auswahl;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(AuswahlText))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(AuswahlText))]
   private FormZiel? _ziel;
 
   public string AuswahlText => Ziel == null
     ? "Noch kein Pokemon ausgew\u00e4hlt"
     : "Ausgew\u00e4hlt: " + Ziel.Anzeige;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";

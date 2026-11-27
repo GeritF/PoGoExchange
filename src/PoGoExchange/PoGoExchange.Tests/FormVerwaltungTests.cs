@@ -9,8 +9,10 @@ public class FormVerwaltungTests
 {
   private readonly Pokemon _icognito =
     new() { Guid = Guid.NewGuid(), DexNr = 201, Name = "Icognito" };
+
   private readonly Pokemon _vulpix =
     new() { Guid = Guid.NewGuid(), DexNr = 37, Name = "Vulpix" };
+
   private readonly List<PokemonForm> _offiziell;
   private readonly List<PokemonForm> _eigene = new();
 

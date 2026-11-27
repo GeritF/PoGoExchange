@@ -116,11 +116,11 @@ public static class TauschlistenImport
       ? ohneDoppelpunkt
       : ohneDoppelpunkt.Substring(leerzeichen + 1);
 
-    return Abschnitte.FirstOrDefault(
-      a => string.Equals(a, letztesWort, StringComparison.OrdinalIgnoreCase));
+    return Abschnitte.FirstOrDefault(a =>
+      string.Equals(a, letztesWort, StringComparison.OrdinalIgnoreCase));
   }
 
-    // Wertet den Text nach "#DexNr" aus.
+  // Wertet den Text nach "#DexNr" aus.
   // Liefert null bei Erfolg, sonst den Grund fuer die Fehlerliste.
   private static string? Auswerten(Katalog katalog, ImportEintrag eintrag, string rest)
   {

@@ -11,4 +11,3 @@ public partial class SicherungenView : UserControl
     InitializeComponent();
   }
 }
-

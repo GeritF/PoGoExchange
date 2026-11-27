@@ -23,7 +23,8 @@ public sealed class CsvLeseErgebnis<T>
 
 public static class CsvSpeicher
 {
-  private static readonly Encoding Utf8MitBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+  private static readonly Encoding Utf8MitBom =
+    new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
 
   // Beim Lesen wird NewLine bewusst nicht gesetzt: Ist es gesetzt, akzeptiert
   // CsvHelper ausschliesslich diesen Zeilenumbruch. Ohne Angabe werden

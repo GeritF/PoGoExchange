@@ -37,32 +37,24 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
 
   public AnforderungenViewModel Anforderungen { get; } = new();
 
-  [ObservableProperty]
-  private string _kopf = "";
+  [ObservableProperty] private string _kopf = "";
 
-  [ObservableProperty]
-  private string _fortschritt = "";
+  [ObservableProperty] private string _fortschritt = "";
 
-  [ObservableProperty]
-  private decimal? _anzahl;
+  [ObservableProperty] private decimal? _anzahl;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
 
-  [ObservableProperty]
-  private string _konfliktText = "";
+  [ObservableProperty] private string _konfliktText = "";
 
-  [ObservableProperty]
-  private bool _konfliktSichtbar;
+  [ObservableProperty] private bool _konfliktSichtbar;
 
-  [ObservableProperty]
-  private bool _loeschHinweisSichtbar;
+  [ObservableProperty] private bool _loeschHinweisSichtbar;
 
-  [ObservableProperty]
-  private bool _loeschRueckfrageSichtbar;
+  [ObservableProperty] private bool _loeschRueckfrageSichtbar;
 
   [RelayCommand]
   private void AnforderungenUebernehmen()
@@ -140,7 +132,7 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
       return;
     }
 
-    SuchBearbeitung.AnzahlSetzen(_bestand.Suche, zeile, anzahl, DateTime.UtcNow);
+    SuchBearbeitung.AnzahlSetzen(_bestand.Suche, zeile, anzahl);
     if (Speichern("Gespeichert"))
     {
       Auffrischen();
@@ -160,7 +152,7 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
       return;
     }
 
-    SuchBearbeitung.AnzahlSetzen(_bestand.Suche, zeile, 0, DateTime.UtcNow);
+    SuchBearbeitung.AnzahlSetzen(_bestand.Suche, zeile, 0);
     if (Speichern("Zeile gel\u00f6scht"))
     {
       _navigation.Zurueck();
@@ -208,7 +200,7 @@ public sealed partial class SuchZeileViewModel : SeiteViewModel
   private void Aendern(SuchZeile zeile)
   {
     _eintrag = SuchBearbeitung.AnforderungenAendern(
-      _bestand.Suche, zeile, Anforderungen.Vorlage(), DateTime.UtcNow);
+      _bestand.Suche, zeile, Anforderungen.Vorlage());
     if (!Speichern("Gespeichert"))
     {
       return;

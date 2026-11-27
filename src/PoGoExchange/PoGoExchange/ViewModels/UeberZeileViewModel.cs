@@ -34,20 +34,16 @@ public sealed partial class UeberZeileViewModel : SeiteViewModel
 
   public ExemplarViewModel Merkmale { get; } = new(mitGlueckUndHundert: false);
 
-  [ObservableProperty]
-  private string _kopf = "";
+  [ObservableProperty] private string _kopf = "";
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
 
-  [ObservableProperty]
-  private bool _konfliktSichtbar;
+  [ObservableProperty] private bool _konfliktSichtbar;
 
-  [ObservableProperty]
-  private bool _loeschRueckfrageSichtbar;
+  [ObservableProperty] private bool _loeschRueckfrageSichtbar;
 
   [RelayCommand]
   private void MerkmaleUebernehmen()

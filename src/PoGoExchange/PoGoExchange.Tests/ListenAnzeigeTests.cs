@@ -49,7 +49,7 @@ public class ListenAnzeigeTests
     };
   }
 
-    private static SucheEintrag Suche(
+  private static SucheEintrag Suche(
     PokemonForm form,
     int anzahl = 1,
     bool glueck = false,

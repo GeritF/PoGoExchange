@@ -70,14 +70,13 @@ public static class Entwicklung
   public static SucheEintrag Hochziehen(
     List<SucheEintrag> suche,
     SuchZeile zeile,
-    PokemonForm neueForm,
-    DateTime jetzt)
+    PokemonForm neueForm)
   {
     var formGuid = zeile.Muster.FormBeliebig ? Guid.Empty : neueForm.Guid;
     var ziel = SuchBearbeitung.NeuerEintrag(
-      zeile.Muster, neueForm.PokemonGuid, formGuid, 1, jetzt);
+      zeile.Muster, neueForm.PokemonGuid, formGuid, 1);
 
-    SuchBearbeitung.AnzahlSetzen(suche, zeile, zeile.Ziel - 1, jetzt);
+    SuchBearbeitung.AnzahlSetzen(suche, zeile, zeile.Ziel - 1);
 
     var vorhanden = SuchBearbeitung.Aktive(suche, ziel).FirstOrDefault();
     if (vorhanden != null)

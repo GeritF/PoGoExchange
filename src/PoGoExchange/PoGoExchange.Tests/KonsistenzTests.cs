@@ -6,7 +6,9 @@ namespace PoGoExchange.Tests;
 
 public class KonsistenzTests
 {
-  private readonly Pokemon _glumanda = new() { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" };
+  private readonly Pokemon _glumanda =
+    new() { Guid = Guid.NewGuid(), DexNr = 4, Name = "Glumanda" };
+
   private readonly Pokemon _glurak = new() { Guid = Guid.NewGuid(), DexNr = 6, Name = "Glurak" };
   private readonly PokemonForm _glumandaForm;
   private readonly Katalog _katalog;

@@ -11,4 +11,3 @@ public partial class SucheNeuView : UserControl
     InitializeComponent();
   }
 }
-

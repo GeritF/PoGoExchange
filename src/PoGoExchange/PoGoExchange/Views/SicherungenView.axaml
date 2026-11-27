@@ -5,10 +5,13 @@
              x:DataType="vm:SicherungenViewModel">
   <ScrollViewer>
     <StackPanel Margin="16" Spacing="8">
-      <TextBlock Text="Sicherungen enthalten die pers&#xF6;nlichen Listen und eigenen Formen. Alte Sicherungen werden automatisch aufger&#xE4;umt."
-                 TextWrapping="Wrap" />
+      <TextBlock TextWrapping="Wrap">
+        Sicherungen enthalten die pers&#xF6;nlichen Listen und eigenen Formen.
+        Alte Sicherungen werden automatisch aufger&#xE4;umt.
+      </TextBlock>
       <StackPanel Orientation="Horizontal" Spacing="8">
-        <Button Content="Jetzt sichern" Command="{Binding JetztSichernCommand}" />
+        <Button Content="Jetzt sichern"
+                Command="{Binding JetztSichernCommand}" />
         <TextBlock Text="{Binding Meldung}"
                    IsVisible="{Binding HatMeldung}"
                    VerticalAlignment="Center"
@@ -16,10 +19,14 @@
       </StackPanel>
 
       <StackPanel IsVisible="{Binding RueckfrageSichtbar}" Spacing="4">
-        <TextBlock Text="{Binding RueckfrageText}" Foreground="Red" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding RueckfrageText}"
+                   Foreground="Red"
+                   TextWrapping="Wrap" />
         <StackPanel Orientation="Horizontal" Spacing="8">
-          <Button Content="Ja, wiederherstellen" Command="{Binding WiederherstellenJaCommand}" />
-          <Button Content="Nein" Command="{Binding WiederherstellenNeinCommand}" />
+          <Button Content="Ja, wiederherstellen"
+                  Command="{Binding WiederherstellenJaCommand}" />
+          <Button Content="Nein"
+                  Command="{Binding WiederherstellenNeinCommand}" />
         </StackPanel>
       </StackPanel>
 
@@ -30,8 +37,11 @@
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="vm:SicherungEintrag">
             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2">
-              <TextBlock Text="{Binding Text}" VerticalAlignment="Center" MinWidth="160" />
-              <Button Content="Wiederherstellen" Command="{Binding WiederherstellenCommand}" />
+              <TextBlock Text="{Binding Text}"
+                         VerticalAlignment="Center"
+                         MinWidth="160" />
+              <Button Content="Wiederherstellen"
+                      Command="{Binding WiederherstellenCommand}" />
             </StackPanel>
           </DataTemplate>
         </ItemsControl.ItemTemplate>

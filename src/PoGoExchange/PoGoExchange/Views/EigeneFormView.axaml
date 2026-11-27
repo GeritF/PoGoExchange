@@ -30,7 +30,9 @@
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
-        <TextBlock Text="{Binding AuswahlText}" FontWeight="Bold" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding AuswahlText}"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap" />
       </StackPanel>
 
       <TextBlock Text="Form" FontWeight="Bold" Margin="0,12,0,0" />
@@ -50,23 +52,32 @@
       <TextBlock Text="nur f&#xFC;r Regionalformen, z.B. Alola"
                  Opacity="0.6"
                  TextWrapping="Wrap" />
-      <CheckBox Content="Shiny verf&#xFC;gbar" IsChecked="{Binding ShinyVerfuegbar}" />
+      <CheckBox Content="Shiny verf&#xFC;gbar"
+                IsChecked="{Binding ShinyVerfuegbar}" />
 
-      <Button Content="Speichern" Command="{Binding SpeichernCommand}" Margin="0,12,0,0" />
+      <Button Content="Speichern"
+              Command="{Binding SpeichernCommand}"
+              Margin="0,12,0,0" />
       <TextBlock Text="{Binding Meldung}"
                  IsVisible="{Binding HatMeldung}"
                  Foreground="Red"
                  TextWrapping="Wrap" />
 
-      <StackPanel IsVisible="{Binding !IstNeu}" Spacing="4" Margin="0,12,0,0">
-        <Button Content="L&#xF6;schen" Command="{Binding LoeschenCommand}" />
-        <StackPanel IsVisible="{Binding LoeschRueckfrageSichtbar}" Spacing="4">
+      <StackPanel IsVisible="{Binding !IstNeu}"
+                  Spacing="4"
+                  Margin="0,12,0,0">
+        <Button Content="L&#xF6;schen"
+                Command="{Binding LoeschenCommand}" />
+        <StackPanel IsVisible="{Binding LoeschRueckfrageSichtbar}"
+                    Spacing="4">
           <TextBlock Text="Diese Form wirklich l&#xF6;schen?"
                      Foreground="Red"
                      TextWrapping="Wrap" />
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Ja, l&#xF6;schen" Command="{Binding LoeschenJaCommand}" />
-            <Button Content="Nein" Command="{Binding LoeschenNeinCommand}" />
+            <Button Content="Ja, l&#xF6;schen"
+                    Command="{Binding LoeschenJaCommand}" />
+            <Button Content="Nein"
+                    Command="{Binding LoeschenNeinCommand}" />
           </StackPanel>
         </StackPanel>
       </StackPanel>

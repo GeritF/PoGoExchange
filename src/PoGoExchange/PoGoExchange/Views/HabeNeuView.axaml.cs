@@ -11,4 +11,3 @@ public partial class HabeNeuView : UserControl
     InitializeComponent();
   }
 }
-

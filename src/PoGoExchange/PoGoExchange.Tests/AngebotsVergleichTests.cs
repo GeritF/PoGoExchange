@@ -61,12 +61,12 @@ public class AngebotsVergleichTests
   }
 
   [Theory]
-  [InlineData(false, "", true, "Partyhut", Passung.Passt)]          // nicht gefordert
-  [InlineData(true, "", true, "Partyhut", Passung.Passt)]           // beliebig gefordert
-  [InlineData(true, "partyhut", true, "Partyhut", Passung.Passt)]   // gleicher Text
-  [InlineData(true, "Partyhut", true, "", Passung.Pruefen)]         // Angebot ohne Beschreibung
+  [InlineData(false, "", true, "Partyhut", Passung.Passt)] // nicht gefordert
+  [InlineData(true, "", true, "Partyhut", Passung.Passt)] // beliebig gefordert
+  [InlineData(true, "partyhut", true, "Partyhut", Passung.Passt)] // gleicher Text
+  [InlineData(true, "Partyhut", true, "", Passung.Pruefen)] // Angebot ohne Beschreibung
   [InlineData(true, "Partyhut", true, "Zylinder", Passung.PasstNicht)] // anderer Text
-  [InlineData(true, "", false, "", Passung.PasstNicht)]             // gefordert, aber keins
+  [InlineData(true, "", false, "", Passung.PasstNicht)] // gefordert, aber keins
   public void KostuemRegel(
     bool gefordert,
     string geforderterText,

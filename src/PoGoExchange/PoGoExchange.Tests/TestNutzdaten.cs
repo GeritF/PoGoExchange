@@ -26,8 +26,10 @@ public static class TestNutzdaten
   private static List<T> Lesen<T, TMap>(string datei) where TMap : ClassMap<T>
   {
     var name = "Testdaten." + datei;
-    using var stream = typeof(TestNutzdaten).Assembly.GetManifestResourceStream(name)
-      ?? throw new FileNotFoundException($"Eingebettete Testdatei nicht gefunden: {name}");
+    using var stream =
+      typeof(TestNutzdaten).Assembly.GetManifestResourceStream(name)
+      ?? throw new FileNotFoundException(
+        $"Eingebettete Testdatei nicht gefunden: {name}");
     using var reader = new StreamReader(
       stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
     return CsvSpeicher.Lesen<T, TMap>(reader);

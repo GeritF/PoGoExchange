@@ -80,8 +80,8 @@ public sealed class Katalog
   // Wird beim Einlesen gebraucht, um Regionalformen (z.B. "Alola") zu erkennen.
   public string? RegionsnameFinden(string text)
   {
-    return _regionenReihenfolge.FirstOrDefault(
-      r => string.Equals(r, text, StringComparison.OrdinalIgnoreCase));
+    return _regionenReihenfolge.FirstOrDefault(r =>
+      string.Equals(r, text, StringComparison.OrdinalIgnoreCase));
   }
 
   // Liefert Pokemon und Form zu einer FormGuid, oder null wenn unbekannt

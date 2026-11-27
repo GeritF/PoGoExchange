@@ -16,7 +16,9 @@ public class CsvSpeicherTests : IDisposable
   public void Dispose()
   {
     if (File.Exists(_pfad))
+    {
       File.Delete(_pfad);
+    }
   }
 
   [Fact]

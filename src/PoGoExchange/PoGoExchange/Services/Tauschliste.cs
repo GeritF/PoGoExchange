@@ -59,8 +59,8 @@ public static class Tauschliste
     };
   }
 
-  // Liefert nur nicht geloeschte, gueltige Eintraege;
-  // ungueltige nicht geloeschte Eintraege landen in der Fehlerliste
+  // Liefert die gueltigen Eintraege (Pruefung: Konsistenz.EintragPruefen);
+  // jeder ungueltige wird stattdessen als ExportFehler in fehler eingetragen
   private static List<T> NurGueltige<T>(
     Katalog katalog,
     IEnumerable<T> eintraege,
@@ -90,8 +90,10 @@ public static class Tauschliste
     Katalog katalog,
     ListenEintrag eintrag)
   {
-    var pokemon = katalog.PokemonZuGuid(eintrag.PokemonGuid)
-      ?? throw new InvalidOperationException("Eintrag wurde vor dem Aufloesen nicht geprueft");
+    var pokemon =
+      katalog.PokemonZuGuid(eintrag.PokemonGuid)
+      ?? throw new InvalidOperationException(
+        "Eintrag wurde vor dem Aufloesen nicht geprueft");
     var form = eintrag.FormBeliebig ? null : katalog.FormZuGuid(eintrag.FormGuid);
     return (pokemon, form);
   }

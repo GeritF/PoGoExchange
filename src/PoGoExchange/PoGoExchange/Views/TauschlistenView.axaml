@@ -4,23 +4,23 @@
              xmlns:views="using:PoGoExchange.Views"
              x:Class="PoGoExchange.Views.TauschlistenView"
              x:DataType="vm:TauschlistenViewModel">
-    <DockPanel>
-        <TextBlock DockPanel.Dock="Top"
-                   Text="{Binding Meldungshinweis}"
-                   IsVisible="{Binding HatMeldungen}"
-                   Foreground="DarkOrange"
-                   TextWrapping="Wrap"
-                   Margin="8" />
-        <TabControl>
-            <TabItem Header="Suche ich">
-                <views:ListenTabView DataContext="{Binding Suche}" />
-            </TabItem>
-            <TabItem Header="Habe ich">
-                <views:ListenTabView DataContext="{Binding Habe}" />
-            </TabItem>
-            <TabItem Header="Habe ich &#xFC;ber">
-                <views:ListenTabView DataContext="{Binding Ueber}" />
-            </TabItem>
-        </TabControl>
-    </DockPanel>
+  <DockPanel>
+    <TextBlock DockPanel.Dock="Top"
+               Text="{Binding Meldungshinweis}"
+               IsVisible="{Binding HatMeldungen}"
+               Foreground="DarkOrange"
+               TextWrapping="Wrap"
+               Margin="8" />
+    <TabControl>
+      <TabItem Header="Suche ich">
+        <views:ListenTabView DataContext="{Binding Suche}" />
+      </TabItem>
+      <TabItem Header="Habe ich">
+        <views:ListenTabView DataContext="{Binding Habe}" />
+      </TabItem>
+      <TabItem Header="Habe ich &#xFC;ber">
+        <views:ListenTabView DataContext="{Binding Ueber}" />
+      </TabItem>
+    </TabControl>
+  </DockPanel>
 </UserControl>

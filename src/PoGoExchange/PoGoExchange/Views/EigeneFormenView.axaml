@@ -5,8 +5,10 @@
              x:DataType="vm:EigeneFormenViewModel">
   <ScrollViewer>
     <StackPanel Margin="16" Spacing="8">
-      <TextBlock Text="Formen, die in den mitgelieferten Daten noch fehlen, k&#xF6;nnen hier selbst angelegt werden."
-                 TextWrapping="Wrap" />
+      <TextBlock TextWrapping="Wrap">
+        Formen, die in den mitgelieferten Daten noch fehlen,
+        k&#xF6;nnen hier selbst angelegt werden.
+      </TextBlock>
       <Button Content="+ Neu" Command="{Binding NeuCommand}" />
       <TextBlock Text="{Binding Rueckmeldung}"
                  IsVisible="{Binding HatRueckmeldung}"

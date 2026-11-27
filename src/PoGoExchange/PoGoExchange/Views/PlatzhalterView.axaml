@@ -3,5 +3,5 @@
              xmlns:vm="using:PoGoExchange.ViewModels"
              x:Class="PoGoExchange.Views.PlatzhalterView"
              x:DataType="vm:PlatzhalterViewModel">
-    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="16" />
+  <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="16" />
 </UserControl>

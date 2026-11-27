@@ -8,5 +8,5 @@
         x:Class="PoGoExchange.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="PoGoExchange">
-        <views:MainView />
+  <views:MainView />
 </Window>

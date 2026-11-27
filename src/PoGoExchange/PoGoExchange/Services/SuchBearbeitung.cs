@@ -45,26 +45,8 @@ public sealed class AnlegeErgebnis
 }
 
 // Anlegen und Bearbeiten von Zeilen in "Suche ich".
-// Der Parameter jetzt wird derzeit nicht verwendet; er bleibt fuer
-// spaetere Erweiterungen und haelt die Aufrufe stabil.
 public static class SuchBearbeitung
 {
-  // Liefert null, wenn der Text als Kostuem- oder Hintergrundbeschreibung erlaubt ist
-  public static string? FreitextFehler(string text)
-  {
-    if (text.Contains('"'))
-    {
-      return "Anf\u00fchrungszeichen sind nicht erlaubt";
-    }
-
-    if (text.Contains('\n') || text.Contains('\r'))
-    {
-      return "Zeilenumbr\u00fcche sind nicht erlaubt";
-    }
-
-    return null;
-  }
-
   // Alle waehlbaren Ziele mit Kategorie, passend zu den Anforderungen.
   // "Form beliebig" wird nur bei Pokemon mit mehreren Formen angeboten.
   public static List<SuchZiel> Ziele(
@@ -112,15 +94,14 @@ public static class SuchBearbeitung
     IEnumerable<HabeEintrag> habe,
     SucheEintrag anforderung,
     SuchZiel ziel,
-    int anzahl,
-    DateTime jetzt)
+    int anzahl)
   {
     if (anzahl < 1)
     {
       throw new ArgumentOutOfRangeException(nameof(anzahl), "Anzahl muss mindestens 1 sein");
     }
 
-    var neu = NeuerEintrag(anforderung, ziel.PokemonGuid, ziel.FormGuid, anzahl, jetzt);
+    var neu = NeuerEintrag(anforderung, ziel.PokemonGuid, ziel.FormGuid, anzahl);
     var vorhanden = Aktive(suche, neu).FirstOrDefault();
     if (vorhanden == null)
     {
@@ -164,7 +145,7 @@ public static class SuchBearbeitung
     SucheEintrag neueAnforderung)
   {
     var probe = NeuerEintrag(
-      neueAnforderung, zeile.Muster.PokemonGuid, zeile.Muster.FormGuid, 1, DateTime.MinValue);
+      neueAnforderung, zeile.Muster.PokemonGuid, zeile.Muster.FormGuid, 1);
     var neuerSchluessel = SuchZeilen.Schluessel(probe);
     if (neuerSchluessel == SuchZeilen.Schluessel(zeile.Muster))
     {
@@ -181,8 +162,7 @@ public static class SuchBearbeitung
   public static SucheEintrag AnforderungenAendern(
     List<SucheEintrag> suche,
     SuchZeile zeile,
-    SucheEintrag neueAnforderung,
-    DateTime jetzt)
+    SucheEintrag neueAnforderung)
   {
     var eintraege = Aktive(suche, zeile.Muster);
     if (eintraege.Count == 0)
@@ -202,8 +182,7 @@ public static class SuchBearbeitung
   public static void AnzahlSetzen(
     List<SucheEintrag> suche,
     SuchZeile zeile,
-    int anzahl,
-    DateTime jetzt)
+    int anzahl)
   {
     if (anzahl < 0)
     {
@@ -236,8 +215,7 @@ public static class SuchBearbeitung
     SucheEintrag vorlage,
     Guid pokemonGuid,
     Guid formGuid,
-    int anzahl,
-    DateTime jetzt)
+    int anzahl)
   {
     var eintrag = new SucheEintrag
     {
@@ -278,7 +256,7 @@ public static class SuchBearbeitung
     List<HabeEintrag> exemplare)
   {
     var formGuid = form?.Guid ?? Guid.Empty;
-    var probe = NeuerEintrag(anforderung, pokemon.Guid, formGuid, 1, DateTime.MinValue);
+    var probe = NeuerEintrag(anforderung, pokemon.Guid, formGuid, 1);
 
     ZielKategorie kategorie;
     if (exemplare.Any(h => Anforderung.Erfuellt(h, probe)))

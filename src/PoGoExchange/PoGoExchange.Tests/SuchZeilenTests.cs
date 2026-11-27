@@ -86,9 +86,15 @@ public class SuchZeilenTests
   [Fact]
   public void Kostuemtext_GrossKleinschreibungEgal_OhneHakenIgnoriert()
   {
-    var a = Suche(); a.KostuemAktiv = true; a.KostuemText = "Partyhut";
-    var b = Suche(); b.KostuemAktiv = true; b.KostuemText = "partyhut";
-    var c = Suche(); c.KostuemAktiv = false; c.KostuemText = "Zylinder";
+    var a = Suche();
+    a.KostuemAktiv = true;
+    a.KostuemText = "Partyhut";
+    var b = Suche();
+    b.KostuemAktiv = true;
+    b.KostuemText = "partyhut";
+    var c = Suche();
+    c.KostuemAktiv = false;
+    c.KostuemText = "Zylinder";
     var d = Suche();
 
     var zeilen = SuchZeilen.Bilden(new[] { a, b, c, d }, Array.Empty<HabeEintrag>());

@@ -11,4 +11,3 @@ public partial class HauptseiteView : UserControl
     InitializeComponent();
   }
 }
-

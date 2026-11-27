@@ -6,8 +6,11 @@
              x:DataType="vm:MehrereSuchenViewModel">
   <ScrollViewer>
     <StackPanel Margin="16" Spacing="8">
-      <TextBlock Text="F&#xFC;r alle Pokemon einer Region (oder aller Regionen) eine Suchzeile mit denselben Anforderungen anlegen. Zeilen, die es schon gibt, werden &#xFC;bersprungen."
-                 TextWrapping="Wrap" />
+      <TextBlock TextWrapping="Wrap">
+        F&#xFC;r alle Pokemon einer Region (oder aller Regionen) eine Suchzeile
+        mit denselben Anforderungen anlegen.
+        Zeilen, die es schon gibt, werden &#xFC;bersprungen.
+      </TextBlock>
 
       <StackPanel Orientation="Horizontal" Spacing="8">
         <TextBlock Text="Region:" VerticalAlignment="Center" Width="100" />
@@ -28,7 +31,8 @@
       <TextBlock Text="Vorschau" FontWeight="Bold" Margin="0,12,0,0" />
       <TextBlock Text="{Binding Vorschau}" TextWrapping="Wrap" />
 
-      <CheckBox Content="Vorher Sicherung anlegen" IsChecked="{Binding SicherungVorher}" />
+      <CheckBox Content="Vorher Sicherung anlegen"
+                IsChecked="{Binding SicherungVorher}" />
       <Button Content="Anlegen" Command="{Binding AnlegenCommand}" />
       <TextBlock Text="{Binding Meldung}"
                  IsVisible="{Binding HatMeldung}"

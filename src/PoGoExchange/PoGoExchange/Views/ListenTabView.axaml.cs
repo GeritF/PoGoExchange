@@ -11,4 +11,3 @@ public partial class ListenTabView : UserControl
     InitializeComponent();
   }
 }
-

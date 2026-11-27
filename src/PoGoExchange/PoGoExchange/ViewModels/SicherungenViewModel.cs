@@ -49,11 +49,9 @@ public sealed partial class SicherungenViewModel : SeiteViewModel
 
   public ObservableCollection<SicherungEintrag> Liste { get; } = new();
 
-  [ObservableProperty]
-  private bool _keineVorhanden;
+  [ObservableProperty] private bool _keineVorhanden;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
@@ -68,7 +66,7 @@ public sealed partial class SicherungenViewModel : SeiteViewModel
   public string RueckfrageText => ZumWiederherstellen == null
     ? ""
     : $"Sicherung vom {ZumWiederherstellen.Text} wiederherstellen? Der aktuelle Stand " +
-      "wird vorher gesichert.";
+    "wird vorher gesichert.";
 
   // Der Zeitpunkt wird hier ermittelt und uebergeben. Gibt es dafuer schon eine
   // Sicherung, passiert bewusst nichts (wie ein nicht getroffener Klick).

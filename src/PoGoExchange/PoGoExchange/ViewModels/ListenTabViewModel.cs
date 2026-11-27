@@ -45,28 +45,24 @@ public sealed partial class ListenTabViewModel : ViewModelBase
 
   public bool IstLeer => Zeilen.Count == 0;
 
-  [ObservableProperty]
-  private string _suchtext = "";
+  [ObservableProperty] private string _suchtext = "";
 
   [ObservableProperty]
   [NotifyPropertyChangedFor(nameof(ErledigtStatus))]
   [NotifyPropertyChangedFor(nameof(ErledigtButtonText))]
   private bool _erledigteAnzeigen;
 
-  [ObservableProperty]
-  private bool _rueckfrageSichtbar;
+  [ObservableProperty] private bool _rueckfrageSichtbar;
 
   // Rueckmeldung nach einer Aktion, z.B. "1 von 3 bereits erledigt"
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatRueckmeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatRueckmeldung))]
   private string _rueckmeldung = "";
 
   public bool HatRueckmeldung => Rueckmeldung != "";
 
   // Angetippte Zeile; wird nach dem Oeffnen zurueckgesetzt,
   // damit dieselbe Zeile erneut angetippt werden kann
-  [ObservableProperty]
-  private object? _ausgewaehlt;
+  [ObservableProperty] private object? _ausgewaehlt;
 
   public string ErledigtStatus => ErledigteAnzeigen
     ? "Erledigte werden angezeigt"

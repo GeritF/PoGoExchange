@@ -21,14 +21,12 @@ public sealed partial class EigeneListenViewModel : ViewModelBase
     _neuLaden = neuLaden;
   }
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(RueckfrageSichtbar))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(RueckfrageSichtbar))]
   private string _rueckfrageText = "";
 
   public bool RueckfrageSichtbar => RueckfrageText != "";

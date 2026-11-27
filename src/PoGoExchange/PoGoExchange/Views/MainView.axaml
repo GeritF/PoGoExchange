@@ -7,80 +7,80 @@
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="700"
              x:Class="PoGoExchange.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <Design.DataContext>
-        <vm:MainViewModel />
-    </Design.DataContext>
+  <Design.DataContext>
+    <vm:MainViewModel />
+  </Design.DataContext>
 
-    <DockPanel>
-        <Border DockPanel.Dock="Top" Padding="8" BorderThickness="0,0,0,1" BorderBrush="Gray">
-            <Grid ColumnDefinitions="Auto,*">
-                <Button Grid.Column="0"
-                        Content="&lt; Zur&#xFC;ck"
-                        Command="{Binding ZurueckCommand}"
-                        IsVisible="{Binding Navigation.KannZurueck}"
-                        Margin="0,0,8,0" />
-                <TextBlock Grid.Column="1"
-                           Text="{Binding Navigation.AktuelleSeite.Titel}"
-                           FontSize="20"
-                           VerticalAlignment="Center" />
-            </Grid>
-        </Border>
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Padding="8" BorderThickness="0,0,0,1" BorderBrush="Gray">
+      <Grid ColumnDefinitions="Auto,*">
+        <Button Grid.Column="0"
+                Content="&lt; Zur&#xFC;ck"
+                Command="{Binding ZurueckCommand}"
+                IsVisible="{Binding Navigation.KannZurueck}"
+                Margin="0,0,8,0" />
+        <TextBlock Grid.Column="1"
+                   Text="{Binding Navigation.AktuelleSeite.Titel}"
+                   FontSize="20"
+                   VerticalAlignment="Center" />
+      </Grid>
+    </Border>
 
-        <!-- Seiten ausdruecklich zuordnen statt ueber den ViewLocator (keine Reflexion) -->
-        <ContentControl Content="{Binding Navigation.AktuelleSeite}">
-            <ContentControl.DataTemplates>
-                <DataTemplate DataType="vm:HauptseiteViewModel">
-                    <views:HauptseiteView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:TauschlistenViewModel">
-                    <views:TauschlistenView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:VerwaltungViewModel">
-                    <views:VerwaltungView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:PlatzhalterViewModel">
-                    <views:PlatzhalterView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:SucheNeuViewModel">
-                    <views:SucheNeuView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:SuchZeileViewModel">
-                    <views:SuchZeileView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:HabeNeuViewModel">
-                    <views:HabeNeuView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:HabeZeileViewModel">
-                    <views:HabeZeileView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:UeberNeuViewModel">
-                    <views:UeberNeuView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:UeberZeileViewModel">
-                    <views:UeberZeileView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:EntwickelnViewModel">
-                    <views:EntwickelnView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:ImportExportViewModel">
-                    <views:ImportExportView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:AbgleichErgebnisViewModel">
-                    <views:AbgleichErgebnisView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:MehrereSuchenViewModel">
-                    <views:MehrereSuchenView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:SicherungenViewModel">
-                    <views:SicherungenView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:EigeneFormenViewModel">
-                    <views:EigeneFormenView />
-                </DataTemplate>
-                <DataTemplate DataType="vm:EigeneFormViewModel">
-                    <views:EigeneFormView />
-                </DataTemplate>
-            </ContentControl.DataTemplates>
-        </ContentControl>
-    </DockPanel>
+    <!-- Seiten ausdruecklich zuordnen statt ueber den ViewLocator (keine Reflexion) -->
+    <ContentControl Content="{Binding Navigation.AktuelleSeite}">
+      <ContentControl.DataTemplates>
+        <DataTemplate DataType="vm:HauptseiteViewModel">
+          <views:HauptseiteView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:TauschlistenViewModel">
+          <views:TauschlistenView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:VerwaltungViewModel">
+          <views:VerwaltungView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:PlatzhalterViewModel">
+          <views:PlatzhalterView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:SucheNeuViewModel">
+          <views:SucheNeuView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:SuchZeileViewModel">
+          <views:SuchZeileView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:HabeNeuViewModel">
+          <views:HabeNeuView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:HabeZeileViewModel">
+          <views:HabeZeileView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:UeberNeuViewModel">
+          <views:UeberNeuView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:UeberZeileViewModel">
+          <views:UeberZeileView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:EntwickelnViewModel">
+          <views:EntwickelnView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:ImportExportViewModel">
+          <views:ImportExportView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:AbgleichErgebnisViewModel">
+          <views:AbgleichErgebnisView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:MehrereSuchenViewModel">
+          <views:MehrereSuchenView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:SicherungenViewModel">
+          <views:SicherungenView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:EigeneFormenViewModel">
+          <views:EigeneFormenView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:EigeneFormViewModel">
+          <views:EigeneFormView />
+        </DataTemplate>
+      </ContentControl.DataTemplates>
+    </ContentControl>
+  </DockPanel>
 </UserControl>

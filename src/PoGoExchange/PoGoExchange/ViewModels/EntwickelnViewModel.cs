@@ -22,8 +22,7 @@ public sealed partial class BetroffeneZeile : ViewModelBase
   public string Text { get; }
 
   // Standardmaessig angehakt
-  [ObservableProperty]
-  private bool _ausgewaehlt = true;
+  [ObservableProperty] private bool _ausgewaehlt = true;
 }
 
 // Seite "Entwickeln": Zielform waehlen, betroffene Zeilen in "Suche ich"
@@ -60,22 +59,18 @@ public sealed partial class EntwickelnViewModel : SeiteViewModel
 
   public bool HatAnzahlHinweis => AnzahlHinweis != "";
 
-  [ObservableProperty]
-  private string _suchtext = "";
+  [ObservableProperty] private string _suchtext = "";
 
   public ObservableCollection<FormZiel> Ziele { get; } = new();
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMehrHinweis))]
   private string _mehrHinweis = "";
 
   public bool HatMehrHinweis => MehrHinweis != "";
 
-  [ObservableProperty]
-  private FormZiel? _auswahl;
+  [ObservableProperty] private FormZiel? _auswahl;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(AuswahlText))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(AuswahlText))]
   private FormZiel? _ziel;
 
   public string AuswahlText => Ziel == null
@@ -85,11 +80,9 @@ public sealed partial class EntwickelnViewModel : SeiteViewModel
   // Zeilen in "Suche ich", deren Anforderungen das Exemplar vorher erfuellt
   public ObservableCollection<BetroffeneZeile> Betroffene { get; } = new();
 
-  [ObservableProperty]
-  private bool _hatBetroffene;
+  [ObservableProperty] private bool _hatBetroffene;
 
-  [ObservableProperty]
-  [NotifyPropertyChangedFor(nameof(HatMeldung))]
+  [ObservableProperty] [NotifyPropertyChangedFor(nameof(HatMeldung))]
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
@@ -132,7 +125,7 @@ public sealed partial class EntwickelnViewModel : SeiteViewModel
     Entwicklung.Entwickeln(_bestand.Habe, _zeile, neueForm);
     foreach (var betroffen in ausgewaehlt)
     {
-      Entwicklung.Hochziehen(_bestand.Suche, betroffen.Zeile, neueForm, DateTime.UtcNow);
+      Entwicklung.Hochziehen(_bestand.Suche, betroffen.Zeile, neueForm);
     }
 
     var fehler = _bestand.HabeSpeichern();

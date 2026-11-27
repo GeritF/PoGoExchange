@@ -57,7 +57,9 @@ public sealed class Datenbestand
   public List<HabeEintrag> Habe { get; private set; } = new();
   public List<SucheEintrag> Suche { get; private set; } = new();
   public List<UeberEintrag> Ueber { get; private set; } = new();
+
   public IReadOnlyList<LadeMeldung> Meldungen => _meldungen;
+
   // Die verwendeten Nutzdaten (mitgelieferte oder in Tests uebergebene)
   public Nutzdaten Nutzdaten => _nutzdaten ??= EingebetteteNutzdaten.Alle();
 
@@ -98,13 +100,13 @@ public sealed class Datenbestand
 
     bestand.EigeneFormen = bestand.DateiLaden<PokemonForm, PokemonFormMap>(
       Dateinamen.EigeneFormen, _ => false);
-    bestand.Habe = bestand.ListeLaden<HabeEintrag, HabeEintragMap>(Dateinamen.Habe, jetzt);
+    bestand.Habe = bestand.ListeLaden<HabeEintrag, HabeEintragMap>(Dateinamen.Habe);
     bestand.Zusammenfuehren<HabeEintrag, HabeEintragMap>(
       Dateinamen.Habe, bestand.Habe, e => HabeZeilen.Schluessel(e));
-    bestand.Suche = bestand.ListeLaden<SucheEintrag, SucheEintragMap>(Dateinamen.Suche, jetzt);
+    bestand.Suche = bestand.ListeLaden<SucheEintrag, SucheEintragMap>(Dateinamen.Suche);
     bestand.Zusammenfuehren<SucheEintrag, SucheEintragMap>(
       Dateinamen.Suche, bestand.Suche, e => SuchZeilen.Schluessel(e));
-    bestand.Ueber = bestand.ListeLaden<UeberEintrag, UeberEintragMap>(Dateinamen.Ueber, jetzt);
+    bestand.Ueber = bestand.ListeLaden<UeberEintrag, UeberEintragMap>(Dateinamen.Ueber);
     bestand._abgleichInfo = bestand.DateiLaden<SchluesselWert, SchluesselWertMap>(
       Dateinamen.AbgleichInfo, _ => false);
 
@@ -136,7 +138,7 @@ public sealed class Datenbestand
   }
 
   // Ergaenzt fehlende Kennungen
-  private List<T> ListeLaden<T, TMap>(string datei, DateTime jetzt)
+  private List<T> ListeLaden<T, TMap>(string datei)
     where T : ListenEintrag
     where TMap : ClassMap<T>, new()
   {
@@ -245,7 +247,7 @@ public sealed class Datenbestand
   // Naechster freier Name: datei.csv.bak_1, datei.csv.bak_2, ...
   private static string SicherungsKopie(string pfad)
   {
-    for (var nummer = 1; ; nummer++)
+    for (var nummer = 1;; nummer++)
     {
       var ziel = $"{pfad}.bak_{nummer}";
       if (!File.Exists(ziel))

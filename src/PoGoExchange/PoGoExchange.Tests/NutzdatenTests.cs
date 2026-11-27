@@ -140,7 +140,8 @@ public class NutzdatenTests
 
     var version = info.SingleOrDefault(e => e.Schluessel == "Version");
     Assert.NotNull(version);
-    Assert.True(int.TryParse(version.Wert, out var nummer), $"Version keine Zahl: '{version.Wert}'");
+    Assert.True(int.TryParse(version.Wert, out var nummer),
+      $"Version keine Zahl: '{version.Wert}'");
     Assert.True(nummer >= 1, $"Version kleiner 1: {nummer}");
   }
 

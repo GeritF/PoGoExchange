@@ -20,8 +20,10 @@ public static class Anforderung
       return false;
     }
 
-    if (suche.Geschlecht != Geschlecht.Unbestimmt &&
-        exemplar.Geschlecht != suche.Geschlecht)
+    if (
+      (suche.Geschlecht != Geschlecht.Unbestimmt) &&
+      (exemplar.Geschlecht != suche.Geschlecht)
+    )
     {
       return false;
     }
@@ -31,8 +33,10 @@ public static class Anforderung
       return false;
     }
 
-    if (suche.Dynamax != DynamaxStufe.Keins &&
-        exemplar.Dynamax != suche.Dynamax)
+    if (
+      (suche.Dynamax != DynamaxStufe.Keins) &&
+      (exemplar.Dynamax != suche.Dynamax)
+    )
     {
       return false;
     }

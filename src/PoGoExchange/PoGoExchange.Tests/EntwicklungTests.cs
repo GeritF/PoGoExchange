@@ -8,12 +8,11 @@ namespace PoGoExchange.Tests;
 
 public class EntwicklungTests
 {
-  private static readonly DateTime Jetzt = new(2026, 11, 24, 12, 0, 0, DateTimeKind.Utc);
-
   private static readonly PokemonForm Glumanda = new()
   {
     Guid = Guid.NewGuid(), PokemonGuid = Guid.NewGuid()
   };
+
   private static readonly PokemonForm Glurak = new()
   {
     Guid = Guid.NewGuid(), PokemonGuid = Guid.NewGuid()
@@ -72,7 +71,7 @@ public class EntwicklungTests
 
     var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
     var zeile = Assert.Single(Betroffen(ergebnis, suche, habe));
-    Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
+    Entwicklung.Hochziehen(suche, zeile, Glurak);
 
     Assert.Equal("(2/2)", Zaehler(suche, habe, Glumanda));
     Assert.Equal("(1/1)", Zaehler(suche, habe, Glurak));
@@ -95,6 +94,7 @@ public class EntwicklungTests
   {
     List<HabeEintrag> HabeListe() =>
       new() { Habe(Glumanda, hundert: true), Habe(Glumanda) };
+
     List<SucheEintrag> SucheListe() =>
       new() { Suche(Glumanda, anzahl: 2), Suche(Glumanda, hundert: true) };
 
@@ -120,7 +120,7 @@ public class EntwicklungTests
 
     var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
     var zeile = Assert.Single(Betroffen(ergebnis, suche, habe));
-    var ziel = Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
+    var ziel = Entwicklung.Hochziehen(suche, zeile, Glurak);
 
     Assert.Same(glurakZeile, ziel);
     Assert.Equal(2, glurakZeile.Anzahl);
@@ -136,7 +136,7 @@ public class EntwicklungTests
 
     var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
     var zeile = Assert.Single(Betroffen(ergebnis, suche, habe));
-    Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
+    Entwicklung.Hochziehen(suche, zeile, Glurak);
 
     Assert.DoesNotContain(alt, suche);
     var aktiv = Assert.Single(suche);
@@ -154,7 +154,7 @@ public class EntwicklungTests
 
     var ergebnis = Entwicklung.Entwickeln(habe, habe[0], Glurak);
     var zeile = Assert.Single(Betroffen(ergebnis, suche, habe));
-    var ziel = Entwicklung.Hochziehen(suche, zeile, Glurak, Jetzt);
+    var ziel = Entwicklung.Hochziehen(suche, zeile, Glurak);
 
     Assert.Equal(Glurak.PokemonGuid, ziel.PokemonGuid);
     Assert.True(ziel.FormBeliebig);

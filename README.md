@@ -722,8 +722,8 @@ sie als "neueste des Tages" ersetzt. Das ist bewusst so; der wiederhergestellte
 Stand ist ja jetzt der aktuelle.
 
 Auf dem Handy liegen die Sicherungen im privaten Bereich der App. Sie
-schuetzen vor Fehlbedienung, nicht vor dem Verlust des Geraets; dafuer ist
-spaeter das Exportpaket gedacht.
+schuetzen vor Fehlbedienung, nicht vor dem Verlust des Geraets; dafuer gibt
+es den Export der eigenen Listen (Import/Export > "Eigene Listen").
 
 ---
 
@@ -1466,8 +1466,11 @@ zugeordnet werden koennen.
 - Quelltext wird in reinem ASCII geschrieben. Sonderzeichen in Anzeigetexten
   stehen als `\u`-Escapes im Quelltext (z.B. `"Kost\u00fcm"`).
 - Der Code-Stil ist in `src/PoGoExchange/.editorconfig` festgelegt:
-  Einrueckung mit 2 Leerzeichen, geschweifte Klammern auch bei einzeiligen
-  `if`-Bloecken, Zeilen bis etwa 100 Zeichen.
+  Einrueckung mit 2 Leerzeichen (auch in XAML und Projektdateien),
+  geschweifte Klammern auch bei einzeiligen `if`-Bloecken und Schleifen,
+  Zeilen bis 100 Zeichen, Folgezeilen 2 Leerzeichen tiefer. Die Einzelheiten
+  stehen in `ENTWICKLUNG.md` (Abschnitt 4); `test/Pruefung_Format.sh` prueft
+  die Regeln.
 - Laden und Speichern der Daten uebernimmt `Services/Datenbestand.cs`, das
   tolerante Lesen der CSV-Dateien `CsvSpeicher.LesenMitPruefung`.
 - Tests haengen nicht an den echten Nutzdaten: Wer einen `Datenbestand`
@@ -1491,7 +1494,8 @@ zugeordnet werden koennen.
   ueber" uebernehmen `Services/HabeBearbeitung.cs` und
   `Services/UeberBearbeitung.cs`. "+ Mehrere" nutzt `Services/SammelSuche.cs`,
   Sicherungen `Services/Sicherungen.cs`, eigene Formen
-  `Services/FormVerwaltung.cs`.
+  `Services/FormVerwaltung.cs`. Die Pruefung der freien Texte fuer Kostuem
+  und Hintergrund liegt in `Services/Freitext.cs`.
 - Nach jeder Aenderung an den eigenen Formen wird der Katalog mit
   `Datenbestand.KatalogAufbauen` neu aufgebaut. Seiten lesen den Katalog
   deshalb immer ueber `Datenbestand.Katalog` und merken ihn sich nicht.

@@ -47,7 +47,6 @@ public static class SammelSuche
     SammelModus modus,
     IEnumerable<SucheEintrag> suche,
     IEnumerable<HabeEintrag> habe,
-    DateTime jetzt,
     string? region = null)
   {
     var exemplare = habe.ToList();
@@ -103,9 +102,9 @@ public static class SammelSuche
   // eine nicht archivierte Form verfuegbar ist
   private static IEnumerable<(Guid PokemonGuid, Guid FormGuid, bool ShinyVerfuegbar, bool InGo)>
     Ziele(
-    Katalog katalog,
-    SammelModus modus,
-    string? region)
+      Katalog katalog,
+      SammelModus modus,
+      string? region)
   {
     foreach (var pokemon in katalog.AllePokemon())
     {

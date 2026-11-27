@@ -8,8 +8,6 @@ namespace PoGoExchange.Tests;
 
 public class SuchBearbeitungTests
 {
-  private static readonly DateTime Jetzt = new(2026, 11, 24, 12, 0, 0, DateTimeKind.Utc);
-
   private readonly Pokemon _glumanda = Pkmn(4, "Glumanda");
   private readonly Pokemon _vulpix = Pkmn(37, "Vulpix");
   private readonly Pokemon _flabebe = Pkmn(669, "Flab\u00e9b\u00e9");
@@ -87,17 +85,6 @@ public class SuchBearbeitungTests
 
   private static readonly SucheEintrag NurShiny = new() { Shiny = true };
 
-  [Theory]
-  [InlineData("Partyhut", true)]
-  [InlineData("Party \"Hut\"", false)]
-  [InlineData("Party\nHut", false)]
-  public void FreitextFehler_NurAnfuehrungszeichenUndZeilenumbruchVerboten(
-    string text,
-    bool erlaubt)
-  {
-    Assert.Equal(erlaubt, SuchBearbeitung.FreitextFehler(text) == null);
-  }
-
   [Fact]
   public void Ziele_FormBeliebigNurBeiMehrerenFormen()
   {
@@ -148,7 +135,7 @@ public class SuchBearbeitungTests
     var suche = new List<SucheEintrag>();
 
     var ergebnis = SuchBearbeitung.Anlegen(
-      suche, new[] { Habe(_glumandaForm) }, NurShiny, ZielFuer(_glumandaForm), 3, Jetzt);
+      suche, new[] { Habe(_glumandaForm) }, NurShiny, ZielFuer(_glumandaForm), 3);
 
     Assert.Null(ergebnis.Vorher);
     Assert.Equal("1/3", ergebnis.Nachher.ToString());
@@ -163,7 +150,7 @@ public class SuchBearbeitungTests
     var suche = new List<SucheEintrag> { Suche(_glumandaForm, anzahl: 2) };
 
     var ergebnis = SuchBearbeitung.Anlegen(
-      suche, new[] { Habe(_glumandaForm) }, NurShiny, ZielFuer(_glumandaForm), 3, Jetzt);
+      suche, new[] { Habe(_glumandaForm) }, NurShiny, ZielFuer(_glumandaForm), 3);
 
     Assert.Equal("1/2", ergebnis.Vorher?.ToString());
     Assert.Equal("1/5", ergebnis.Nachher.ToString());
@@ -209,7 +196,7 @@ public class SuchBearbeitungTests
       FormGuid = Guid.NewGuid()
     };
 
-    var ergebnis = SuchBearbeitung.AnforderungenAendern(suche, zeile, neu, Jetzt);
+    var ergebnis = SuchBearbeitung.AnforderungenAendern(suche, zeile, neu);
 
     Assert.True(ergebnis.Hundert);
     Assert.Equal("Partyhut", ergebnis.KostuemText);
@@ -227,7 +214,7 @@ public class SuchBearbeitungTests
     var zeileMitGlueck = SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>())
       .Single(z => z.Muster.Glueck);
 
-    var ergebnis = SuchBearbeitung.AnforderungenAendern(suche, zeileMitGlueck, NurShiny, Jetzt);
+    var ergebnis = SuchBearbeitung.AnforderungenAendern(suche, zeileMitGlueck, NurShiny);
 
     Assert.Same(mitGlueck, ergebnis);
     Assert.Equal(5, ergebnis.Anzahl);
@@ -240,7 +227,7 @@ public class SuchBearbeitungTests
     var suche = new List<SucheEintrag> { Suche(_glumandaForm, anzahl: 2) };
     var zeile = SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()).Single();
 
-    SuchBearbeitung.AnzahlSetzen(suche, zeile, 4, Jetzt);
+    SuchBearbeitung.AnzahlSetzen(suche, zeile, 4);
 
     Assert.Equal(4, suche.Single().Anzahl);
   }
@@ -251,7 +238,7 @@ public class SuchBearbeitungTests
     var suche = new List<SucheEintrag> { Suche(_glumandaForm, anzahl: 2) };
     var zeile = SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()).Single();
 
-    SuchBearbeitung.AnzahlSetzen(suche, zeile, 0, Jetzt);
+    SuchBearbeitung.AnzahlSetzen(suche, zeile, 0);
 
     Assert.Empty(SuchZeilen.Bilden(suche, Array.Empty<HabeEintrag>()));
   }

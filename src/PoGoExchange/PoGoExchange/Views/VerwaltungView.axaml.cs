@@ -11,4 +11,3 @@ public partial class VerwaltungView : UserControl
     InitializeComponent();
   }
 }
-

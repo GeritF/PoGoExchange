@@ -56,8 +56,7 @@ public sealed partial class VerwaltungViewModel : SeiteViewModel
   public string Status { get; }
 
   // Rueckmeldung nach dem Kopieren, z.B. "In die Zwischenablage kopiert"
-  [ObservableProperty]
-  private string _rueckmeldung = "";
+  [ObservableProperty] private string _rueckmeldung = "";
 
   [RelayCommand]
   private async Task Kopieren()
