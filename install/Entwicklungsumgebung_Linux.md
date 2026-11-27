@@ -1,24 +1,31 @@
 # PoGoExchange - Entwicklungsumgebung unter Linux einrichten
 
 Diese Anleitung beschreibt, wie das Projekt PoGoExchange (Avalonia UI, C#, .NET)
-auf einem Linux-Rechner gebaut und auf dem PC sowie auf einem Android-Handy
-gestartet werden kann.
+auf einem Linux-Rechner gebaut, getestet und auf dem PC sowie auf einem
+Android-Handy gestartet werden kann.
+
+Was das Programm tut, steht in der `README.md`. Code-Konventionen,
+Arbeitsweise und Entwicklungsstand stehen in der `ENTWICKLUNG.md`; diese
+Anleitung wiederholt sie nicht.
 
 ## Getestete Umgebung
 
 Getestet ist nur, was hier steht. Andere Distributionen oder Versionen
 funktionieren vermutlich aehnlich, sind aber nicht geprueft.
 
-| Komponente              | Version (Stand 22.11.2026)              |
-|-------------------------|-----------------------------------------|
-| Betriebssystem          | Linux Mint 22.3 Cinnamon (Ubuntu 24.04) |
-| Architektur             | x86_64                                  |
-| .NET SDK                | 10.0.404                                |
-| Java JDK                | OpenJDK 21                              |
-| Avalonia Templates      | 12.1.6                                  |
-| Android SDK             | Plattform android-36, Build-Tools 36.0.0 |
-| JetBrains Toolbox       | 3.9.1                                   |
-| JetBrains Rider         | 2026.3                                  |
+| Komponente          | Version (Stand 27.11.2026)                      |
+|---------------------|-------------------------------------------------|
+| Betriebssystem      | Linux Mint 22.3 Cinnamon (Ubuntu 24.04 Noble)   |
+| Kernel, Architektur | Linux 7.0.0-44-generic, x86_64                  |
+| .NET SDK            | 10.0.404                                        |
+| Android-Workload    | 36.1.118 (SDK-Band 10.0.400)                    |
+| Java JDK            | OpenJDK 21.0.13.1                               |
+| Avalonia Templates  | 12.1.6 (Pakete ebenfalls 12.1.6)                |
+| Android SDK         | Plattform android-36, Build-Tools 36.0.0        |
+| JetBrains Toolbox   | 3.9.2.89815                                     |
+| JetBrains Rider     | 2026.3.0.1                                      |
+| Werkzeuge           | git, perl, awk, zip (vorhanden, fuer `test/`)   |
+| Testgeraet Android  | Samsung Galaxy S24, Android 17, One UI 9.0      |
 
 Alle Befehle werden in einem normalen Terminal ausgefuehrt, wenn nicht anders
 angegeben.
@@ -188,6 +195,14 @@ Falls Rider das .NET SDK nicht findet: unter Settings > Build, Execution,
 Deployment > Toolset and Build als .NET CLI den Pfad `~/.dotnet/dotnet`
 eintragen.
 
+Formatierung:
+
+- Unter Settings > Editor > Code Style **"Enable EditorConfig support"**
+  einschalten. Die Regeln stehen in `src/PoGoExchange/.editorconfig`.
+- Zum Formatieren nur das Profil **"Built-in: Reformat Code"** verwenden,
+  nicht den Code-Cleanup; dieser kann Code inhaltlich aendern. Einzelheiten
+  und Erfahrungen stehen in `ENTWICKLUNG.md` (Abschnitte 4 und 6).
+
 ## 10. Repository klonen
 
 Das Repository in einen **leeren bzw. noch nicht existierenden** Ordner
@@ -279,6 +294,11 @@ cd ~/DEV/3_PoGoExchange/src/PoGoExchange
 dotnet build PoGoExchange.slnx
 ```
 
+Alle NuGet-Pakete (Avalonia, CommunityToolkit.Mvvm, CsvHelper, xUnit usw.)
+stehen mit ihren Versionen zentral in `src/PoGoExchange/Directory.Packages.props`
+und werden beim ersten Build automatisch geladen. Von Hand ist nichts zu
+installieren.
+
 ### Desktop
 
 In Rider die Solution `src/PoGoExchange/PoGoExchange.slnx` oeffnen, oben die
@@ -300,6 +320,56 @@ dotnet build PoGoExchange.Android -t:Run "-p:AndroidSdkDirectory=$HOME/Android/S
 > oft noch eine Weile im Hintergrund. Rider zeigt die Sitzung dann weiter als
 > laufend an. Zum Beenden den roten Stop-Button in Rider verwenden.
 
+> Randnotiz: Der Debug-Start aus Rider dauert auf Android lange. Ist die App
+> einmal installiert, startet sie ueber das App-Symbol schnell.
+
+## 14. Tests ausfuehren
+
+Die Fachlogik wird im Projekt `PoGoExchange.Tests` mit xUnit getestet:
+
+```bash
+cd ~/DEV/3_PoGoExchange
+./test/Test_XUnit.sh
+```
+
+Das Skript bereinigt zuerst (`dotnet clean`), fuehrt dann alle Tests aus und
+zeigt eine Zusammenfassung und eine Auswertung pro Testklasse. Erwartet:
+"Tests erfolgreich: True" und die in `ENTWICKLUNG.md` genannte Anzahl.
+
+Alternativ ohne Auswertung:
+
+```bash
+cd ~/DEV/3_PoGoExchange/src/PoGoExchange
+dotnet test PoGoExchange.Tests
+```
+
+Der Testlauf baut Desktop- und Android-Projekt nicht mit. Nach Aenderungen,
+die diese Projekte betreffen koennen (auch Views und gemeinsamer Code), dazu
+`./test/Build_Plattformen.sh` ausfuehren.
+
+## 15. Skripte im Ordner `test/`
+
+Alle Skripte sind Bash-Skripte fuer Linux und lassen sich aus jedem Ordner
+starten. Ihre Ausgaben folgen dem Muster `=== Ueberschrift ===` und
+`Schluessel: Wert`.
+
+| Skript                 | Zweck                                               | Braucht           |
+|------------------------|-----------------------------------------------------|-------------------|
+| `Test_XUnit.sh`        | Testlauf mit Auswertung pro Testklasse              | dotnet, perl      |
+| `Build_Plattformen.sh` | baut Desktop- und Android-Projekt                   | dotnet            |
+| `Pruefung_Format.sh`   | prueft Formatierungsregeln (nur lesend)             | awk               |
+| `Diff_Export.sh`       | schreibt Aenderungen nach `~/PoGoExchange_diff.txt` | git               |
+| `DatenAufsHandy.sh`    | kopiert persoenliche Daten in die Debug-App         | adb (Android SDK) |
+
+Hinweise:
+
+- `Test_XUnit.sh`: Im Skript schaltet `ALLE_TESTS=1` die Liste aller
+  einzelnen Tests ein, `SAUBER=0` das vorherige `dotnet clean` aus.
+- `Diff_Export.sh` ohne Parameter vergleicht mit dem Index (`git add -A`),
+  mit `head` mit dem letzten Commit.
+- `DatenAufsHandy.sh` funktioniert nur mit Debug-Versionen der App und
+  **ueberschreibt** die Daten auf dem Handy.
+
 ---
 
 ## Anhang: Hinweise zur Arbeit am Projekt
@@ -308,13 +378,27 @@ dotnet build PoGoExchange.Android -t:Run "-p:AndroidSdkDirectory=$HOME/Android/S
 
 ```
 3_PoGoExchange/
-  install/                  Installationsskripte (Archive werden ignoriert)
+  README.md                   Funktionen, Datenstrukturen, Begruendungen
+  ENTWICKLUNG.md              Stand, Konventionen, Arbeitsweise, ToDo
+  install/                    diese Anleitung (Archive werden ignoriert)
+    Zusatz_fuer_Gerit/        tatsaechlich ausgefuehrte Schritte (siehe unten)
+  test/                       Skripte fuer Tests, Builds, Pruefungen
   src/PoGoExchange/
-    PoGoExchange.slnx       Solution
-    PoGoExchange/           gemeinsamer Code (Views, ViewModels, Logik)
-    PoGoExchange.Android/   Android-Startprojekt
-    PoGoExchange.Desktop/   Desktop-Startprojekt (Linux, Windows)
+    PoGoExchange.slnx         Solution
+    Directory.Packages.props  Paketversionen (zentral)
+    .editorconfig             Formatierungsregeln
+    PoGoExchange/             gemeinsamer Code
+      Models/ Services/       Fachlogik (ohne Oberflaechentypen)
+      ViewModels/ Views/      Oberflaeche
+      Nutzdaten/              mitgelieferte Daten (eingebettet)
+    PoGoExchange.Android/     Android-Startprojekt
+    PoGoExchange.Desktop/     Desktop-Startprojekt (Linux, Windows)
+    PoGoExchange.Tests/       xUnit-Tests
+      Testdaten/              feste Testdaten (nicht mit Nutzdaten ersetzen)
 ```
+
+Die persoenlichen Daten liegen nicht im Repository, sondern im Datenordner
+(Linux `~/.local/share/PoGoExchange`, siehe README "Wo die Daten liegen").
 
 Die von der Vorlage zusaetzlich erzeugten Projekte fuer iOS und Browser sind
 entfernt. iOS laesst sich unter Linux ohnehin nicht bauen.
@@ -352,6 +436,15 @@ install/**/jetbrains-toolbox-*/
 
 Git versioniert keine leeren Ordner. Ein leerer Ordner kommt erst ins
 Repository, sobald eine Datei darin liegt.
+
+### Ordner `install/Zusatz_fuer_Gerit`
+
+Die Skripte dort sind die Schritte, die bei der ersten Einrichtung
+tatsaechlich ausgefuehrt wurden (Stand 22.11.2026). Sie bleiben als Protokoll
+erhalten und werden nicht an diese Anleitung angeglichen. Bekannte
+Abweichung: `4_Register.sh` setzt kein `ANDROID_HOME`; die Einrichtung
+funktionierte trotzdem. Ob die Variable noetig ist, ist nicht geprueft.
+Massgeblich ist diese Anleitung.
 
 ### Noch nicht beschrieben
 

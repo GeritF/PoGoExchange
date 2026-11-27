@@ -38,6 +38,7 @@ public sealed class SammelErgebnis
 public static class SammelSuche
 {
   // region schraenkt auf eine Region ein (siehe Katalog.RegionZuDex), null = alle.
+  // Vergleich ohne Gross-/Kleinschreibung (wie ListenAnzeige.RegionPasst).
   // Bewusst nur ueber die Dex-Nummer, anders als ListenAnzeige.RegionPasst:
   // Galar-Zapdos gehoert hier zu Kanto, nicht zu Galar (gewollt, siehe README).
   // Pokemon mit InGoVerfuegbar = false werden immer uebersprungen.
@@ -110,7 +111,8 @@ public static class SammelSuche
   {
     foreach (var pokemon in katalog.AllePokemon())
     {
-      if (region != null && katalog.RegionZuDex(pokemon.DexNr) != region)
+      var dexRegion = katalog.RegionZuDex(pokemon.DexNr);
+      if (region != null && !string.Equals(dexRegion, region, StringComparison.OrdinalIgnoreCase))
       {
         continue;
       }

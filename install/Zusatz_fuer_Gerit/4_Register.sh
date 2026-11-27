@@ -1,3 +1,9 @@
+#!/bin/bash
+# So bei der Erstinstallation tatsaechlich ausgefuehrt (Stand 22.11.2026).
+# Massgeblich ist install/Entwicklungsumgebung_Linux.md.
+# Abweichung: ANDROID_HOME wurde hier nicht gesetzt (die Anleitung setzt es
+# in Schritt 4). Ob es noetig ist, ist nicht geprueft; ohne lief es.
+
 cat >> ~/.profile <<'EOF'
 
 # .NET und Java fuer Avalonia/Android

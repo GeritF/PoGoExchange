@@ -1,3 +1,8 @@
+#!/bin/bash
+# So bei der Erstinstallation tatsaechlich ausgefuehrt (Stand 22.11.2026).
+# Massgeblich ist install/Entwicklungsumgebung_Linux.md.
+# Abweichung: ohne Ausgabe von ANDROID_HOME (siehe 4_Register.sh).
+
 echo "=== Pruefung ==="
 echo "dotnet Pfad: $(command -v dotnet || echo 'nichts gefunden')"
 sdks=$(dotnet --list-sdks 2>/dev/null)

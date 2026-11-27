@@ -59,6 +59,15 @@ public class SammelSucheRegionTests
   }
 
   [Fact]
+  public void Region_OhneGrossKleinschreibung()
+  {
+    var ergebnis = Anlegen(new SucheEintrag(), SammelModus.ProForm, "jOHTO");
+
+    var eintrag = Assert.Single(ergebnis.NeueEintraege);
+    Assert.Equal(_feurigel.Guid, eintrag.PokemonGuid);
+  }
+
+  [Fact]
   public void Shiny_UeberspringtFormenOhneVerfuegbaresShiny()
   {
     var ergebnis = Anlegen(new SucheEintrag { Shiny = true }, SammelModus.ProForm, "Kalos");

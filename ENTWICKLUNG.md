@@ -6,7 +6,7 @@ Entwicklung in einem neuen Chat fortsetzt. Was das Programm tut und warum,
 steht in der `README.md`; diese Datei wiederholt das nicht, sondern verweist
 darauf.
 
-Stand: 2026-11-27, 348 Tests gruen.
+Stand: 2026-11-27, 349 Tests gruen.
 
 ## Inhalt
 
@@ -122,6 +122,7 @@ Stand: 2026-11-27, 348 Tests gruen.
 - **Gewolltes Verhalten:** "+ Mehrere" (`SammelSuche`) filtert die Region nur
   ueber die Dex-Nummer, nicht ueber die Form-Region (Galar-Zapdos gehoert
   dort zu Kanto). Von Gerit so festgelegt; nicht an `RegionPasst` angleichen.
+  Verglichen wird wie dort ohne Gross-/Kleinschreibung.
 - Bei "Neue eigene Form" stehen zwei Auswahlen "Region:" (Filter fuer die
   Pokemon-Auswahl und Region der neuen Form). Von Gerit geprueft und bewusst
   so belassen.
@@ -482,7 +483,9 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - Entwicklungsrechner: Linux Mint 22.3, .NET SDK 10 in `~/.dotnet`, JDK 21,
   Android-SDK in `~/Android/Sdk`, Rider mit "Rider Android Support" und
   "AvaloniaRider". Einrichtung: `install/Entwicklungsumgebung_Linux.md`
-  (Stand vor Testprojekt und spaeteren Erweiterungen).
+  (Stand 2026-11-27: Tests, Skripte in `test/`, aktuelle Versionen). Der
+  Ordner `install/Zusatz_fuer_Gerit` ist ein Protokoll der tatsaechlich
+  ausgefuehrten Erstinstallation und wird nicht angeglichen.
 - Repository: `~/DEV/3_PoGoExchange`, GitHub `GeritF/PoGoExchange` (SSH).
 - Projekte unter `src/PoGoExchange/`: `PoGoExchange` (gemeinsam),
   `PoGoExchange.Desktop`, `PoGoExchange.Android`, `PoGoExchange.Tests`.
@@ -536,8 +539,18 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes
 
-- Derzeit keine Punkte. Naechste Schritte mit Gerit abstimmen (Kandidaten
-  unter "Spaeter").
+- **Nidoran beim Einlesen fremder Listen:** Die Namen enthalten die Symbole
+  U+2640 und U+2642. Zusaetzlich Schreibweisen wie "Nidoran w", "Nidoran
+  weiblich", "Nidoran (w)" bzw. "Nidoran m", "Nidoran maennlich",
+  "Nidoran (m)" erkennen.
+- **Button "Erhalten" direkt in der Liste "Suche ich"** an jeder Zeile.
+- **Button "Erhalten" im Abgleich-Ergebnis** bei "Er hat, was ich suche".
+- **Fremde Listen ohne Dex-Nummer erkennen:** Spieler ohne die App
+  schreiben Listen ohne `#Nummer`, mit abweichenden Leerzeichen oder anderen
+  Trennern. Vorher festlegen, welche Zeilen erkannt werden sollen (z.B.
+  ueber den Namen). Mindestens alle Zeilen mit Aufzaehlungszeichen, die nicht
+  erkannt wurden, in einer einsehbaren Liste zeigen, statt nur "nichts
+  erkannt".
 
 ### Spaeter
 
@@ -546,11 +559,18 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   schnell ausprobieren und wechseln lassen. Wichtig: Die Stile sollen
   ressourcenschonend bleiben, kein Komponentenpaket, das das Projekt stark
   vergroessert (z.B. auf 100 MB).
-- Update der Nutzdaten fuer offiziell entfernte Formen (archivieren und nach
-  `eigene_formen.csv` uebernehmen). Bisher wurde nie eine offizielle Form
-  entfernt; erst bauen, wenn der Fall eintritt.
-- `install/Entwicklungsumgebung_Linux.md` auf den aktuellen Stand bringen
-  (Testprojekt, CsvHelper, Skripte).
+- **Kopf- und Fusstext** fuer die eigene Tauschliste (z.B. Trainername,
+  Freundescode); erster Punkt unter "Einstellungen" (dafuer bleibt
+  `PlatzhalterViewModel` erhalten).
+- **"Teilen"** der eigenen Tauschliste auf Android (Teilen-Menue, z.B.
+  WhatsApp).
+- **Shiny-Verfuegbarkeit offizieller Formen selbst freischalten** (z.B. wenn
+  ein Shiny erscheint, bevor ein Update der Nutzdaten kommt). Bis dahin: die
+  Form einzeln ueber "+ Neu" suchen; "+ Mehrere" ueberspringt sie.
+- **Eigene Pokemon** mit noch nicht vergebener Dex-Nummer anlegen. Bringt ein
+  Update diese Dex-Nummer, ersetzt der offizielle Eintrag den eigenen
+  (Verweise umstellen, eigene Formen nach Form und Region zuordnen), egal ob
+  Name oder andere Angaben abweichen.
 
 ### Sehr viel spaeter
 
@@ -561,30 +581,14 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
     Rueckfrage "Wirklich ersetzen?"; gleiche Paket- und Versionsregeln.
   - Vorher Testprogramm fuer Ports, Berechtigungen und Broadcast.
   - Windows-Build und Verteilung.
-- **Kopf- und Fusstext** fuer die eigene Tauschliste (z.B. Trainername,
-  Freundescode); erster Punkt unter "Einstellungen".
-- **"Teilen"** der eigenen Tauschliste auf Android (Teilen-Menue, z.B.
-  WhatsApp).
-- **Button "Erhalten" direkt in der Liste "Suche ich"** an jeder Zeile.
-- **Button "Erhalten" im Abgleich-Ergebnis** bei "Er hat, was ich suche".
-- **Fremde Listen ohne Dex-Nummer erkennen:** Spieler ohne die App
-  schreiben Listen ohne `#Nummer`, mit abweichenden Leerzeichen oder anderen
-  Trennern. Vorher festlegen, welche Zeilen erkannt werden sollen (z.B.
-  ueber den Namen). Mindestens alle Zeilen mit Aufzaehlungszeichen, die nicht
-  erkannt wurden, in einer einsehbaren Liste zeigen, statt nur "nichts
-  erkannt".
-- **Shiny-Verfuegbarkeit offizieller Formen selbst freischalten** (z.B. wenn
-  ein Shiny erscheint, bevor ein Update der Nutzdaten kommt). Bis dahin: die
-  Form einzeln ueber "+ Neu" suchen; "+ Mehrere" ueberspringt sie.
-- **Eigene Pokemon** mit noch nicht vergebener Dex-Nummer anlegen. Bringt ein
-  Update diese Dex-Nummer, ersetzt der offizielle Eintrag den eigenen
-  (Verweise umstellen, eigene Formen nach Form und Region zuordnen), egal ob
-  Name oder andere Angaben abweichen.
-- **Nidoran beim Einlesen fremder Listen:** Die Namen enthalten die Symbole
-  U+2640 und U+2642. Zusaetzlich Schreibweisen wie "Nidoran w", "Nidoran
-  weiblich", "Nidoran (w)" bzw. "Nidoran m", "Nidoran maennlich",
-  "Nidoran (m)" erkennen.
+- **Update der Nutzdaten fuer offiziell entfernte Formen** (archivieren und
+  nach `eigene_formen.csv` uebernehmen). Bisher wurde nie eine offizielle
+  Form entfernt; erst bauen, wenn der Fall eintritt.
 
 ### Aufraeumen bei Gelegenheit
+
+Hier werden kleine Aufraeumpunkte gesammelt, die waehrend anderer Runden
+auffallen (z.B. Hinweise aus dem Hauptchat), und bei passender Gelegenheit
+nebenbei erledigt.
 
 - Derzeit keine offenen Punkte (letzte Aufraeumrunde 2026-11-27).
