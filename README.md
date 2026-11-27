@@ -338,7 +338,10 @@ Mit "+ Mehrere" werden viele Suchzeilen mit denselben Anforderungen auf
 einmal angelegt, z.B. "Von jedem Kanto-Pokemon ein Shiny" oder "Von jedem ein
 100er". Die Seite bietet:
 
-- **Region**: "Alle Regionen" oder eine bestimmte Region (nach Dex-Nummer).
+- **Region**: "Alle Regionen" oder eine bestimmte Region. Hier zaehlt
+  gewollt nur die Dex-Nummer, anders als bei der Auswahl unter den
+  Suchfeldern: "+ Mehrere" mit Galar legt keine Zeile fuer Galar-Zapdos an
+  (Dex-Nummer 145, Kanto); dafuer "+ Mehrere" mit Kanto verwenden.
 - **Zeilen**: "Eine Zeile pro Form" (voreingestellt; Vulpix bekommt zwei
   Zeilen, Kanto und Alola, Flabebe eine pro Farbe) oder "Eine Zeile pro
   Pokemon (Form beliebig)". Archivierte Formen werden nicht beruecksichtigt.
@@ -1160,6 +1163,12 @@ Form") zaehlt nur die Dex-Nummer. "Zapdos - Form (beliebig)" erscheint also
 nur bei "Kanto". So bleibt die Regel ohne Sonderfaelle und deckt sich mit der
 Gruppierung.
 
+Bei "+ Mehrere" zaehlt gewollt nur die Dex-Nummer, auch fuer einzelne
+Formen. Dort beschreibt die Region einen Abschnitt des Pokedex ("von jedem
+Galar-Pokemon"), nicht eine Suche nach Regionalformen. Der Regionsfilter
+unter den Suchfeldern dient dagegen dem Finden und Pflegen, deshalb
+beruecksichtigt er auch die Form-Region.
+
 ## Warum es keine Angabe zur Tauschbarkeit gibt
 
 Ob ein Pokemon tauschbar ist, haengt teils von der Art, teils von einzelnen
@@ -1610,8 +1619,11 @@ zugeordnet werden koennen.
   `SuchBearbeitung.Ziele`, `HabeBearbeitung.Ziele` und `FormVerwaltung.Pokemon`
   nehmen die Region als optionalen Parameter (null = alle). In der Oberflaeche
   ist die Auswahl ein eigener Baustein (`RegionFilterViewModel`,
-  `RegionFilterView`), den die Listen-Registerkarten und alle Seiten mit
-  Pokemon-Auswahl einbinden. "+ Mehrere" hat noch eine eigene Regionsauswahl.
+  `RegionFilterView`), den die Listen-Registerkarten, alle Seiten mit
+  Pokemon-Auswahl und "+ Mehrere" einbinden. `BeschriftungsBreite` an der
+  View richtet die Beschriftung bei Bedarf mit anderen Zeilen aus (bei
+  "+ Mehrere" 100). "+ Mehrere" uebergibt die Region an `SammelSuche`, die
+  gewollt nur ueber die Dex-Nummer filtert.
 - Die Oberflaeche verwendet eine eigene, testbare Navigation
   (`ViewModels/Navigation.cs`) mit einem Seitenstapel. Seiten werden nur in
   `Views/MainView.axaml` ausdruecklich ihren ViewModels zugeordnet (keine

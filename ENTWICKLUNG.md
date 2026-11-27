@@ -111,11 +111,17 @@ Stand: 2026-11-27, 348 Tests gruen.
   Pokemon-Auswahl (Neuer Sucheintrag, Neues Exemplar, Habe ich ueber > Neu,
   Entwickeln, Neue eigene Form). Beim Erhalten ausgeblendet.
 - Regel (`ListenAnzeige.RegionPasst`): Dex-Region oder Spalte `Region` der
-  Form, jeweils ganzer Name ohne Gross-/Kleinschreibung. Galar-Zapdos erscheint bei Kanto und bei Galar, immer unter der
-  Ueberschrift Kanto. Ohne Form ("Form beliebig", Pokemon-Auswahl bei
-  eigenen Formen) nur die Dex-Region.
-- Baustein `RegionFilterViewModel`/`RegionFilterView`. Nach "Form fehlt?
-  Eigene Form anlegen" springt die Region auf "Alle Regionen" zurueck.
+  Form, jeweils ganzer Name ohne Gross-/Kleinschreibung. Galar-Zapdos
+  erscheint bei Kanto und bei Galar, immer unter der Ueberschrift Kanto.
+  Ohne Form ("Form beliebig", Pokemon-Auswahl bei eigenen Formen) nur die
+  Dex-Region.
+- Baustein `RegionFilterViewModel`/`RegionFilterView`, auch in "+ Mehrere"
+  (dort mit `BeschriftungsBreite="100"`, damit die Auswahl unter "Zeilen:"
+  ausgerichtet ist). Nach "Form fehlt? Eigene Form anlegen" springt die
+  Region auf "Alle Regionen" zurueck.
+- **Gewolltes Verhalten:** "+ Mehrere" (`SammelSuche`) filtert die Region nur
+  ueber die Dex-Nummer, nicht ueber die Form-Region (Galar-Zapdos gehoert
+  dort zu Kanto). Von Gerit so festgelegt; nicht an `RegionPasst` angleichen.
 - Bei "Neue eigene Form" stehen zwei Auswahlen "Region:" (Filter fuer die
   Pokemon-Auswahl und Region der neuen Form). Von Gerit geprueft und bewusst
   so belassen.
@@ -581,5 +587,4 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Aufraeumen bei Gelegenheit
 
-- "+ Mehrere" auf den Baustein `RegionFilterViewModel` umstellen (hat noch
-  eine eigene Regionsauswahl mit eigenem "Alle Regionen"). Nicht dringend.
+- Derzeit keine offenen Punkte (letzte Aufraeumrunde 2026-11-27).

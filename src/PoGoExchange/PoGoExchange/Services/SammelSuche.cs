@@ -38,6 +38,8 @@ public sealed class SammelErgebnis
 public static class SammelSuche
 {
   // region schraenkt auf eine Region ein (siehe Katalog.RegionZuDex), null = alle.
+  // Bewusst nur ueber die Dex-Nummer, anders als ListenAnzeige.RegionPasst:
+  // Galar-Zapdos gehoert hier zu Kanto, nicht zu Galar (gewollt, siehe README).
   // Pokemon mit InGoVerfuegbar = false werden immer uebersprungen.
   // Ist Shiny gefordert, werden Ziele ohne verfuegbares Shiny uebersprungen;
   // ein spaeterer erneuter Aufruf ergaenzt neu verfuegbare.

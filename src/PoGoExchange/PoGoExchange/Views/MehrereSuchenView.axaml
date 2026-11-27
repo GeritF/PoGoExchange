@@ -12,12 +12,7 @@
         Zeilen, die es schon gibt, werden &#xFC;bersprungen.
       </TextBlock>
 
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <TextBlock Text="Region:" VerticalAlignment="Center" Width="100" />
-        <ComboBox ItemsSource="{Binding Regionen}"
-                  SelectedIndex="{Binding RegionIndex}"
-                  MinWidth="150" />
-      </StackPanel>
+      <views:RegionFilterView DataContext="{Binding RegionFilter}" BeschriftungsBreite="100" />
       <StackPanel Orientation="Horizontal" Spacing="8">
         <TextBlock Text="Zeilen:" VerticalAlignment="Center" Width="100" />
         <ComboBox ItemsSource="{Binding ModusAuswahl}"

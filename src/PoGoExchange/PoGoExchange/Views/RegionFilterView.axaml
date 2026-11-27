@@ -4,7 +4,7 @@
              x:Class="PoGoExchange.Views.RegionFilterView"
              x:DataType="vm:RegionFilterViewModel">
   <StackPanel Orientation="Horizontal" Spacing="8">
-    <TextBlock Text="Region:" VerticalAlignment="Center" />
+    <TextBlock x:Name="Beschriftung" Text="Region:" VerticalAlignment="Center" />
     <ComboBox ItemsSource="{Binding Regionen}"
               SelectedIndex="{Binding RegionIndex}"
               MinWidth="150" />

@@ -20,7 +20,7 @@ public class MehrereSuchenViewModelTests : IDisposable
   // (Flabebe Rot, Irrbis XS/M/XL/XXL) und eine ohne (Flabebe Blau)
   private static void KalosShiny(MehrereSuchenViewModel vm)
   {
-    vm.RegionIndex = vm.Regionen.ToList().IndexOf("Kalos");
+    vm.RegionFilter.RegionIndex = vm.RegionFilter.Regionen.ToList().IndexOf("Kalos");
     vm.Anforderungen.Shiny = true;
   }
 

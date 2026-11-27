@@ -4,7 +4,6 @@ using PoGoExchange.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace PoGoExchange.ViewModels;
 
@@ -13,8 +12,6 @@ namespace PoGoExchange.ViewModels;
 // denselben Anforderungen an. Logik: Services/SammelSuche.cs
 public sealed partial class MehrereSuchenViewModel : SeiteViewModel
 {
-  private const string AlleRegionen = "Alle Regionen";
-
   private readonly Datenbestand _bestand;
   private readonly Action<SammelErgebnis> _gespeichert;
 
@@ -22,11 +19,8 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
   {
     _bestand = bestand;
     _gespeichert = gespeichert;
-    Regionen =
-    [
-      AlleRegionen,
-      .. bestand.Katalog.RegionenInReihenfolge()
-    ];
+    RegionFilter = new RegionFilterViewModel(bestand.Katalog.RegionenInReihenfolge());
+    RegionFilter.Geaendert += VorschauAktualisieren;
     Anforderungen.Geaendert += VorschauAktualisieren;
     VorschauAktualisieren();
   }
@@ -35,15 +29,13 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
 
   public AnforderungenViewModel Anforderungen { get; } = new();
 
-  public IReadOnlyList<string> Regionen { get; }
+  public RegionFilterViewModel RegionFilter { get; }
 
   public IReadOnlyList<string> ModusAuswahl { get; } =
   [
     "Eine Zeile pro Form",
     "Eine Zeile pro Pokemon (Form beliebig)"
   ];
-
-  [ObservableProperty] private int _regionIndex;
 
   [ObservableProperty] private int _modusIndex;
 
@@ -55,11 +47,6 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
   private string _meldung = "";
 
   public bool HatMeldung => Meldung != "";
-
-  partial void OnRegionIndexChanged(int value)
-  {
-    VorschauAktualisieren();
-  }
 
   partial void OnModusIndexChanged(int value)
   {
@@ -114,7 +101,6 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
 
   private SammelErgebnis Berechnen()
   {
-    var region = RegionIndex <= 0 || RegionIndex >= Regionen.Count ? null : Regionen[RegionIndex];
     var modus = ModusIndex == 1 ? SammelModus.ProPokemon : SammelModus.ProForm;
     return SammelSuche.Anlegen(
       _bestand.Katalog,
@@ -122,7 +108,7 @@ public sealed partial class MehrereSuchenViewModel : SeiteViewModel
       modus,
       _bestand.Suche,
       _bestand.Habe,
-      region);
+      RegionFilter.Region);
   }
 
   private void VorschauAktualisieren()
