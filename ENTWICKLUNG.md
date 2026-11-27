@@ -228,9 +228,18 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - Attribute: ein einzelnes Attribut mit kurzem Feld auf einer Zeile
   (`[ObservableProperty] private bool _shiny;`), sonst jedes Attribut und
   das Feld auf einer eigenen Zeile.
+- Lange Aufrufe: Ist die Zeile zu lang, duerfen die Argumente und die
+  schliessende Klammer auf eigenen Zeilen stehen (wie bei Bedingungen; nach
+  Ermessen, wird nicht vereinheitlicht). Beispiel:
+  `ListenTabViewModelTests.Suchtext_BautListeNeuAuf_MitUeberschriften`.
 - `using` alphabetisch, `System` wird nicht vorgezogen
-  (`dotnet_sort_system_directives_first = false`). Umsortiert wird erst im
-  eigenen Cleanup-Lauf (siehe ToDo-Liste).
+  (`dotnet_sort_system_directives_first = false`); unbenutzte `using`
+  werden entfernt.
+- Sammlungsausdruecke statt `new[] { ... }`, `new()` bei Sammlungen,
+  `Array.Empty<T>()` und `.ToList()`: `["a", "b"]`, `[]`, `[.. quelle]`.
+  Ausnahmen: `var x = new[] { ... }` (kein Zieltyp) und einzelne
+  `Assert.Equal(new[] { ... }, ...)`, die Rider nicht umstellt (vermutlich
+  mehrdeutig).
 - Laengere Texte in XAML als Inhalt des `TextBlock` statt im Attribut
   `Text`; Umbrueche und Einrueckung erscheinen als einfache Leerzeichen
   (Beobachtung auf Android, Stichproben):
@@ -323,6 +332,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - **Fehler offen benennen:** Liegt ein Fehler im gelieferten Code oder in
   einer falschen Aussage, das klar sagen; Gerits Tippfehler als Nebendetail
   behandeln.
+- **Diffs zur Auswertung** ueber `test/Diff_Export.sh` als Datei anfordern,
+  nicht aus der Konsole.
 - **Skripte:** Bash fuer Linux Mint, immer vollstaendig als Code-Abschnitt
   (keine Teilstuecke zum Einfuegen). Ausgaben mit Ueberschriften
   `=== ... ===` und jedem Wert als `Schluessel: Wert`; leere Ergebnisse
@@ -395,6 +406,14 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   `Assert.True(... .Count > 0, "Keine Eintraege angelegt ...")`). Die
   Meldung erscheint in `Test_XUnit.sh` unter "Fehlermeldung" (geprueft mit
   einem Gegentest).
+- **`Test_XUnit.sh` baut Desktop und Android nicht mit.** Aendert sich etwas
+  in `PoGoExchange.Desktop` oder `PoGoExchange.Android` (auch durch einen
+  Cleanup, z.B. entfernte `using`), zusaetzlich `test/Build_Plattformen.sh`
+  ausfuehren.
+- **Rider "Fix in solution":** Die Umstellung auf Sammlungsausdruecke liess
+  an einigen Stellen ungluecklich verteilte Zeilen zurueck (z.B. `:` allein
+  auf einer Zeile, Leerzeile mitten im Ausdruck). Danach den Diff
+  (`test/Diff_Export.sh`) auf solche Stellen durchsehen.
 - **Rider:** Drag-and-Drop zwischen Projekten erzeugt Verweise statt
   Verschiebungen (mit `git mv` verschieben). "Unload Project" blendet nur aus.
 - **Debug-Start auf Android** dauert lange; der Start ueber das App-Symbol
@@ -414,9 +433,16 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - Datenordner: Linux `~/.local/share/PoGoExchange`, Windows
   `%LOCALAPPDATA%\PoGoExchange`, Android
   `/data/user/0/com.GeritF.PoGoExchange/files/PoGoExchange`.
-- Skripte: `test/Test_XUnit.sh` (Testlauf), `test/Pruefung_Format.sh`
-  (Formatierungsregeln pruefen, nur lesend), `test/DatenAufsHandy.sh`
-  (persoenliche Daten in die Debug-App kopieren, ueberschreibt sie).
+- Skripte im Ordner `test/`:
+  - `Test_XUnit.sh`: Testlauf mit Auswertung pro Klasse.
+  - `Build_Plattformen.sh`: baut Desktop- und Android-Projekt.
+  - `Pruefung_Format.sh`: prueft die Formatierungsregeln (nur lesend).
+  - `Diff_Export.sh`: schreibt alle Aenderungen nach
+    `~/PoGoExchange_diff.txt` (ohne Parameter Vergleich mit dem Index, mit
+    `head` mit dem letzten Commit); die Datei wird zur Auswertung
+    hochgeladen.
+  - `DatenAufsHandy.sh`: persoenliche Daten in die Debug-App kopieren
+    (ueberschreibt sie).
 - Nutzdaten: die echten (1025 Pokemon) in `PoGoExchange/Nutzdaten/`;
   Testdaten (11 Pokemon) in `PoGoExchange.Tests/Testdaten/`. Persoenliche
   Beispieldaten nur im Datenordner, nicht im Repository.
@@ -453,10 +479,6 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes
 
-- **Cleanup-Lauf (eigene Runde):** Sammlungsausdruecke (`["a", "b"]` statt
-  `new[] { "a", "b" }`) und `using` alphabetisch sortieren. Laeuft ueber den
-  Rider-Cleanup und aendert Code, daher mit Diff-Kontrolle
-  (`git diff -w --ignore-blank-lines`) und Testlauf.
 - Mit Gerit abstimmen: Windows-Build, WLAN-Abgleich.
 - **`ViewLocator` entfernen (eigene Runde):** Er ist in `App.axaml` noch als
   Reflexions-Fallback registriert, obwohl die Seiten in `MainView.axaml`

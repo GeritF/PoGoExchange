@@ -1468,7 +1468,8 @@ zugeordnet werden koennen.
 - Der Code-Stil ist in `src/PoGoExchange/.editorconfig` festgelegt:
   Einrueckung mit 2 Leerzeichen (auch in XAML und Projektdateien),
   geschweifte Klammern auch bei einzeiligen `if`-Bloecken und Schleifen,
-  Zeilen bis 100 Zeichen, Folgezeilen 2 Leerzeichen tiefer. Die Einzelheiten
+  Zeilen bis 100 Zeichen, Folgezeilen 2 Leerzeichen tiefer, `using`
+  alphabetisch, Sammlungsausdruecke (`[...]`). Die Einzelheiten
   stehen in `ENTWICKLUNG.md` (Abschnitt 4); `test/Pruefung_Format.sh` prueft
   die Regeln.
 - Laden und Speichern der Daten uebernimmt `Services/Datenbestand.cs`, das
@@ -1515,6 +1516,9 @@ zugeordnet werden koennen.
   den `ViewLocator` (keine Reflexion, sicher fuer optimierte Android-Builds).
 - Plattformfunktionen (Beenden, Zwischenablage) stellt die Oberflaeche ueber
   `AppActions` bereit, damit die ViewModels keine Oberflaechentypen brauchen.
+- `test/Build_Plattformen.sh` baut das Desktop- und das Android-Projekt, die
+  der Testlauf nicht mitbaut. `test/Diff_Export.sh` schreibt alle
+  Aenderungen gegenueber dem Index oder dem letzten Commit in eine Datei.
 - `test/DatenAufsHandy.sh` kopiert die persoenlichen Daten vom PC in die
   Debug-App auf dem Handy (ueber `adb` und `run-as`). Das funktioniert nur mit
   Debug-Versionen und ueberschreibt die Daten auf dem Handy.
