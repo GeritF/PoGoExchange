@@ -1150,10 +1150,10 @@ landen neue Pokemon dort, bevor `regionen.csv` erweitert wurde.
 
 Der Regionsfilter beruecksichtigt beides: die Region der Dex-Nummer und die
 Spalte `Region` der Form. Verglichen wird jeweils der ganze Name ohne
-Gross-/Kleinschreibung. Wer bei
-der Pflege "Galar" waehlt, will auch Galar-Zapdos sehen, obwohl es nach der
-Dex-Nummer zu Kanto gehoert. Die Gruppierung aendert sich dadurch nicht:
-Galar-Zapdos steht auch mit Filter "Galar" unter der Ueberschrift "Kanto".
+Gross-/Kleinschreibung. Wer bei der Pflege "Galar" waehlt, will auch
+Galar-Zapdos sehen, obwohl es nach der Dex-Nummer zu Kanto gehoert. Die
+Gruppierung aendert sich dadurch nicht: Galar-Zapdos steht auch mit Filter
+"Galar" unter der Ueberschrift "Kanto".
 
 Ohne bestimmte Form ("Form beliebig", Auswahl eines Pokemon bei "Neue eigene
 Form") zaehlt nur die Dex-Nummer. "Zapdos - Form (beliebig)" erscheint also
@@ -1613,9 +1613,11 @@ zugeordnet werden koennen.
   `RegionFilterView`), den die Listen-Registerkarten und alle Seiten mit
   Pokemon-Auswahl einbinden. "+ Mehrere" hat noch eine eigene Regionsauswahl.
 - Die Oberflaeche verwendet eine eigene, testbare Navigation
-  (`ViewModels/Navigation.cs`) mit einem Seitenstapel. Seiten werden in
-  `Views/MainView.axaml` ausdruecklich ihren ViewModels zugeordnet, nicht ueber
-  den `ViewLocator` (keine Reflexion, sicher fuer optimierte Android-Builds).
+  (`ViewModels/Navigation.cs`) mit einem Seitenstapel. Seiten werden nur in
+  `Views/MainView.axaml` ausdruecklich ihren ViewModels zugeordnet (keine
+  Reflexion, sicher fuer optimierte Android-Builds). Den `ViewLocator` aus
+  der Projektvorlage gibt es nicht mehr: Er suchte die View zur Laufzeit ueber
+  den Klassennamen und haette einen fehlenden Eintrag verdeckt.
 - Plattformfunktionen (Beenden, Zwischenablage) stellt die Oberflaeche ueber
   `AppActions` bereit, damit die ViewModels keine Oberflaechentypen brauchen.
 - Die Bildschirmtastatur behandelt `MainView.axaml.cs` zentral fuer alle

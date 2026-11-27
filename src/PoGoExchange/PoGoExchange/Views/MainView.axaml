@@ -27,7 +27,9 @@
       </Grid>
     </Border>
 
-    <!-- Seiten ausdruecklich zuordnen statt ueber den ViewLocator (keine Reflexion) -->
+    <!-- Seiten ausdruecklich zuordnen (keine Reflexion). Jede neue Seite braucht
+         hier einen Eintrag; fehlt er, zeigt Avalonia vermutlich nur den
+         Klassennamen des ViewModels als Text. -->
     <ContentControl Content="{Binding Navigation.AktuelleSeite}">
       <ContentControl.DataTemplates>
         <DataTemplate DataType="vm:HauptseiteViewModel">

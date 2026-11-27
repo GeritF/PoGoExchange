@@ -152,13 +152,15 @@ public partial class MainView : UserControl
       return 0;
     }
 
-    // Unterkante ohne den bisherigen Abstand (Margin liegt ausserhalb von Bounds)
+    // Unterkante des Inhalts; liegt bei schon gesetztem Abstand um diesen
+    // hoeher (die Margin liegt ausserhalb von Bounds)
     var unten = Inhalt.TranslatePoint(new Point(0, Inhalt.Bounds.Height), _topLevel);
     if (unten == null)
     {
       return 0;
     }
 
+    // Bisherigen Abstand dazurechnen: Unterkante, wie sie ohne Abstand waere
     return Math.Max(0, unten.Value.Y + Inhalt.Margin.Bottom - verdeckt.Y);
   }
 }

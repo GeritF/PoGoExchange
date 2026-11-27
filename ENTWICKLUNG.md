@@ -194,7 +194,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   fuer die ganze Zeile; fuer Teilmengen Anzahl verringern und neue Zeile
   anlegen.
 - **`ViewLocator` per Reflexion.** Seiten werden in `MainView.axaml`
-  ausdruecklich zugeordnet.
+  ausdruecklich zugeordnet; der `ViewLocator` der Projektvorlage ist
+  entfernt.
 - **Andere Frameworks:** Delphi FMX, Lazarus, Qt, PWA, MAUI, Flutter,
   Kotlin (siehe README, falls dort begruendet).
 
@@ -291,7 +292,10 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - Navigation ueber den eigenen Seitenstapel `ViewModels/Navigation.cs`;
   jede Seite erbt von `SeiteViewModel`.
 - Neue Seiten brauchen einen Eintrag in den `DataTemplates` von
-  `Views/MainView.axaml`.
+  `Views/MainView.axaml`. Einen `ViewLocator` als Rueckfall gibt es nicht
+  mehr (entfernt 2026-11-27). Fehlt der Eintrag, zeigt Avalonia vermutlich
+  statt der Seite nur den Klassennamen des ViewModels (nicht beobachtet,
+  nur erwartet); beim ersten Oeffnen der Seite auf dem Desktop pruefen.
 - `PlatzhalterViewModel`/`PlatzhalterView` werden derzeit nicht benutzt,
   bleiben aber bewusst fuer eine spaetere Seite "Einstellungen". Nicht als
   toten Code entfernen.
@@ -526,11 +530,8 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Als Naechstes
 
-- **`ViewLocator` entfernen (eigene Runde):** Er ist in `App.axaml` noch als
-  Reflexions-Fallback registriert, obwohl die Seiten in `MainView.axaml`
-  ausdruecklich zugeordnet werden. Die KI erklaert vorher, was das Entfernen
-  bewirkt, und prueft, ob irgendwo ein ViewModel ohne eigene Vorlage
-  angezeigt wird.
+- Derzeit keine Punkte. Naechste Schritte mit Gerit abstimmen (Kandidaten
+  unter "Spaeter").
 
 ### Spaeter
 
