@@ -120,6 +120,15 @@ Stand: 2026-11-27, 348 Tests gruen.
   Pokemon-Auswahl und Region der neuen Form). Von Gerit geprueft und bewusst
   so belassen.
 
+### Bildschirmtastatur (eingebaut)
+
+- Zentral in `MainView.axaml.cs` fuer alle Seiten: Bei offener Tastatur
+  bekommt der aeussere `DockPanel` (`Inhalt`) unten eine `Margin` in Hoehe
+  des verdeckten Teils, beim Schliessen wieder 0. Kein Unit-Test (reiner
+  Oberflaechencode), erprobt auf dem Testgeraet mit Gerits Ablauf ("py"
+  eingeben, Shiny anhaken, Pygraulon waehlen).
+- Messwerte und der Fehler beim ersten Versuch: siehe Stolpersteine.
+
 ### Was die Fachlogik bereits kann
 
 Alle Dienste liegen in `src/PoGoExchange/PoGoExchange/Services/`:
@@ -363,6 +372,11 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 - **Doku zuletzt:** README und diese Datei erst in einem eigenen Schritt
   aendern, nachdem Gerit die Code-Aenderungen uebernommen hat und die Tests
   gruen sind. Vorher Doku-Aenderungen hoechstens als Vorschau nennen.
+- **Inhaltsverzeichnis der README** (zwei Ebenen: Teile `#` und Abschnitte
+  `##`, mit Links) bei neuen, umbenannten oder entfernten Ueberschriften
+  mitpflegen. Die Anker folgen der GitHub-Schreibweise: Kleinbuchstaben,
+  Satzzeichen entfallen, Leerzeichen werden `-`; doppelte Ueberschriften
+  bekommen `-1` (z.B. `#sicherungen-1` in Teil 3).
 - **Doku als ganze Dateien:** Geaenderte Dokumente immer vollstaendig zum
   Herunterladen bereitstellen, keine Anweisungen der Art "in Zeile x
   folgendes aendern".
@@ -438,9 +452,23 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
   ist schnell.
 - **Neue `ApplicationId`** auf Android bedeutet neue App mit eigenem,
   leerem Datenordner.
+- **Android, Bildschirmtastatur (gemessenes Verhalten auf dem Testgeraet):**
+  Avalonia verkleinert das Fenster nicht, wenn die Tastatur erscheint
+  (Fenster bleibt 411x891, Skalierung 2,63). `TopLevel.InputPane` liefert
+  Zustand und verdeckten Bereich zuverlaessig (Tastatur Y=513,9, Hoehe
+  329,5; endet bei 843,4 = Fenster minus Navigationsleiste 48). Die
+  SafeArea betraegt oben 39,24 und unten 48. Antippen einer CheckBox
+  schliesst die Tastatur.
+- **`Padding` der `MainView` nicht setzen:** Dort legt Avalonia auf Android
+  den Abstand fuer Status- und Navigationsleiste ab (geschlossen aus der
+  Beobachtung, nicht im Avalonia-Quelltext geprueft). Der erste Versuch setzte
+  den Tastaturabstand dort und schob den Inhalt dauerhaft unter die
+  Statusleiste (Zurueck-Button nicht mehr bedienbar). Eigene Abstaende
+  deshalb als `Margin` am inneren `DockPanel` (`Inhalt`).
 
 ## 7. Umgebung und Werkzeuge
 
+- Testgeraet Android: Samsung Galaxy S24, Android 17, One UI 9.0.
 - Entwicklungsrechner: Linux Mint 22.3, .NET SDK 10 in `~/.dotnet`, JDK 21,
   Android-SDK in `~/Android/Sdk`, Rider mit "Rider Android Support" und
   "AvaloniaRider". Einrichtung: `install/Entwicklungsumgebung_Linux.md`
@@ -506,12 +534,6 @@ sollen nicht erneut vorgeschlagen werden, ausser Gerit fragt danach.
 
 ### Spaeter
 
-- **Bildschirmtastatur auf dem Handy** verdeckt wesentliche Teile der
-  Oberflaeche. Beispiel: "py" eingeben, dann den Haken "Shiny" setzen, dann
-  in der Liste Pygraulon waehlen. Die App muss auf das Einblenden der Tastatur
-  reagieren und den Sichtbereich anpassen. Ansatz aus Gerits FMX-Erfahrung:
-  alles liegt in einem Scrollbereich, der bei eingeblendeter Tastatur einen
-  Rand in Tastaturhoehe bekommt, sodass weiterhin alles erreichbar ist.
 - **Design ueberarbeiten** (bisher sehr schlicht). Groesseres Vorhaben,
   vermutlich mit einem eigenen Testprojekt, in dem sich verschiedene Stile
   schnell ausprobieren und wechseln lassen. Wichtig: Die Stile sollen

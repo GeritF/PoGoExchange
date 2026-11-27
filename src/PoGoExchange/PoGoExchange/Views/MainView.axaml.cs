@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Platform;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -28,6 +29,11 @@ public partial class MainView : UserControl
     }
 
     _topLevel.BackRequested += ZurueckAngefordert;
+    if (_topLevel.InputPane != null)
+    {
+      _topLevel.InputPane.StateChanged += TastaturGeaendert;
+    }
+
     var zwischenablage = _topLevel.Clipboard;
     AppActions.InZwischenablageKopieren = zwischenablage == null
       ? null
@@ -97,8 +103,15 @@ public partial class MainView : UserControl
     if (_topLevel != null)
     {
       _topLevel.BackRequested -= ZurueckAngefordert;
+      if (_topLevel.InputPane != null)
+      {
+        _topLevel.InputPane.StateChanged -= TastaturGeaendert;
+      }
+
       _topLevel = null;
     }
+
+    Inhalt.Margin = default;
 
     base.OnDetachedFromVisualTree(e);
   }
@@ -114,5 +127,38 @@ public partial class MainView : UserControl
     }
 
     e.Handled = true;
+  }
+
+  // Bildschirmtastatur: Avalonia verkleinert die Ansicht nicht selbst. Deshalb
+  // bekommt der Inhalt unten einen Abstand in Hoehe des verdeckten Teils. So
+  // liegen alle Seiten oberhalb der Tastatur und lassen sich bis zum Ende
+  // scrollen. Der Abstand wird gegen die Unterkante des Inhalts gerechnet,
+  // damit eine Navigationsleiste nicht doppelt zaehlt.
+  // Wichtig: Nicht Padding der MainView setzen. Dort liegt auf Android der
+  // Abstand fuer Status- und Navigationsleiste; ueberschrieben rutscht der
+  // Inhalt unter die Statusleiste (beobachtet auf dem S24).
+  // Gemessen auf Samsung Galaxy S24 (Android 17, One UI 9.0): Der verdeckte
+  // Bereich endet ueber der Navigationsleiste, wie der Inhalt.
+  private void TastaturGeaendert(object? sender, InputPaneStateEventArgs e)
+  {
+    Inhalt.Margin = new Thickness(0, 0, 0, TastaturAbstand(e.NewState, e.EndRect));
+  }
+
+  private double TastaturAbstand(InputPaneState zustand, Rect verdeckt)
+  {
+    // Leerer Bereich: schwebende Tastatur ueber der Ansicht, kein Abstand
+    if (zustand != InputPaneState.Open || verdeckt.Height <= 0 || _topLevel == null)
+    {
+      return 0;
+    }
+
+    // Unterkante ohne den bisherigen Abstand (Margin liegt ausserhalb von Bounds)
+    var unten = Inhalt.TranslatePoint(new Point(0, Inhalt.Bounds.Height), _topLevel);
+    if (unten == null)
+    {
+      return 0;
+    }
+
+    return Math.Max(0, unten.Value.Y + Inhalt.Margin.Bottom - verdeckt.Y);
   }
 }

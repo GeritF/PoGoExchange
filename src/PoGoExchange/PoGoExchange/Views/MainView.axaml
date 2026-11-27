@@ -11,7 +11,8 @@
     <vm:MainViewModel />
   </Design.DataContext>
 
-  <DockPanel>
+  <!-- Inhalt: unten Abstand fuer die Bildschirmtastatur (siehe MainView.axaml.cs) -->
+  <DockPanel x:Name="Inhalt">
     <Border DockPanel.Dock="Top" Padding="8" BorderThickness="0,0,0,1" BorderBrush="Gray">
       <Grid ColumnDefinitions="Auto,*">
         <Button Grid.Column="0"

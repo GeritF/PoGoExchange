@@ -14,10 +14,59 @@ Die Einrichtung der Entwicklungsumgebung ist in
 
 ## Inhalt
 
-1. Funktionen fuer Anwender
-2. Datenstrukturen
-3. Technische Details und Begruendungen
-4. Hinweise zur Entwicklung
+1. [Funktionen fuer Anwender](#1-funktionen-fuer-anwender)
+   - [Grundidee](#grundidee)
+   - [Aufbau der Oberflaeche](#aufbau-der-oberflaeche)
+   - [Formen und Merkmale](#formen-und-merkmale)
+   - [Persoenliche Listen](#persoenliche-listen)
+   - [Pokemon zu "Suche ich" hinzufuegen](#pokemon-zu-suche-ich-hinzufuegen)
+   - [Zeile in "Suche ich" bearbeiten](#zeile-in-suche-ich-bearbeiten)
+   - [Erhalten](#erhalten)
+   - [Exemplar zu "Habe ich" hinzufuegen](#exemplar-zu-habe-ich-hinzufuegen)
+   - ["Habe ich ueber" bearbeiten](#habe-ich-ueber-bearbeiten)
+   - [Mehrere auf einmal suchen ("+ Mehrere")](#mehrere-auf-einmal-suchen--mehrere)
+   - [Eigene Formen](#eigene-formen)
+   - [Pokemon entwickeln](#pokemon-entwickeln)
+   - [Zeilen in "Habe ich" aendern oder loeschen](#zeilen-in-habe-ich-aendern-oder-loeschen)
+   - [Tauschliste erstellen](#tauschliste-erstellen)
+   - [Tauschlisten anderer Spieler abgleichen](#tauschlisten-anderer-spieler-abgleichen)
+   - [Abgleich zwischen Geraeten (z.B. Handy und PC)](#abgleich-zwischen-geraeten-zb-handy-und-pc)
+   - [Eigene Listen exportieren und importieren](#eigene-listen-exportieren-und-importieren)
+   - [Updates der Nutzdaten](#updates-der-nutzdaten)
+   - [Regeln fuer Formen](#regeln-fuer-formen)
+   - [Wo die Daten liegen](#wo-die-daten-liegen)
+   - [Sicherungen](#sicherungen)
+   - [Haeufige Fragen](#haeufige-fragen)
+2. [Datenstrukturen](#2-datenstrukturen)
+   - [Allgemeine Festlegungen](#allgemeine-festlegungen)
+   - [Nutzdaten](#nutzdaten)
+   - [Eigene Daten des Spielers](#eigene-daten-des-spielers)
+   - [Exportpaket (ZIP)](#exportpaket-zip)
+   - [Eintragstext](#eintragstext)
+   - [Tauschliste (Textformat)](#tauschliste-textformat)
+3. [Technische Details und Begruendungen](#3-technische-details-und-begruendungen)
+   - [Warum Nutzdaten und eigene Daten getrennt sind](#warum-nutzdaten-und-eigene-daten-getrennt-sind)
+   - [Warum Formen und Merkmale getrennt sind](#warum-formen-und-merkmale-getrennt-sind)
+   - [Warum "Form beliebig" kein Eintrag in den Nutzdaten ist](#warum-form-beliebig-kein-eintrag-in-den-nutzdaten-ist)
+   - [Warum GUIDs statt Dex-Nummer oder Name](#warum-guids-statt-dex-nummer-oder-name)
+   - [Warum es keine Region-Spalte bei den Pokemon gibt](#warum-es-keine-region-spalte-bei-den-pokemon-gibt)
+   - [Warum es keine Angabe zur Tauschbarkeit gibt](#warum-es-keine-angabe-zur-tauschbarkeit-gibt)
+   - [Warum die Kategorie gefuehrt wird](#warum-die-kategorie-gefuehrt-wird)
+   - [Glueck und 100er](#glueck-und-100er)
+   - [Zeilen in "Suche ich" und ihre Zaehler](#zeilen-in-suche-ich-und-ihre-zaehler)
+   - [Warum "Habe ich ueber" keine Anzahl hat](#warum-habe-ich-ueber-keine-anzahl-hat)
+   - [Eindeutigkeit von Formen](#eindeutigkeit-von-formen)
+   - [Einlesen von Tauschlisten](#einlesen-von-tauschlisten)
+   - [Abgleich der Merkmale mit fremden Listen](#abgleich-der-merkmale-mit-fremden-listen)
+   - [Archivieren statt Loeschen](#archivieren-statt-loeschen)
+   - [Loeschen und Erkennen von Aenderungen](#loeschen-und-erkennen-von-aenderungen)
+   - [Sicherungen](#sicherungen-1)
+   - [Abgleich zwischen Geraeten](#abgleich-zwischen-geraeten)
+   - [Dateiformat](#dateiformat)
+   - [Laden der persoenlichen Dateien](#laden-der-persoenlichen-dateien)
+   - [Sprache](#sprache)
+   - [Plattformen](#plattformen)
+4. [Hinweise zur Entwicklung](#4-hinweise-zur-entwicklung)
 
 ---
 
@@ -740,6 +789,19 @@ Auf dem Handy liegen die Sicherungen im privaten Bereich der App. Sie
 schuetzen vor Fehlbedienung, nicht vor dem Verlust des Geraets; dafuer gibt
 es den Export der eigenen Listen (Import/Export > "Eigene Listen").
 
+## Haeufige Fragen
+
+**Ich habe ein Pokemon als Shiny in "Habe ich", warum steht es in der
+Tauschliste nicht unter "1:1"?**
+
+"1:1" ist eine Eigenschaft einer Suche, nicht eines vorhandenen Exemplars.
+Unter "1:1" erscheinen nur Zeilen aus "Suche ich", bei denen der Haken
+"1:1 moeglich" gesetzt ist. Er bedeutet: "Dafuer wuerde ich dasselbe Pokemon
+zurueckgeben." Was in "Habe ich" oder "Habe ich ueber" steht, beeinflusst den
+Abschnitt nicht. Ausserdem ist "1:1" kein Anhang an der Zeile, sondern eine
+eigene Ueberschrift, z.B. "Kanto 1:1:" (siehe "Tauschliste erstellen").
+Abhilfe: die Zeile in "Suche ich" oeffnen und "1:1 moeglich" anhaken.
+
 ---
 
 # 2. Datenstrukturen
@@ -1087,7 +1149,8 @@ landen neue Pokemon dort, bevor `regionen.csv` erweitert wurde.
 ### Auswahl "Region" unter dem Suchfeld
 
 Der Regionsfilter beruecksichtigt beides: die Region der Dex-Nummer und die
-Spalte `Region` der Form (ganzer Name, ohne Gross-/Kleinschreibung). Wer bei
+Spalte `Region` der Form. Verglichen wird jeweils der ganze Name ohne
+Gross-/Kleinschreibung. Wer bei
 der Pflege "Galar" waehlt, will auch Galar-Zapdos sehen, obwohl es nach der
 Dex-Nummer zu Kanto gehoert. Die Gruppierung aendert sich dadurch nicht:
 Galar-Zapdos steht auch mit Filter "Galar" unter der Ueberschrift "Kanto".
@@ -1475,6 +1538,11 @@ zugeordnet werden koennen.
   ermittelt (siehe "Wo die Daten liegen"). Unter Android ergibt das
   `/data/user/0/com.GeritF.PoGoExchange/files/PoGoExchange` (gemessen auf dem
   Entwicklungsgeraet).
+- Android, Bildschirmtastatur: Ist sie eingeblendet, wird der nutzbare
+  Bereich um den verdeckten Teil kleiner. Alle Seiten bleiben oberhalb der
+  Tastatur und lassen sich bis zum Ende scrollen; Status- und
+  Navigationsleiste bleiben frei. Erprobt auf Samsung Galaxy S24 (Android 17,
+  One UI 9.0).
 
 ---
 
@@ -1550,6 +1618,12 @@ zugeordnet werden koennen.
   den `ViewLocator` (keine Reflexion, sicher fuer optimierte Android-Builds).
 - Plattformfunktionen (Beenden, Zwischenablage) stellt die Oberflaeche ueber
   `AppActions` bereit, damit die ViewModels keine Oberflaechentypen brauchen.
+- Die Bildschirmtastatur behandelt `MainView.axaml.cs` zentral fuer alle
+  Seiten: Bei `InputPane.StateChanged` bekommt der aeussere `DockPanel`
+  (`Inhalt`) unten eine `Margin` in Hoehe des verdeckten Teils (gerechnet
+  gegen seine Unterkante). Das `Padding` der `MainView` bleibt unberuehrt,
+  dort setzt Avalonia auf Android den Abstand fuer Status- und
+  Navigationsleiste.
 - `test/Build_Plattformen.sh` baut das Desktop- und das Android-Projekt, die
   der Testlauf nicht mitbaut. `test/Diff_Export.sh` schreibt alle
   Aenderungen gegenueber dem Index oder dem letzten Commit in eine Datei.
